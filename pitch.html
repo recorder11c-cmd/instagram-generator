@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram投稿文ジェネレーター｜飲食店向け無料お試し</title>
+  <style>
+    :root {
+      --cream: #f5f0e8; --terracotta: #c4704a; --terracotta-dark: #a85a37;
+      --wood: #8b6340; --wood-light: #b08860; --charcoal: #3a3028;
+      --border: #d4c4a8; --white-warm: #fdfaf5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Hiragino Sans','Yu Gothic',sans-serif; background: var(--cream); color: var(--charcoal); line-height: 1.8; }
+
+    /* Hero */
+    .hero { background: var(--charcoal); color: #fff; text-align: center; padding: 64px 24px 56px; }
+    .hero-deco { color: var(--terracotta); letter-spacing: 0.4em; font-size: 13px; margin-bottom: 20px; }
+    .hero h1 { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: clamp(22px,5vw,34px); font-weight: normal; letter-spacing: 0.15em; line-height: 1.5; margin-bottom: 16px; }
+    .hero-sub { font-size: 14px; color: #b0a090; letter-spacing: 0.12em; margin-bottom: 32px; }
+    .hero-badge { display: inline-block; background: var(--terracotta); color: #fff; padding: 10px 28px; border-radius: 30px; font-size: 14px; letter-spacing: 0.15em; }
+
+    .page { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+
+    /* Section */
+    .section { padding: 40px 0; border-bottom: 1px solid var(--border); }
+    .section:last-child { border-bottom: none; }
+    .section-label { font-size: 11px; color: var(--terracotta); letter-spacing: 0.3em; margin-bottom: 8px; }
+    .section-title { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 20px; font-weight: normal; letter-spacing: 0.15em; margin-bottom: 20px; }
+
+    /* Problem */
+    .pain-list { list-style: none; display: grid; gap: 10px; }
+    .pain-list li { display: flex; gap: 14px; align-items: center; padding: 14px 18px; background: var(--white-warm); border: 1px solid var(--border); border-radius: 4px; font-size: 15px; }
+    .pain-icon { font-size: 20px; flex-shrink: 0; }
+
+    /* Features */
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+    .feature-card { background: var(--white-warm); border: 1px solid var(--border); border-radius: 4px; padding: 20px; }
+    .feature-card .icon { font-size: 24px; margin-bottom: 10px; }
+    .feature-card h3 { font-size: 14px; font-weight: bold; margin-bottom: 6px; color: var(--terracotta); }
+    .feature-card p { font-size: 12px; color: #6a5a4a; line-height: 1.7; }
+
+    /* Flow */
+    .flow { display: flex; flex-direction: column; gap: 0; }
+    .flow-item { display: flex; gap: 20px; align-items: flex-start; padding: 20px 0; border-bottom: 1px dashed var(--border); }
+    .flow-item:last-child { border-bottom: none; }
+    .flow-num { width: 36px; height: 36px; border-radius: 50%; background: var(--terracotta); color: #fff; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .flow-content h3 { font-size: 15px; font-weight: bold; margin-bottom: 4px; }
+    .flow-content p { font-size: 13px; color: #6a5a4a; }
+    .flow-time { font-size: 11px; color: var(--terracotta); font-weight: bold; margin-top: 4px; }
+
+    /* Metrics */
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; }
+    .metric-card { background: var(--white-warm); border: 1px solid var(--border); border-radius: 4px; padding: 20px; text-align: center; }
+    .metric-num { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 36px; color: var(--terracotta); line-height: 1; margin-bottom: 6px; }
+    .metric-label { font-size: 12px; color: var(--wood); }
+
+    /* Trial */
+    .trial-box { background: var(--charcoal); color: #fff; border-radius: 4px; padding: 36px; text-align: center; }
+    .trial-box h2 { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 22px; font-weight: normal; letter-spacing: 0.15em; margin-bottom: 12px; }
+    .trial-box p { color: #b0a090; font-size: 14px; margin-bottom: 24px; line-height: 1.8; }
+    .trial-list { list-style: none; text-align: left; max-width: 320px; margin: 0 auto 28px; }
+    .trial-list li { padding: 6px 0; font-size: 14px; display: flex; gap: 10px; }
+    .trial-list li::before { content: '✓'; color: var(--terracotta); font-weight: bold; }
+    .trial-contact { font-size: 13px; color: #b0a090; }
+    .trial-contact a { color: var(--terracotta); text-decoration: none; }
+
+    /* What we ask */
+    .ask-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .ask-card { background: var(--white-warm); border: 1px solid var(--border); border-radius: 4px; padding: 18px; }
+    .ask-card h3 { font-size: 13px; color: var(--terracotta); margin-bottom: 8px; font-weight: bold; }
+    .ask-card p { font-size: 12px; color: #6a5a4a; line-height: 1.7; }
+
+    /* Footer */
+    .footer { text-align: center; padding: 40px 20px; color: var(--wood-light); font-size: 12px; letter-spacing: 0.15em; }
+
+    @media (max-width: 500px) {
+      .ask-grid { grid-template-columns: 1fr; }
+      .flow-item { flex-direction: row; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <p class="hero-deco">✦ Instagram投稿文ジェネレーター ✦</p>
+  <h1>毎日の投稿文を<br>30秒で。</h1>
+  <p class="hero-sub">飲食店のInstagram担当者が抱える「文章を考える時間」をゼロにする</p>
+  <span class="hero-badge">今なら無料でお試し提供中</span>
+</div>
+
+<div class="page">
+
+  <!-- Problem -->
+  <div class="section">
+    <p class="section-label">PROBLEM</p>
+    <h2 class="section-title">こんなお悩み、ありませんか？</h2>
+    <ul class="pain-list">
+      <li><span class="pain-icon">😓</span><span>料理の仕込みで忙しいのに、投稿文を考える時間がない</span></li>
+      <li><span class="pain-icon">📝</span><span>毎回「今日のおすすめです」になってしまう。バリエーションが出ない</span></li>
+      <li><span class="pain-icon">⏰</span><span>投稿しようと思って結局できない日が続いている</span></li>
+      <li><span class="pain-icon">💬</span><span>スタッフ紹介や満席告知など、パターンが増えると余計に大変</span></li>
+    </ul>
+  </div>
+
+  <!-- Features -->
+  <div class="section">
+    <p class="section-label">SOLUTION</p>
+    <h2 class="section-title">7つの投稿パターンに対応</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="icon">🍽️</div>
+        <h3>今日のおすすめ</h3>
+        <p>食材・料理名を入力するだけ。季節感とトーンを合わせた投稿文を自動生成</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🧑‍🍳</div>
+        <h3>スタッフ紹介</h3>
+        <p>名前・役割・エピソードを入力。人柄が伝わる温かい紹介文に</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📅</div>
+        <h3>本日の空き状況</h3>
+        <p>残席状況・おすすめ時間帯を選ぶだけ。押しつけがましくない案内文に</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🎉</div>
+        <h3>満席御礼＋次回誘導</h3>
+        <p>感謝を伝えながら次の予約につながる文章を自動生成</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🌿</div>
+        <h3>食材・こだわり紹介</h3>
+        <p>産地やエピソードを入力。食材への愛情が伝わる文体に</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🆕</div>
+        <h3>新メニュー告知</h3>
+        <p>メニュー名と説明を入力するだけ。期待感を高める告知文に</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📣</div>
+        <h3>お知らせ</h3>
+        <p>臨時休業・イベント・記念など。丁寧で簡潔なお知らせ文に</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="section">
+    <p class="section-label">HOW IT WORKS</p>
+    <h2 class="section-title">使い方はたった3ステップ</h2>
+    <div class="flow">
+      <div class="flow-item">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <h3>投稿タイプを選ぶ</h3>
+          <p>7種類のパターンから今日投稿したい内容を選択する</p>
+          <p class="flow-time">⏱ 5秒</p>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <h3>キーワードを入力する</h3>
+          <p>料理名・食材・スタッフ名など、必要な情報を入力する</p>
+          <p class="flow-time">⏱ 20秒</p>
+        </div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <h3>生成してコピー</h3>
+          <p>ボタンを押すと投稿文＋ハッシュタグが自動生成。気に入らなければ直接編集もできる</p>
+          <p class="flow-time">⏱ 5秒</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Voice -->
+  <div class="section">
+    <p class="section-label">VOICE</p>
+    <h2 class="section-title">モニター店舗の声</h2>
+    <div style="display:grid;gap:14px;">
+      <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:4px;padding:20px;font-size:14px;color:#4a3a2a;line-height:1.9">
+        <div style="color:var(--terracotta);font-size:13px;margin-bottom:8px">⭐⭐⭐⭐⭐　京都・和食居酒屋</div>
+        「毎日投稿しようと思っても文章が思いつかず、週1も続かなかった。このツールを使い始めてから毎日投稿できるようになりました。文章の質も上がったと思います」
+      </div>
+      <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:4px;padding:20px;font-size:14px;color:#4a3a2a;line-height:1.9">
+        <div style="color:var(--terracotta);font-size:13px;margin-bottom:8px">⭐⭐⭐⭐⭐　大阪・イタリアン</div>
+        「スタッフ紹介や満席御礼など、パターンが7種類あるのが助かっています。毎回悩んでいた投稿文が本当に楽になりました」
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--wood-light);margin-top:10px;text-align:center">※ モニター店舗募集中。現在5店舗限定・完全無料</p>
+  </div>
+
+  <!-- Metrics -->
+  <div class="section">
+    <p class="section-label">IMPACT</p>
+    <h2 class="section-title">期待できる効果</h2>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-num">30<span style="font-size:18px">秒</span></div>
+        <div class="metric-label">1投稿あたりの作業時間</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num">7<span style="font-size:18px">種</span></div>
+        <div class="metric-label">投稿パターン対応</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num">¥0</div>
+        <div class="metric-label">導入コスト（お試し期間）</div>
+      </div>
+    </div>
+    <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:4px;padding:20px;margin-top:16px;font-size:13px;color:#6a5a4a;line-height:1.9">
+      <strong style="color:var(--charcoal)">📊 一緒に検証したいこと</strong><br>
+      ① 投稿頻度の変化（週◯回 → 週◯回）<br>
+      ② 1投稿にかかる時間の変化<br>
+      ③ いいね数・保存数・フォロワー数の推移<br>
+      ④ 「インスタ見て来ました」という来店数の変化
+    </div>
+  </div>
+
+  <!-- Trial -->
+  <div class="section">
+    <p class="section-label">FREE TRIAL</p>
+    <h2 class="section-title">無料お試しの内容</h2>
+    <div class="trial-box">
+      <h2>1ヶ月間、完全無料</h2>
+      <p>お店のInstagramを分析して<br>専用ツールのURLを無料で発行します</p>
+      <ul class="trial-list">
+        <li>お店専用のジェネレーターURLを発行</li>
+        <li>投稿回数・生成回数は無制限</li>
+        <li>使い方サポートあり</li>
+        <li>効果レポートを月末に共有</li>
+      </ul>
+      <p class="trial-contact">お申し込み・ご質問はDMまで</p>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <div class="section" id="plan">
+    <p class="section-label">PLAN</p>
+    <h2 class="section-title">料金プラン</h2>
+
+    <!-- Toggle -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;">
+      <span id="label-monthly" style="font-size:13px;font-weight:bold;color:var(--terracotta)">月額払い</span>
+      <div onclick="togglePlan()" id="toggle-wrap" style="width:48px;height:26px;background:var(--terracotta);border-radius:13px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;">
+        <div id="toggle-knob" style="width:20px;height:20px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:left .2s;"></div>
+      </div>
+      <span id="label-annual" style="font-size:13px;color:var(--wood)">年間払い <span style="font-size:11px;background:rgba(196,112,74,0.15);color:var(--terracotta);padding:2px 8px;border-radius:10px;margin-left:4px;">2ヶ月分無料</span></span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;">
+
+      <!-- ベーシック -->
+      <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:6px;padding:22px 18px;text-align:center;">
+        <p style="font-size:11px;color:var(--wood);letter-spacing:.15em;margin-bottom:10px;">BASIC</p>
+        <p style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:28px;color:var(--charcoal);line-height:1;" id="price-basic">¥980</p>
+        <p style="font-size:11px;color:var(--wood-light);margin-bottom:14px;" id="period-basic">/月</p>
+        <p style="font-size:12px;color:#6a5a4a;line-height:1.8;text-align:left;">✓ ツールURL発行<br>✓ 生成回数無制限</p>
+      </div>
+
+      <!-- スタンダード -->
+      <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:6px;padding:22px 18px;text-align:center;">
+        <p style="font-size:11px;color:var(--wood);letter-spacing:.15em;margin-bottom:10px;">STANDARD</p>
+        <p style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:28px;color:var(--charcoal);line-height:1;" id="price-standard">¥1,980</p>
+        <p style="font-size:11px;color:var(--wood-light);margin-bottom:14px;" id="period-standard">/月</p>
+        <p style="font-size:12px;color:#6a5a4a;line-height:1.8;text-align:left;">✓ ツールURL発行<br>✓ 生成回数無制限<br>✓ 月次レポート</p>
+      </div>
+
+      <!-- プレミアム -->
+      <div style="background:var(--charcoal);border:2px solid var(--terracotta);border-radius:6px;padding:22px 18px;text-align:center;position:relative;">
+        <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--terracotta);color:#fff;font-size:10px;padding:3px 12px;border-radius:10px;letter-spacing:.1em;white-space:nowrap;">人気</div>
+        <p style="font-size:11px;color:#b0a090;letter-spacing:.15em;margin-bottom:10px;">PREMIUM</p>
+        <p style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:28px;color:#fff;line-height:1;" id="price-premium">¥2,980</p>
+        <p style="font-size:11px;color:#b0a090;margin-bottom:14px;" id="period-premium">/月</p>
+        <p style="font-size:12px;color:#d0c0a8;line-height:1.8;text-align:left;">✓ ツールURL発行<br>✓ 生成回数無制限<br>✓ 月次レポート<br>✓ チャットサポート</p>
+      </div>
+
+      <!-- おまかせ -->
+      <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:6px;padding:22px 18px;text-align:center;">
+        <p style="font-size:11px;color:var(--wood);letter-spacing:.15em;margin-bottom:10px;">FULL</p>
+        <p style="font-family:'Hiragino Mincho ProN','Yu Mincho',serif;font-size:28px;color:var(--charcoal);line-height:1;" id="price-full">¥14,800</p>
+        <p style="font-size:11px;color:var(--wood-light);margin-bottom:14px;" id="period-full">/月</p>
+        <p style="font-size:12px;color:#6a5a4a;line-height:1.8;text-align:left;">✓ 全部込み<br>✓ 投稿代行（月8本）<br>✓ 週次レポート<br>✓ 優先サポート</p>
+      </div>
+
+    </div>
+    <p style="font-size:12px;color:var(--wood-light);margin-top:16px;text-align:center;">年間払いは2ヶ月分無料（月額換算で約17%オフ）</p>
+  </div>
+
+  <!-- Apply Form -->
+  <div class="section" id="apply">
+    <p class="section-label">APPLY</p>
+    <h2 class="section-title">無料モニターに申し込む</h2>
+    <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:4px;padding:28px;">
+      <p style="font-size:13px;color:#6a5a4a;margin-bottom:24px;line-height:1.8">以下をご記入いただくと、内容をコピーして加藤へ送ることができます。<br>Instagram DM <strong style="color:var(--terracotta)">@kato_insta_support</strong> へお送りください。</p>
+
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;color:#6a5a4a;margin-bottom:6px;letter-spacing:.1em">店名 *</label>
+        <input type="text" id="applyShopName" placeholder="例：〇〇食堂 / △△カフェ" style="width:100%;padding:10px 14px;background:var(--cream);border:1px solid var(--border);border-radius:3px;font-size:14px;font-family:inherit;color:var(--charcoal);outline:none;box-sizing:border-box">
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+        <div>
+          <label style="display:block;font-size:12px;color:#6a5a4a;margin-bottom:6px;letter-spacing:.1em">業種 *</label>
+          <select id="applyType" style="width:100%;padding:10px 14px;background:var(--cream);border:1px solid var(--border);border-radius:3px;font-size:14px;font-family:inherit;color:var(--charcoal);outline:none;appearance:none;box-sizing:border-box">
+            <option>居酒屋・和食</option>
+            <option>カフェ・スイーツ店</option>
+            <option>イタリアン・洋食</option>
+            <option>ラーメン・麺類</option>
+            <option>その他飲食店</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;color:#6a5a4a;margin-bottom:6px;letter-spacing:.1em">所在地 *</label>
+          <input type="text" id="applyLocation" placeholder="例：京都市中京区" style="width:100%;padding:10px 14px;background:var(--cream);border:1px solid var(--border);border-radius:3px;font-size:14px;font-family:inherit;color:var(--charcoal);outline:none;box-sizing:border-box">
+        </div>
+      </div>
+
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;color:#6a5a4a;margin-bottom:6px;letter-spacing:.1em">Instagram アカウントURL（任意）</label>
+        <input type="text" id="applyInsta" placeholder="例：https://www.instagram.com/your_account" style="width:100%;padding:10px 14px;background:var(--cream);border:1px solid var(--border);border-radius:3px;font-size:14px;font-family:monospace;color:var(--charcoal);outline:none;box-sizing:border-box">
+      </div>
+
+      <div style="margin-bottom:24px">
+        <label style="display:block;font-size:12px;color:#6a5a4a;margin-bottom:6px;letter-spacing:.1em">ご連絡先（LINE ID / メール / Instagram ID）*</label>
+        <input type="text" id="applyContact" placeholder="例：line_id_xxxx / mail@example.com / @your_account" style="width:100%;padding:10px 14px;background:var(--cream);border:1px solid var(--border);border-radius:3px;font-size:14px;font-family:inherit;color:var(--charcoal);outline:none;box-sizing:border-box">
+      </div>
+
+      <button id="applyBtn" onclick="submitApply()" style="width:100%;padding:14px;background:var(--terracotta);color:#fff;border:none;border-radius:3px;font-size:15px;letter-spacing:.2em;font-family:'Hiragino Mincho ProN','Yu Mincho',serif;cursor:pointer;transition:background .2s">
+        無料モニターに申し込む
+      </button>
+
+      <!-- 送信中 -->
+      <div id="applySending" style="display:none;margin-top:14px;text-align:center;font-size:13px;color:var(--wood)">
+        送信中…
+      </div>
+
+      <!-- 完了メッセージ -->
+      <div id="applyCopied" style="display:none;margin-top:14px;padding:28px 20px;background:#f0f7f0;border:1px solid #a0c8a0;border-radius:4px;text-align:center">
+        <div style="font-size:28px;margin-bottom:10px">🎉</div>
+        <div style="font-size:16px;font-weight:bold;color:#2d6a2d;margin-bottom:16px">申し込みを受け付けました！</div>
+        <div style="font-size:14px;color:#3a5a3a;line-height:2.2;">
+          加藤より<strong>24時間以内</strong>に<br>
+          専用ツールのURLをお送りします。<br><br>
+          お急ぎの場合はInstagram DMへ<br>
+          <strong style="color:var(--terracotta)">@kato_insta_support</strong>
+        </div>
+      </div>
+
+      <p style="font-size:12px;color:#9a8a7a;margin-top:12px;text-align:center">24時間以内にご連絡いたします</p>
+    </div>
+  </div>
+
+  <!-- What we ask in return -->
+  <div class="section">
+    <p class="section-label">お願いしたいこと</p>
+    <h2 class="section-title">無料のかわりにいただきたいもの</h2>
+    <div class="ask-grid">
+      <div class="ask-card">
+        <h3>📋 月1回のフィードバック</h3>
+        <p>使いやすかった点・改善してほしい点を簡単に教えていただくだけでOKです（5分程度）</p>
+      </div>
+      <div class="ask-card">
+        <h3>📊 数字の共有</h3>
+        <p>投稿前後のフォロワー数・いいね数などを月末に教えていただけると助かります</p>
+      </div>
+      <div class="ask-card">
+        <h3>💬 感想コメント</h3>
+        <p>使ってみた率直な感想を一言いただけると、改善と広報活動に活かさせていただきます</p>
+      </div>
+      <div class="ask-card">
+        <h3>🤝 ご紹介（任意）</h3>
+        <p>よかったと思っていただけたら、同業の方へのご紹介をいただけると大変ありがたいです</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>Instagram投稿文ジェネレーター ─ 飲食店向け専用ツール</p>
+  <p style="margin-top:6px">Powered by Claude ✦ Anthropic</p>
+</div>
+
+<script>
+  // Plan toggle
+  let isAnnual = false;
+  const plans = {
+    basic:    { monthly: '¥980',    annual: '¥9,800',    periodM: '/月', periodA: '/年' },
+    standard: { monthly: '¥1,980',  annual: '¥19,800',   periodM: '/月', periodA: '/年' },
+    premium:  { monthly: '¥2,980',  annual: '¥29,800',   periodM: '/月', periodA: '/年' },
+    full:     { monthly: '¥14,800', annual: '¥148,000',  periodM: '/月', periodA: '/年' },
+  };
+
+  function togglePlan() {
+    isAnnual = !isAnnual;
+    const knob = document.getElementById('toggle-knob');
+    const lm   = document.getElementById('label-monthly');
+    const la   = document.getElementById('label-annual');
+    knob.style.left = isAnnual ? '25px' : '3px';
+    lm.style.color  = isAnnual ? 'var(--wood)' : 'var(--terracotta)';
+    lm.style.fontWeight = isAnnual ? 'normal' : 'bold';
+    la.style.color  = isAnnual ? 'var(--terracotta)' : 'var(--wood)';
+    la.style.fontWeight = isAnnual ? 'bold' : 'normal';
+
+    for (const [key, val] of Object.entries(plans)) {
+      document.getElementById('price-' + key).textContent  = isAnnual ? val.annual  : val.monthly;
+      document.getElementById('period-' + key).textContent = isAnnual ? val.periodA : val.periodM;
+    }
+  }
+
+  // ★ Formspree フォームIDをここに入れる（formspree.io で取得）
+  const FORMSPREE_ID = 'xvznowgk';
+
+  async function submitApply() {
+    const shop    = document.getElementById('applyShopName').value.trim();
+    const type    = document.getElementById('applyType').value;
+    const loc     = document.getElementById('applyLocation').value.trim();
+    const insta   = document.getElementById('applyInsta').value.trim();
+    const contact = document.getElementById('applyContact').value.trim();
+
+    if (!shop || !loc || !contact) {
+      alert('店名・所在地・ご連絡先は必須です。');
+      return;
+    }
+
+    const btn = document.getElementById('applyBtn');
+    btn.disabled = true;
+    btn.textContent = '送信中…';
+    document.getElementById('applySending').style.display = 'block';
+
+    // Formspreeにメール通知を送る
+    if (FORMSPREE_ID !== 'YOUR_FORM_ID') {
+      try {
+        await fetch('https://formspree.io/f/' + FORMSPREE_ID, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            店名: shop, 業種: type, 所在地: loc,
+            Instagram: insta || '未記入',
+            連絡先: contact,
+            _subject: '【k-sta】新規モニター申し込み：' + shop,
+          })
+        });
+      } catch(e) {
+        console.warn('Formspree送信エラー:', e);
+      }
+    }
+
+    // 完了表示
+    document.getElementById('applySending').style.display = 'none';
+    document.getElementById('applyCopied').style.display = 'block';
+    btn.style.display = 'none';
+
+    // ページをスクロール
+    document.getElementById('applyCopied').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+</script>
+</body>
+</html>

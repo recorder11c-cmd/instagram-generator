@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>デプロイマニュアル｜Instagram投稿文ジェネレーター</title>
+  <style>
+    :root {
+      --cream: #f5f0e8; --terracotta: #c4704a; --wood: #8b6340;
+      --wood-light: #b08860; --charcoal: #3a3028; --border: #d4c4a8;
+      --white-warm: #fdfaf5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Hiragino Sans','Yu Gothic',sans-serif; background: var(--cream); color: var(--charcoal); font-size: 14px; line-height: 1.8; }
+    .page { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    h1 { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 24px; font-weight: normal; letter-spacing: 0.2em; text-align: center; margin-bottom: 6px; }
+    .subtitle { text-align: center; font-size: 12px; color: var(--wood-light); letter-spacing: 0.15em; margin-bottom: 36px; }
+    .deco { text-align: center; color: var(--terracotta); margin-bottom: 36px; letter-spacing: 0.3em; }
+
+    h2 { font-size: 15px; font-weight: bold; letter-spacing: 0.12em; color: var(--terracotta); margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    h3 { font-size: 13px; font-weight: bold; color: var(--wood); margin: 20px 0 8px; }
+
+    .section { background: var(--white-warm); border: 1px solid var(--border); border-radius: 4px; padding: 20px 24px; margin-bottom: 20px; }
+
+    .step-block { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: var(--terracotta); color: #fff; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+    .step-content h3 { margin-top: 0; }
+    .step-content p { font-size: 13px; color: #5a4a3a; line-height: 1.8; }
+
+    .tag { display: inline-block; background: var(--cream); border: 1px solid var(--border); border-radius: 3px; padding: 1px 8px; font-family: monospace; font-size: 12px; color: var(--wood); }
+    .note { background: #fdf8f0; border-left: 3px solid var(--terracotta); padding: 10px 14px; font-size: 12px; color: #7a5a3a; border-radius: 0 3px 3px 0; margin: 10px 0; line-height: 1.7; }
+    .check-list { list-style: none; padding: 0; }
+    .check-list li { padding: 4px 0 4px 24px; position: relative; font-size: 13px; }
+    .check-list li::before { content: '✓'; position: absolute; left: 0; color: var(--terracotta); font-weight: bold; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .method-card { border: 1px solid var(--border); border-radius: 4px; padding: 16px; background: var(--cream); }
+    .method-card h3 { color: var(--terracotta); margin-top: 0; }
+    .method-badge { font-size: 10px; background: var(--terracotta); color: #fff; padding: 2px 8px; border-radius: 10px; letter-spacing: 0.1em; margin-left: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 10px 0; }
+    th { background: var(--cream); padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); font-weight: bold; color: var(--wood); }
+    td { padding: 8px 12px; border-bottom: 1px solid #ede5d8; }
+    .err-row td:first-child { font-family: monospace; color: #9b4a2a; font-size: 11px; }
+
+    .print-btn { position: fixed; bottom: 24px; right: 24px; padding: 10px 18px; background: var(--terracotta); color: #fff; border: none; border-radius: 3px; font-size: 12px; letter-spacing: 0.12em; cursor: pointer; font-family: inherit; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .print-btn:hover { background: #a85a37; }
+
+    @media print {
+      body { background: #fff; font-size: 12px; }
+      .page { padding: 20px; }
+      .print-btn { display: none; }
+      .section { break-inside: avoid; }
+    }
+    @media (max-width: 500px) { .two-col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <h1>デプロイマニュアル</h1>
+  <p class="subtitle">Instagram 投稿文ジェネレーター ─ クライアント向け公開手順</p>
+  <div class="deco">─ ✦ ─</div>
+
+  <!-- 概要 -->
+  <h2>📋 概要</h2>
+  <div class="section">
+    <p>このマニュアルは、制作アンケートで生成したZIPファイルをNetlifyに公開するための手順書です。<br>
+    クライアントごとに専用URLが発行され、そのURLを共有するだけでツールが利用できます。</p>
+    <div class="note" style="margin-top:12px">
+      <strong>デプロイ方法は2種類あります</strong><br>
+      ① <strong>自動デプロイ</strong>（推奨）: アンケートページのボタン一つで完了。所要時間：約30秒<br>
+      ② <strong>手動デプロイ</strong>: ZIPをダウンロードしてNetlifyにドロップ。所要時間：約5分
+    </div>
+  </div>
+
+  <!-- 事前準備 -->
+  <h2>🔧 事前準備（初回のみ）</h2>
+  <div class="section">
+    <ul class="check-list">
+      <li>Netlifyアカウントを作成する（<strong>netlify.com</strong> ─ 無料）</li>
+      <li>Anthropic APIキーを取得する（<strong>platform.claude.com</strong>）</li>
+      <li>Netlify Personal Access Tokenを発行する（下記参照）</li>
+    </ul>
+    <div class="note" style="margin-top:12px">
+      <strong>Netlify Personal Access Tokenの発行方法：</strong><br>
+      app.netlify.com → 右上アイコン → User settings → Applications → Personal access tokens → New access token
+    </div>
+    <div class="note">
+      <strong>アンケートページの「自動デプロイ設定」に一度入力すれば次回から自動入力されます。</strong>
+    </div>
+  </div>
+
+  <!-- 自動デプロイ -->
+  <h2>⚡ 方法①：自動デプロイ（推奨）</h2>
+  <div class="section">
+    <div class="step-block">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>アンケートページを開く</h3>
+        <p>制作アンケートのURLをブラウザで開き、「自動デプロイ設定」欄にNetlifyトークンとAPIキーを入力する。</p>
+      </div>
+    </div>
+    <div class="step-block">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>スクリーンショットをアップロード</h3>
+        <p>クライアントのInstagramプロフィール・投稿のスクリーンショットを複数枚アップロードし「Claudeで解析する」をクリック。</p>
+      </div>
+    </div>
+    <div class="step-block">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>情報を確認・編集して生成</h3>
+        <p>Claudeが自動抽出した店舗情報を確認・必要に応じて修正し、「専用ジェネレーターをダウンロード」をクリック。</p>
+      </div>
+    </div>
+    <div class="step-block">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>「Netlifyに自動デプロイ」をクリック</h3>
+        <p>Step 4の画面で「⚡ Netlifyに自動デプロイ」ボタンをクリック。約30秒でURLが発行される。</p>
+      </div>
+    </div>
+    <div class="step-block">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h3>URLをクライアントに共有</h3>
+        <p>表示されたURLをコピーしてクライアントに送る。これで完了。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 手動デプロイ -->
+  <h2>📦 方法②：手動デプロイ</h2>
+  <div class="section">
+    <div class="step-block">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>ZIPをダウンロード・解凍</h3>
+        <p>Step 4の「ZIPをダウンロード」ボタンでファイルを取得。ダウンロードフォルダに保存されたZIPをダブルクリックして解凍する。</p>
+      </div>
+    </div>
+    <div class="step-block">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Netlifyに新しいサイトを作成</h3>
+        <p>netlify.com → Projects → 画面内の点線枠に<strong>解凍したフォルダ</strong>をドラッグ＆ドロップ。デプロイが完了するまで待つ（約10秒）。</p>
+      </div>
+    </div>
+    <div class="step-block">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Environment variablesを設定</h3>
+        <p>サイトのダッシュボードで：<br>
+        Project configuration → Environment variables → Add a variable → Add a single variable<br>
+        <strong>Key:</strong> <span class="tag">ANTHROPIC_API_KEY</span><br>
+        <strong>Value:</strong> <span class="tag">sk-ant-xxxxxxxx</span>（APIキーを入力）</p>
+      </div>
+    </div>
+    <div class="step-block">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h3>再デプロイ</h3>
+        <p>Deploys → 点線枠に再度フォルダをドロップ（環境変数を反映させるため）。</p>
+      </div>
+    </div>
+    <div class="step-block">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h3>URLを共有</h3>
+        <p>ダッシュボード上部に表示される <span class="tag">xxxxx.netlify.app</span> のURLをクライアントに送る。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- コスト -->
+  <h2>💰 コスト目安</h2>
+  <div class="section">
+    <table>
+      <tr><th>項目</th><th>金額</th><th>備考</th></tr>
+      <tr><td>Netlifyホスティング</td><td>無料</td><td>Freeプランで十分</td></tr>
+      <tr><td>Anthropic API</td><td>約$0.003〜0.005 / 生成1回</td><td>$20で約4,000〜6,000回</td></tr>
+      <tr><td>アンケート解析（Claude）</td><td>約$0.01〜0.02 / 1クライアント</td><td>画像解析込み</td></tr>
+    </table>
+    <div class="note">1クライアントあたりの初期費用はほぼ0円。APIの使用量はAnthropicコンソールで随時確認できます。</div>
+  </div>
+
+  <!-- よくあるエラー -->
+  <h2>🛠 よくあるエラーと対処法</h2>
+  <div class="section">
+    <table>
+      <tr><th>エラー</th><th>原因</th><th>対処</th></tr>
+      <tr class="err-row"><td>APIエラー (400)</td><td>画像サイズが大きすぎる</td><td>スクショを減らすか、より小さい画像を使う</td></tr>
+      <tr class="err-row"><td>APIエラー (401)</td><td>APIキーが無効</td><td>platform.claudeでキーを再確認・再発行</td></tr>
+      <tr class="err-row"><td>Failed to fetch</td><td>ファイル直接開き（file://）</td><td>localhostまたはNetlify経由で開く</td></tr>
+      <tr class="err-row"><td>Page not found</td><td>URLにファイル名がついている</td><td>ファイル名を省いたURLで開く</td></tr>
+      <tr class="err-row"><td>自動デプロイ失敗</td><td>トークンの権限不足</td><td>Netlifyトークンを再発行（全権限付与）</td></tr>
+    </table>
+  </div>
+
+  <!-- ファイル構成 -->
+  <h2>📁 ZIPファイルの構成</h2>
+  <div class="section">
+    <pre style="background:var(--cream);padding:16px;border-radius:3px;font-size:12px;line-height:2;font-family:monospace;overflow-x:auto">
+shop_generator.zip
+├── index.html               ← お客様専用のジェネレーター本体
+├── netlify/
+│   └── functions/
+│       └── proxy.js         ← AnthropicAPI呼び出しプロキシ
+└── netlify.toml             ← Netlify設定ファイル</pre>
+    <div class="note" style="margin-top:12px">このフォルダをまるごとNetlifyにドロップするだけでOK。ファイルを個別に扱う必要はありません。</div>
+  </div>
+
+</div>
+
+<button class="print-btn" onclick="window.print()">印刷 / PDF保存</button>
+</body>
+</html>

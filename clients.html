@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>クライアント管理｜k-sta</title>
+  <style>
+    :root {
+      --cream: #f5f0e8; --terracotta: #c4704a; --terracotta-dark: #a85a37;
+      --wood: #8b6340; --wood-light: #b08860; --charcoal: #3a3028;
+      --border: #d4c4a8; --white-warm: #fdfaf5;
+      --green: #4a8a5a; --yellow: #c8960a; --red: #b04040;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Hiragino Sans','Yu Gothic',sans-serif; background: var(--cream); color: var(--charcoal); }
+
+    .header { background: var(--charcoal); color: #fff; padding: 20px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .header h1 { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 18px; font-weight: normal; letter-spacing: .15em; }
+    .header-actions { display: flex; gap: 10px; }
+    .btn { padding: 8px 18px; border-radius: 4px; border: none; font-size: 13px; cursor: pointer; font-family: inherit; letter-spacing: .05em; transition: background .2s; }
+    .btn-primary { background: var(--terracotta); color: #fff; }
+    .btn-primary:hover { background: var(--terracotta-dark); }
+    .btn-outline { background: transparent; color: #d0c0a8; border: 1px solid #5a4a3a; }
+    .btn-outline:hover { background: #4a3a2a; }
+
+    .page { max-width: 1000px; margin: 0 auto; padding: 28px 20px; }
+
+    /* Summary Cards */
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 14px; margin-bottom: 28px; }
+    .summary-card { background: var(--white-warm); border: 1px solid var(--border); border-radius: 6px; padding: 18px; text-align: center; }
+    .summary-num { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 32px; color: var(--terracotta); line-height: 1; margin-bottom: 6px; }
+    .summary-label { font-size: 11px; color: var(--wood); letter-spacing: .1em; }
+
+    /* Alert */
+    .alert { background: #fff8e8; border: 1px solid #e8c840; border-radius: 4px; padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: #7a6010; display: none; }
+    .alert strong { color: #5a4000; }
+
+    /* Table */
+    .table-wrap { background: var(--white-warm); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--charcoal); color: #d0c0a8; padding: 12px 14px; text-align: left; font-weight: normal; font-size: 11px; letter-spacing: .1em; white-space: nowrap; }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #f8f4ee; }
+
+    .status-badge { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: bold; letter-spacing: .05em; white-space: nowrap; }
+    .status-trial   { background: #e8f4e8; color: var(--green); }
+    .status-expiring{ background: #fff4e0; color: var(--yellow); }
+    .status-expired { background: #fde8e8; color: var(--red); }
+    .status-paid    { background: #e8eef8; color: #3a5a9a; }
+    .status-cancel  { background: #f0f0f0; color: #888; }
+
+    .plan-badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; background: rgba(196,112,74,0.12); color: var(--terracotta); }
+
+    .days-left { font-weight: bold; }
+    .days-ok   { color: var(--green); }
+    .days-warn { color: var(--yellow); }
+    .days-over { color: var(--red); }
+
+    .action-btns { display: flex; gap: 6px; }
+    .btn-sm { padding: 4px 10px; font-size: 11px; border-radius: 3px; border: none; cursor: pointer; font-family: inherit; }
+    .btn-edit   { background: #e8eef8; color: #3a5a9a; }
+    .btn-delete { background: #fde8e8; color: var(--red); }
+    .btn-line   { background: #e8f4e8; color: var(--green); }
+
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--wood-light); font-size: 14px; }
+
+    /* Modal */
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+    .modal-bg.open { display: flex; }
+    .modal { background: var(--white-warm); border-radius: 8px; padding: 32px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .modal h2 { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 18px; font-weight: normal; margin-bottom: 24px; color: var(--charcoal); }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; color: var(--wood); margin-bottom: 6px; letter-spacing: .1em; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px 12px; background: var(--cream); border: 1px solid var(--border);
+      border-radius: 3px; font-size: 14px; font-family: inherit; color: var(--charcoal); outline: none;
+    }
+    .form-group textarea { height: 70px; resize: vertical; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .modal-actions .btn { flex: 1; padding: 12px; }
+    .btn-cancel-modal { background: var(--cream); color: var(--charcoal); border: 1px solid var(--border); }
+
+    @media (max-width: 600px) {
+      th:nth-child(4), td:nth-child(4),
+      th:nth-child(6), td:nth-child(6) { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>✦ クライアント管理</h1>
+  <div class="header-actions">
+    <button class="btn btn-outline" onclick="exportCSV()">CSVエクスポート</button>
+    <button class="btn btn-primary" onclick="openModal()">＋ クライアント追加</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Summary -->
+  <div class="summary">
+    <div class="summary-card">
+      <div class="summary-num" id="count-all">0</div>
+      <div class="summary-label">総クライアント数</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" id="count-trial" style="color:#4a8a5a">0</div>
+      <div class="summary-label">試用中</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" id="count-paid" style="color:#3a5a9a">0</div>
+      <div class="summary-label">有料継続</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" id="count-mrr">¥0</div>
+      <div class="summary-label">月間収益（MRR）</div>
+    </div>
+  </div>
+
+  <!-- Alert -->
+  <div class="alert" id="alert-box"></div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>店名</th>
+          <th>プラン</th>
+          <th>状態</th>
+          <th>開始日</th>
+          <th>残日数</th>
+          <th>連絡先</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="client-table">
+        <tr><td colspan="7" class="empty-state">クライアントがまだいません。「＋ クライアント追加」から追加してください。</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h2 id="modal-title">クライアント追加</h2>
+    <input type="hidden" id="edit-id">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>店名 *</label>
+        <input type="text" id="f-name" placeholder="例：〇〇食堂">
+      </div>
+      <div class="form-group">
+        <label>業種</label>
+        <select id="f-type">
+          <option>居酒屋・和食</option>
+          <option>カフェ・スイーツ</option>
+          <option>イタリアン・洋食</option>
+          <option>ラーメン・麺類</option>
+          <option>その他</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>プラン</label>
+        <select id="f-plan">
+          <option value="0">無料モニター</option>
+          <option value="980">ベーシック（¥980）</option>
+          <option value="1980">スタンダード（¥1,980）</option>
+          <option value="2980">プレミアム（¥2,980）</option>
+          <option value="14800">おまかせ（¥14,800）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>状態</label>
+        <select id="f-status">
+          <option value="trial">試用中</option>
+          <option value="paid">有料継続</option>
+          <option value="expiring">終了間近</option>
+          <option value="expired">終了</option>
+          <option value="cancel">キャンセル</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>開始日 *</label>
+        <input type="date" id="f-start">
+      </div>
+      <div class="form-group">
+        <label>終了日</label>
+        <input type="date" id="f-end">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Instagram URL</label>
+      <input type="text" id="f-insta" placeholder="https://www.instagram.com/xxx">
+    </div>
+
+    <div class="form-group">
+      <label>連絡先（LINE / メール）</label>
+      <input type="text" id="f-contact" placeholder="line_id / mail@example.com">
+    </div>
+
+    <div class="form-group">
+      <label>ツールURL</label>
+      <input type="text" id="f-tool" placeholder="https://xxx.vercel.app">
+    </div>
+
+    <div class="form-group">
+      <label>メモ</label>
+      <textarea id="f-memo" placeholder="特記事項など"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-cancel-modal" onclick="closeModal()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveClient()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let clients = JSON.parse(localStorage.getItem('ksta_clients') || '[]');
+  let editingId = null;
+
+  const PLAN_LABELS = {
+    '0': '無料モニター', '980': 'ベーシック', '1980': 'スタンダード',
+    '2980': 'プレミアム', '14800': 'おまかせ'
+  };
+  const STATUS_LABELS = {
+    trial: '試用中', paid: '有料継続', expiring: '終了間近', expired: '終了', cancel: 'キャンセル'
+  };
+  const STATUS_CLASS = {
+    trial: 'status-trial', paid: 'status-paid', expiring: 'status-expiring',
+    expired: 'status-expired', cancel: 'status-cancel'
+  };
+
+  function daysLeft(endDate) {
+    if (!endDate) return null;
+    const diff = new Date(endDate) - new Date();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    return d.replace(/-/g, '/');
+  }
+
+  function render() {
+    const tbody = document.getElementById('client-table');
+    if (clients.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">クライアントがまだいません。「＋ クライアント追加」から追加してください。</td></tr>';
+    } else {
+      tbody.innerHTML = clients.map(c => {
+        const days = daysLeft(c.end);
+        let daysHtml = '—';
+        if (days !== null) {
+          const cls = days > 7 ? 'days-ok' : days > 0 ? 'days-warn' : 'days-over';
+          daysHtml = `<span class="days-left ${cls}">${days > 0 ? days + '日' : '期限切れ'}</span>`;
+        }
+        return `<tr>
+          <td><strong>${c.name}</strong><br><span style="font-size:11px;color:var(--wood-light)">${c.type||''}</span></td>
+          <td><span class="plan-badge">${PLAN_LABELS[c.plan]||c.plan}</span></td>
+          <td><span class="status-badge ${STATUS_CLASS[c.status]}">${STATUS_LABELS[c.status]}</span></td>
+          <td>${formatDate(c.start)}</td>
+          <td>${daysHtml}</td>
+          <td style="font-size:12px;color:var(--wood)">${c.contact||'—'}</td>
+          <td>
+            <div class="action-btns">
+              <button class="btn-sm btn-edit" onclick="editClient('${c.id}')">編集</button>
+              <button class="btn-sm btn-delete" onclick="deleteClient('${c.id}')">削除</button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Summary
+    document.getElementById('count-all').textContent = clients.length;
+    document.getElementById('count-trial').textContent = clients.filter(c => c.status === 'trial').length;
+    document.getElementById('count-paid').textContent = clients.filter(c => c.status === 'paid').length;
+    const mrr = clients.filter(c => c.status === 'paid').reduce((s, c) => s + parseInt(c.plan||0), 0);
+    document.getElementById('count-mrr').textContent = '¥' + mrr.toLocaleString();
+
+    // Alert
+    const expiring = clients.filter(c => {
+      const d = daysLeft(c.end);
+      return d !== null && d <= 7 && d >= 0 && c.status === 'trial';
+    });
+    const alertBox = document.getElementById('alert-box');
+    if (expiring.length > 0) {
+      alertBox.style.display = 'block';
+      alertBox.innerHTML = '⚠️ <strong>継続確認が必要なクライアント：</strong> ' +
+        expiring.map(c => `${c.name}（残${daysLeft(c.end)}日）`).join('、');
+    } else {
+      alertBox.style.display = 'none';
+    }
+  }
+
+  function save() {
+    localStorage.setItem('ksta_clients', JSON.stringify(clients));
+    render();
+  }
+
+  function openModal(id = null) {
+    editingId = id;
+    const modal = document.getElementById('modal');
+    if (id) {
+      const c = clients.find(x => x.id === id);
+      document.getElementById('modal-title').textContent = 'クライアント編集';
+      document.getElementById('f-name').value = c.name || '';
+      document.getElementById('f-type').value = c.type || '居酒屋・和食';
+      document.getElementById('f-plan').value = c.plan || '0';
+      document.getElementById('f-status').value = c.status || 'trial';
+      document.getElementById('f-start').value = c.start || '';
+      document.getElementById('f-end').value = c.end || '';
+      document.getElementById('f-insta').value = c.insta || '';
+      document.getElementById('f-contact').value = c.contact || '';
+      document.getElementById('f-tool').value = c.tool || '';
+      document.getElementById('f-memo').value = c.memo || '';
+    } else {
+      document.getElementById('modal-title').textContent = 'クライアント追加';
+      document.getElementById('f-name').value = '';
+      document.getElementById('f-type').value = '居酒屋・和食';
+      document.getElementById('f-plan').value = '0';
+      document.getElementById('f-status').value = 'trial';
+      const today = new Date().toISOString().split('T')[0];
+      const end = new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0];
+      document.getElementById('f-start').value = today;
+      document.getElementById('f-end').value = end;
+      document.getElementById('f-insta').value = '';
+      document.getElementById('f-contact').value = '';
+      document.getElementById('f-tool').value = '';
+      document.getElementById('f-memo').value = '';
+    }
+    modal.classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    editingId = null;
+  }
+
+  function saveClient() {
+    const name = document.getElementById('f-name').value.trim();
+    if (!name) { alert('店名を入力してください'); return; }
+    const data = {
+      id: editingId || Date.now().toString(),
+      name,
+      type:    document.getElementById('f-type').value,
+      plan:    document.getElementById('f-plan').value,
+      status:  document.getElementById('f-status').value,
+      start:   document.getElementById('f-start').value,
+      end:     document.getElementById('f-end').value,
+      insta:   document.getElementById('f-insta').value.trim(),
+      contact: document.getElementById('f-contact').value.trim(),
+      tool:    document.getElementById('f-tool').value.trim(),
+      memo:    document.getElementById('f-memo').value.trim(),
+    };
+    if (editingId) {
+      const idx = clients.findIndex(c => c.id === editingId);
+      clients[idx] = data;
+    } else {
+      clients.push(data);
+    }
+    save();
+    closeModal();
+  }
+
+  function editClient(id) { openModal(id); }
+
+  function deleteClient(id) {
+    const c = clients.find(x => x.id === id);
+    if (confirm(`「${c.name}」を削除しますか？`)) {
+      clients = clients.filter(x => x.id !== id);
+      save();
+    }
+  }
+
+  function exportCSV() {
+    const header = ['店名','業種','プラン','状態','開始日','終了日','Instagram','連絡先','ツールURL','メモ'];
+    const rows = clients.map(c => [
+      c.name, c.type, PLAN_LABELS[c.plan]||c.plan, STATUS_LABELS[c.status],
+      c.start, c.end, c.insta, c.contact, c.tool, c.memo
+    ].map(v => `"${(v||'').replace(/"/g,'""')}"`));
+    const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ksta_clients_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+  }
+
+  // Close modal on background click
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  render();
+</script>
+</body>
+</html>

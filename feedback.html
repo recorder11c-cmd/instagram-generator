@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>月次フィードバックシート｜Instagram投稿文ジェネレーター</title>
+  <style>
+    :root {
+      --cream: #f5f0e8; --terracotta: #c4704a; --wood: #8b6340;
+      --wood-light: #b08860; --charcoal: #3a3028; --border: #d4c4a8; --white-warm: #fdfaf5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Hiragino Sans','Yu Gothic',sans-serif; background: var(--cream); color: var(--charcoal); font-size: 14px; line-height: 1.8; }
+    .page { max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
+
+    h1 { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 22px; font-weight: normal; letter-spacing: 0.2em; text-align: center; margin-bottom: 6px; }
+    .subtitle { text-align: center; font-size: 12px; color: var(--wood-light); letter-spacing: 0.15em; margin-bottom: 8px; }
+    .deco { text-align: center; color: var(--terracotta); margin-bottom: 36px; letter-spacing: 0.3em; }
+
+    .section { background: var(--white-warm); border: 1px solid var(--border); border-radius: 4px; padding: 24px; margin-bottom: 20px; }
+    .section-title { font-size: 13px; font-weight: bold; color: var(--terracotta); letter-spacing: 0.15em; margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 12px; color: var(--wood); letter-spacing: 0.1em; margin-bottom: 7px; font-weight: bold; }
+    .hint { font-size: 11px; color: var(--wood-light); margin-bottom: 7px; }
+    input[type="text"], input[type="number"], textarea, select {
+      width: 100%; padding: 10px 14px; background: var(--cream); border: 1px solid var(--border);
+      border-radius: 3px; font-size: 14px; font-family: inherit; color: var(--charcoal);
+      outline: none; transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--terracotta); background: var(--white-warm); }
+    textarea { resize: vertical; min-height: 72px; line-height: 1.7; }
+
+    /* 数値入力行 */
+    .metrics-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .metric-input { text-align: center; }
+    .metric-input label { text-align: center; }
+    .metric-input input { text-align: center; font-size: 20px; padding: 12px 8px; }
+
+    /* 星評価 */
+    .star-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .star-btn { padding: 8px 16px; border: 1px solid var(--border); border-radius: 20px; background: var(--cream); font-size: 14px; cursor: pointer; transition: all 0.15s; }
+    .star-btn:hover, .star-btn.selected { background: var(--terracotta); color: #fff; border-color: var(--terracotta); }
+
+    /* チェックボックス */
+    .check-group { display: flex; flex-direction: column; gap: 10px; }
+    .check-item { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; }
+    .check-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--terracotta); flex-shrink: 0; }
+
+    /* 送信ボタン */
+    .btn-submit { width: 100%; padding: 14px; background: var(--terracotta); color: #fff; border: none; border-radius: 3px; font-size: 15px; letter-spacing: 0.2em; font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; cursor: pointer; margin-top: 8px; }
+    .btn-submit:hover { background: #a85a37; }
+
+    /* 完了メッセージ */
+    .done-msg { display: none; background: #f0f7f0; border: 1px solid #a0c8a0; border-radius: 4px; padding: 24px; text-align: center; margin-top: 20px; }
+    .done-msg.visible { display: block; }
+    .done-msg h2 { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 18px; font-weight: normal; color: #2d6a2d; margin-bottom: 8px; }
+
+    @media (max-width: 480px) { .metrics-row { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <h1>月次フィードバックシート</h1>
+  <p class="subtitle">Instagram投稿文ジェネレーター ─ お試し期間ご報告</p>
+  <div class="deco">─ ✦ ─</div>
+
+  <!-- 基本情報 -->
+  <div class="section">
+    <p class="section-title">📋 基本情報</p>
+    <div class="form-group">
+      <label>店舗名</label>
+      <input type="text" id="shopName" placeholder="例：上古屋">
+    </div>
+    <div class="form-group">
+      <label>ご報告月</label>
+      <input type="text" id="reportMonth" placeholder="例：2025年5月">
+    </div>
+    <div class="form-group">
+      <label>回答者名</label>
+      <input type="text" id="responder" placeholder="例：田中（オーナー）">
+    </div>
+  </div>
+
+  <!-- 使用状況 -->
+  <div class="section">
+    <p class="section-title">📊 使用状況</p>
+    <div class="form-group">
+      <label>今月の投稿回数（ジェネレーター使用分）</label>
+      <div class="metrics-row">
+        <div class="metric-input">
+          <label>使用前（月間）</label>
+          <input type="number" id="postsBefore" min="0" placeholder="0">
+        </div>
+        <div class="metric-input">
+          <label>使用後（今月）</label>
+          <input type="number" id="postsAfter" min="0" placeholder="0">
+        </div>
+        <div class="metric-input">
+          <label>うちAI生成</label>
+          <input type="number" id="postsAI" min="0" placeholder="0">
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>よく使った投稿タイプ（複数選択可）</label>
+      <div class="check-group">
+        <label class="check-item"><input type="checkbox" value="food"> 🍽️ 今日のおすすめ</label>
+        <label class="check-item"><input type="checkbox" value="staff"> 🧑‍🍳 スタッフ紹介</label>
+        <label class="check-item"><input type="checkbox" value="seats"> 📅 空き状況</label>
+        <label class="check-item"><input type="checkbox" value="full"> 🎉 満席御礼</label>
+        <label class="check-item"><input type="checkbox" value="ingredient"> 🌿 食材紹介</label>
+        <label class="check-item"><input type="checkbox" value="newmenu"> 🆕 新メニュー</label>
+        <label class="check-item"><input type="checkbox" value="notice"> 📣 お知らせ</label>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>1投稿あたりにかかる時間</label>
+      <div class="metrics-row">
+        <div class="metric-input">
+          <label>使用前</label>
+          <input type="text" id="timeBefore" placeholder="例：15分">
+        </div>
+        <div class="metric-input">
+          <label>使用後</label>
+          <input type="text" id="timeAfter" placeholder="例：1分">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Instagramデータ -->
+  <div class="section">
+    <p class="section-title">📈 Instagram数値（わかる範囲でOK）</p>
+    <div class="metrics-row">
+      <div class="metric-input">
+        <label>フォロワー数（月初）</label>
+        <input type="number" id="followerStart" min="0" placeholder="0">
+      </div>
+      <div class="metric-input">
+        <label>フォロワー数（月末）</label>
+        <input type="number" id="followerEnd" min="0" placeholder="0">
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="metrics-row">
+        <div class="metric-input">
+          <label>平均いいね数<br><small style="font-size:10px">（使用後）</small></label>
+          <input type="number" id="avgLikes" min="0" placeholder="0">
+        </div>
+        <div class="metric-input">
+          <label>平均保存数<br><small style="font-size:10px">（使用後）</small></label>
+          <input type="number" id="avgSaves" min="0" placeholder="0">
+        </div>
+        <div class="metric-input">
+          <label>「インスタ見て」<br>来店数</label>
+          <input type="number" id="instagramVisits" min="0" placeholder="0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 満足度 -->
+  <div class="section">
+    <p class="section-title">⭐ 満足度・評価</p>
+    <div class="form-group">
+      <label>全体的な満足度</label>
+      <div class="star-group" id="satisfactionGroup">
+        <button class="star-btn" onclick="selectStar('satisfaction',this,'😞 不満')">😞 不満</button>
+        <button class="star-btn" onclick="selectStar('satisfaction',this,'😐 普通')">😐 普通</button>
+        <button class="star-btn" onclick="selectStar('satisfaction',this,'😊 満足')">😊 満足</button>
+        <button class="star-btn" onclick="selectStar('satisfaction',this,'🤩 大満足')">🤩 大満足</button>
+      </div>
+      <input type="hidden" id="satisfaction">
+    </div>
+    <div class="form-group">
+      <label>生成される文章の質</label>
+      <div class="star-group" id="qualityGroup">
+        <button class="star-btn" onclick="selectStar('quality',this,'低い')">低い</button>
+        <button class="star-btn" onclick="selectStar('quality',this,'まあまあ')">まあまあ</button>
+        <button class="star-btn" onclick="selectStar('quality',this,'良い')">良い</button>
+        <button class="star-btn" onclick="selectStar('quality',this,'とても良い')">とても良い</button>
+      </div>
+      <input type="hidden" id="quality">
+    </div>
+    <div class="form-group">
+      <label>操作のしやすさ</label>
+      <div class="star-group" id="usabilityGroup">
+        <button class="star-btn" onclick="selectStar('usability',this,'難しい')">難しい</button>
+        <button class="star-btn" onclick="selectStar('usability',this,'少し難しい')">少し難しい</button>
+        <button class="star-btn" onclick="selectStar('usability',this,'使いやすい')">使いやすい</button>
+        <button class="star-btn" onclick="selectStar('usability',this,'とても使いやすい')">とても使いやすい</button>
+      </div>
+      <input type="hidden" id="usability">
+    </div>
+    <div class="form-group">
+      <label>有料になった場合、月いくらまでなら使い続けますか？</label>
+      <div class="star-group" id="priceGroup">
+        <button class="star-btn" onclick="selectStar('price',this,'無料のみ')">無料のみ</button>
+        <button class="star-btn" onclick="selectStar('price',this,'〜¥1,000')">〜¥1,000</button>
+        <button class="star-btn" onclick="selectStar('price',this,'〜¥3,000')">〜¥3,000</button>
+        <button class="star-btn" onclick="selectStar('price',this,'〜¥5,000')">〜¥5,000</button>
+      </div>
+      <input type="hidden" id="price">
+    </div>
+  </div>
+
+  <!-- コメント -->
+  <div class="section">
+    <p class="section-title">💬 自由記述</p>
+    <div class="form-group">
+      <label>良かったところ</label>
+      <textarea id="goodPoints" placeholder="例：文章のトーンがお店の雰囲気に合っていた。毎日更新できるようになった。"></textarea>
+    </div>
+    <div class="form-group">
+      <label>改善してほしいところ</label>
+      <textarea id="improvements" placeholder="例：ハッシュタグをもう少し絞り込みたい。スタッフ紹介にもっと項目が欲しい。"></textarea>
+    </div>
+    <div class="form-group">
+      <label>他に欲しい機能・投稿タイプがあれば</label>
+      <textarea id="requests" placeholder="例：季節の挨拶投稿、周年記念、メニュー終了のお知らせなど"></textarea>
+    </div>
+    <div class="form-group">
+      <label>知人の飲食店に紹介できそうですか？（任意）</label>
+      <div class="star-group" id="referralGroup">
+        <button class="star-btn" onclick="selectStar('referral',this,'難しい')">難しい</button>
+        <button class="star-btn" onclick="selectStar('referral',this,'検討する')">検討する</button>
+        <button class="star-btn" onclick="selectStar('referral',this,'紹介できる')">紹介できる</button>
+        <button class="star-btn" onclick="selectStar('referral',this,'ぜひ紹介したい')">ぜひ紹介したい</button>
+      </div>
+      <input type="hidden" id="referral">
+    </div>
+    <div class="form-group">
+      <label>一言感想（広報に使わせていただける場合はご記入ください）</label>
+      <textarea id="testimonial" placeholder="例：「毎日の投稿がストレスでしたが、今は30秒で終わります」"></textarea>
+    </div>
+  </div>
+
+  <button class="btn-submit" onclick="submitFeedback()">フィードバックを送信する</button>
+
+  <div class="done-msg" id="doneMsg">
+    <h2>ありがとうございます！</h2>
+    <p style="font-size:13px;color:#5a8a5a;margin-top:8px">いただいたフィードバックはサービス改善に活かします。<br>引き続きよろしくお願いいたします。</p>
+  </div>
+
+</div>
+
+<script>
+  const ratings = {};
+  function selectStar(key, btn, val) {
+    ratings[key] = val;
+    const group = btn.closest('.star-group');
+    group.querySelectorAll('.star-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById(key).value = val;
+  }
+
+  function submitFeedback() {
+    const data = {
+      店舗名: document.getElementById('shopName').value,
+      報告月: document.getElementById('reportMonth').value,
+      回答者: document.getElementById('responder').value,
+      使用前投稿数: document.getElementById('postsBefore').value,
+      使用後投稿数: document.getElementById('postsAfter').value,
+      AI生成数: document.getElementById('postsAI').value,
+      使用前所要時間: document.getElementById('timeBefore').value,
+      使用後所要時間: document.getElementById('timeAfter').value,
+      フォロワー月初: document.getElementById('followerStart').value,
+      フォロワー月末: document.getElementById('followerEnd').value,
+      平均いいね: document.getElementById('avgLikes').value,
+      平均保存: document.getElementById('avgSaves').value,
+      インスタ経由来店: document.getElementById('instagramVisits').value,
+      満足度: ratings.satisfaction || '',
+      文章の質: ratings.quality || '',
+      操作性: ratings.usability || '',
+      許容価格: ratings.price || '',
+      良かった点: document.getElementById('goodPoints').value,
+      改善点: document.getElementById('improvements').value,
+      追加要望: document.getElementById('requests').value,
+      紹介意向: ratings.referral || '',
+      一言感想: document.getElementById('testimonial').value,
+    };
+
+    // テキスト形式でコピー
+    const text = Object.entries(data).map(([k,v]) => `【${k}】\n${v || '未記入'}`).join('\n\n');
+    navigator.clipboard.writeText(text).catch(() => {});
+
+    document.getElementById('doneMsg').classList.add('visible');
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>上古屋 Instagram投稿文ジェネレーター</title>
+  <style>
+    :root {
+      --cream: #f5f0e8;
+      --cream-dark: #ede5d8;
+      --terracotta: #c4704a;
+      --terracotta-dark: #a85a37;
+      --terracotta-light: #d98b68;
+      --wood: #8b6340;
+      --wood-light: #b08860;
+      --charcoal: #3a3028;
+      --charcoal-soft: #5a4a3a;
+      --white-warm: #fdfaf5;
+      --border: #d4c4a8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', Georgia, serif;
+      background-color: var(--cream);
+      color: var(--charcoal);
+      min-height: 100vh;
+      background-image:
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 60px,
+          rgba(139,99,64,0.04) 60px,
+          rgba(139,99,64,0.04) 61px
+        ),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 60px,
+          rgba(139,99,64,0.04) 60px,
+          rgba(139,99,64,0.04) 61px
+        );
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .header-deco {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .header-deco::before,
+    .header-deco::after {
+      content: '';
+      display: block;
+      width: 48px;
+      height: 1px;
+      background: var(--wood-light);
+    }
+
+    .header-deco span {
+      color: var(--terracotta);
+      font-size: 18px;
+    }
+
+    .shop-name {
+      font-size: 28px;
+      font-weight: normal;
+      letter-spacing: 0.25em;
+      color: var(--charcoal);
+      margin-bottom: 6px;
+    }
+
+    .shop-subtitle {
+      font-size: 12px;
+      color: var(--wood-light);
+      letter-spacing: 0.2em;
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    }
+
+    /* Card */
+    .card {
+      background: var(--white-warm);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 28px 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(58,48,40,0.07);
+    }
+
+    .card-title {
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      color: var(--wood);
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--cream-dark);
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      background: var(--terracotta);
+      border-radius: 2px;
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--charcoal-soft);
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      font-weight: normal;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 14px;
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      color: var(--charcoal);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      appearance: none;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--terracotta-light);
+      background: var(--white-warm);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.7;
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--wood-light);
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* Generate Button */
+    .btn-generate {
+      width: 100%;
+      padding: 14px;
+      background: var(--terracotta);
+      color: var(--white-warm);
+      border: none;
+      border-radius: 3px;
+      font-size: 15px;
+      letter-spacing: 0.25em;
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-generate:hover:not(:disabled) {
+      background: var(--terracotta-dark);
+    }
+
+    .btn-generate:active:not(:disabled) {
+      transform: scale(0.99);
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* Loading */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: var(--wood-light);
+      font-size: 13px;
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      letter-spacing: 0.12em;
+    }
+
+    .loading.visible { display: block; }
+
+    .loading-dots {
+      display: inline-flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .loading-dots span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--terracotta-light);
+      animation: dot-pulse 1.2s ease-in-out infinite;
+    }
+
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot-pulse {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Output */
+    .output-section {
+      display: none;
+    }
+
+    .output-section.visible {
+      display: block;
+    }
+
+    .output-card {
+      background: var(--white-warm);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(58,48,40,0.07);
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--cream-dark);
+    }
+
+    .output-label {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      color: var(--wood);
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .output-label::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 13px;
+      background: var(--terracotta);
+      border-radius: 2px;
+    }
+
+    .char-count {
+      font-size: 11px;
+      color: var(--wood-light);
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    }
+
+    .output-text {
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--charcoal);
+      white-space: pre-wrap;
+      word-break: break-all;
+      min-height: 60px;
+      outline: none;
+      border-radius: 3px;
+      transition: background 0.2s, box-shadow 0.2s;
+      padding: 4px 6px;
+      margin: -4px -6px;
+    }
+    .output-text[contenteditable="true"]:hover {
+      background: rgba(196,112,74,0.04);
+    }
+    .output-text[contenteditable="true"]:focus {
+      background: var(--white-warm);
+      box-shadow: 0 0 0 2px rgba(196,112,74,0.25);
+    }
+    .edit-hint {
+      font-size: 11px;
+      color: var(--wood-light);
+      margin-top: 6px;
+      font-family: 'Hiragino Sans','Yu Gothic',sans-serif;
+    }
+
+    .hashtag-list {
+      font-size: 13px;
+      line-height: 2;
+      color: var(--terracotta-dark);
+      word-break: break-all;
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    }
+
+    .btn-copy {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      color: var(--wood);
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover {
+      background: var(--cream-dark);
+      border-color: var(--wood-light);
+    }
+
+    .btn-copy.copied {
+      border-color: var(--terracotta-light);
+      color: var(--terracotta);
+      background: rgba(196,112,74,0.05);
+    }
+
+    .btn-copy svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .btn-copy-all {
+      width: 100%;
+      padding: 11px;
+      background: var(--cream-dark);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      color: var(--charcoal-soft);
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-copy-all:hover {
+      background: var(--border);
+    }
+
+    .btn-copy-all.copied {
+      border-color: var(--terracotta-light);
+      color: var(--terracotta);
+      background: rgba(196,112,74,0.06);
+    }
+
+    /* Error */
+    .error-msg {
+      display: none;
+      padding: 12px 16px;
+      background: #fdf0ec;
+      border: 1px solid #e8b4a0;
+      border-radius: 3px;
+      color: #9b4a2a;
+      font-size: 13px;
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .error-msg.visible { display: block; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-text {
+      font-size: 11px;
+      color: var(--wood-light);
+      letter-spacing: 0.15em;
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    }
+
+    .footer-deco {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--terracotta-light);
+      letter-spacing: 0.3em;
+    }
+
+    /* Post Type Tabs */
+    .type-tabs {
+      display: flex; gap: 6px; overflow-x: auto; margin-bottom: 20px;
+      padding-bottom: 4px; scrollbar-width: none;
+    }
+    .type-tabs::-webkit-scrollbar { display: none; }
+    .type-tab {
+      flex-shrink: 0; padding: 7px 13px; border: 1px solid var(--border);
+      border-radius: 20px; background: var(--cream); color: var(--wood);
+      font-size: 12px; font-family: inherit; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap; letter-spacing: 0.05em;
+    }
+    .type-tab:hover { border-color: var(--terracotta-light); color: var(--terracotta); }
+    .type-tab.active { background: var(--terracotta); color: #fff; border-color: var(--terracotta); }
+    .type-form { display: none; }
+    .type-form.active { display: block; }
+
+    /* Responsive */
+    @media (max-width: 500px) {
+      .form-row { grid-template-columns: 1fr; }
+      .card { padding: 20px 18px; }
+      .output-card { padding: 20px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-deco">
+        <span>✦</span>
+      </div>
+      <h1 class="shop-name">上古屋</h1>
+      <p class="shop-subtitle">Instagram 投稿文ジェネレーター ─ 京都・西洞院蛸薬師</p>
+    </header>
+
+    <!-- Form -->
+    <div class="card">
+      <h2 class="card-title">投稿タイプを選ぶ</h2>
+
+      <!-- Type Tabs -->
+      <div class="type-tabs">
+        <button class="type-tab active" onclick="switchType('food',this)">🍽️ 今日のおすすめ</button>
+        <button class="type-tab" onclick="switchType('staff',this)">🧑‍🍳 スタッフ紹介</button>
+        <button class="type-tab" onclick="switchType('seats',this)">📅 空き状況</button>
+        <button class="type-tab" onclick="switchType('full',this)">🎉 満席御礼</button>
+        <button class="type-tab" onclick="switchType('ingredient',this)">🌿 食材紹介</button>
+        <button class="type-tab" onclick="switchType('newmenu',this)">🆕 新メニュー</button>
+        <button class="type-tab" onclick="switchType('notice',this)">📣 お知らせ</button>
+      </div>
+
+      <!-- Type 1: 今日のおすすめ -->
+      <div class="type-form active" id="form-food">
+        <div class="form-group">
+          <label>今日の料理・食材</label>
+          <textarea id="foodInput" placeholder="例：京丹後産の松葉ガニ、丹後とり貝の刺身、地酒「久美の浦」燗酒…"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>季節</label>
+            <div class="select-wrapper">
+              <select id="season">
+                <option value="春" selected>春</option>
+                <option value="夏">夏</option>
+                <option value="秋">秋</option>
+                <option value="冬">冬</option>
+              </select>
+              <small id="seasonDebug" style="color:#999;font-size:10px"></small>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>投稿トーン</label>
+            <div class="select-wrapper">
+              <select id="tone">
+                <option value="しみじみ系">しみじみ系</option>
+                <option value="食欲そそる系">食欲そそる系</option>
+                <option value="お知らせ系">お知らせ系</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Type 2: スタッフ紹介 -->
+      <div class="type-form" id="form-staff">
+        <div class="form-row">
+          <div class="form-group">
+            <label>スタッフ名</label>
+            <input type="text" id="staffName" placeholder="例：田中さん">
+          </div>
+          <div class="form-group">
+            <label>役割・ポジション</label>
+            <input type="text" id="staffRole" placeholder="例：板前・ホール担当">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>人柄・エピソード</label>
+          <textarea id="staffEpisode" placeholder="例：笑顔が絶えない20代。京丹後出身で地元食材への愛情が人一倍強い。お客様との会話を大切にしている。"></textarea>
+        </div>
+        <div class="form-group">
+          <label>得意料理・こだわり（任意）</label>
+          <input type="text" id="staffSpecialty" placeholder="例：だし巻き卵、鯖の棒寿司">
+        </div>
+      </div>
+
+      <!-- Type 3: 空き状況 -->
+      <div class="type-form" id="form-seats">
+        <div class="form-row">
+          <div class="form-group">
+            <label>本日の空き状況</label>
+            <div class="select-wrapper">
+              <select id="seatsStatus">
+                <option value="余裕あり">余裕あり 🟢</option>
+                <option value="残り少なめ">残り少なめ 🟡</option>
+                <option value="残りわずか">残りわずか 🔴</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>おすすめ時間帯（任意）</label>
+            <input type="text" id="seatsTime" placeholder="例：18時〜19時半">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>今夜のひと言（任意）</label>
+          <input type="text" id="seatsComment" placeholder="例：今夜は鰹のたたきと地酒が揃ってます">
+        </div>
+        <div class="form-group">
+          <label>季節</label>
+          <div class="select-wrapper">
+            <select id="seatsSeason">
+              <option value="春">春</option><option value="夏">夏</option>
+              <option value="秋">秋</option><option value="冬">冬</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Type 4: 満席御礼 -->
+      <div class="type-form" id="form-full">
+        <div class="form-group">
+          <label>次の空き日時</label>
+          <input type="text" id="fullNextDate" placeholder="例：来週木曜・金曜 / 今週末のランチ">
+        </div>
+        <div class="form-group">
+          <label>感謝のひと言（任意）</label>
+          <input type="text" id="fullThanks" placeholder="例：おかげさまで連日満席が続いています">
+        </div>
+        <div class="form-group">
+          <label>予約先・連絡先（任意）</label>
+          <input type="text" id="fullContact" placeholder="例：DMまたはお電話にて / 食べログから">
+        </div>
+      </div>
+
+      <!-- Type 5: 食材紹介 -->
+      <div class="type-form" id="form-ingredient">
+        <div class="form-row">
+          <div class="form-group">
+            <label>食材名</label>
+            <input type="text" id="ingredientName" placeholder="例：京丹後産 松葉ガニ">
+          </div>
+          <div class="form-group">
+            <label>産地・仕入れ先（任意）</label>
+            <input type="text" id="ingredientOrigin" placeholder="例：京丹後市・間人漁港">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>こだわり・エピソード</label>
+          <textarea id="ingredientEpisode" placeholder="例：今年初の間人ガニ。水揚げ直後に仕入れる活け蟹で、甘みと旨みが格段に違う。刺身・焼き・鍋で…"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>季節</label>
+            <div class="select-wrapper">
+              <select id="ingredientSeason">
+                <option value="春">春</option><option value="夏">夏</option>
+                <option value="秋">秋</option><option value="冬">冬</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>投稿トーン</label>
+            <div class="select-wrapper">
+              <select id="ingredientTone">
+                <option value="しみじみ系">しみじみ系</option>
+                <option value="食欲そそる系">食欲そそる系</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Type 6: 新メニュー -->
+      <div class="type-form" id="form-newmenu">
+        <div class="form-group">
+          <label>メニュー名</label>
+          <input type="text" id="newmenuName" placeholder="例：丹後野菜の炊き合わせ">
+        </div>
+        <div class="form-group">
+          <label>特徴・説明</label>
+          <textarea id="newmenuDesc" placeholder="例：春野菜を丁寧にだしで炊いた新作。タケノコ・菜の花・うすいえんどう…旬の恵みをそのままに。"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>提供期間（任意）</label>
+            <input type="text" id="newmenuPeriod" placeholder="例：〜5月末 / 数量限定 / 通年">
+          </div>
+          <div class="form-group">
+            <label>季節</label>
+            <div class="select-wrapper">
+              <select id="newmenuSeason">
+                <option value="春">春</option><option value="夏">夏</option>
+                <option value="秋">秋</option><option value="冬">冬</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Type 7: お知らせ -->
+      <div class="type-form" id="form-notice">
+        <div class="form-group">
+          <label>お知らせの種類</label>
+          <div class="select-wrapper">
+            <select id="noticeType">
+              <option value="臨時休業・定休変更">臨時休業・定休変更</option>
+              <option value="イベント・特別企画">イベント・特別企画</option>
+              <option value="記念・感謝">記念・感謝</option>
+              <option value="営業時間変更">営業時間変更</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>お知らせ内容</label>
+          <textarea id="noticeContent" placeholder="例：5月3〜5日はGW休業とさせていただきます。6日（月）より通常営業。ご迷惑をおかけします。"></textarea>
+        </div>
+      </div>
+
+      <button class="btn-generate" id="generateBtn" onclick="generatePost()">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        投稿文を生成する
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+      言葉を紡いでいます
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div class="error-msg" id="errorMsg"></div>
+
+    <!-- Output -->
+    <div class="output-section" id="outputSection">
+
+      <div class="output-card">
+        <div class="output-header">
+          <span class="output-label">Instagram 投稿文</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="char-count" id="charCount"></span>
+            <button class="btn-copy" id="copyPost" onclick="copyText('postText', 'copyPost')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              コピー
+            </button>
+          </div>
+        </div>
+        <div class="output-text" id="postText" contenteditable="true" spellcheck="false"></div>
+        <p class="edit-hint">✏️ クリックして直接編集できます</p>
+      </div>
+
+      <div class="output-card">
+        <div class="output-header">
+          <span class="output-label">ハッシュタグ</span>
+          <button class="btn-copy" id="copyTags" onclick="copyText('hashtagText', 'copyTags')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            コピー
+          </button>
+        </div>
+        <div class="hashtag-list" id="hashtagText"></div>
+      </div>
+
+      <button class="btn-copy-all" id="copyAll" onclick="copyAll()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        投稿文＋ハッシュタグをまとめてコピー
+      </button>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p class="footer-text">じんわり良い酒、良い食事。</p>
+      <p class="footer-deco">─ ✦ ─</p>
+    </footer>
+
+  </div>
+
+  <script>
+    const SHOP = {
+      name: '上古屋',
+      location: '京都・西洞院蛸薬師',
+      genre: '和食居酒屋',
+      concept: 'じんわり良い酒、良い食事 / ほっこりまち酒場',
+      description: '京町家を改装した木のぬくもりあふれる小さな居酒屋（カウンター8席、テーブル14席）',
+      specialty: '店主の地元・京丹後の食材と地酒にこだわる',
+      target: '仕事帰りのゆったりしたい大人',
+      hashtags: '#上古屋'
+    };
+
+    const SHOP_INTRO = `あなたは${SHOP.location}にある${SHOP.genre}「${SHOP.name}」のInstagram担当者です。
+【店舗情報】${SHOP.description}。${SHOP.specialty}。コンセプト：${SHOP.concept}。ターゲット：${SHOP.target}。`;
+
+    const TONE_GUIDE = {
+      'しみじみ系': 'しみじみとした余韻を大切に、静かで詩的な文体。日常のちょっとした豊かさを感じさせる。',
+      '食欲そそる系': '料理の香りや食感が伝わるような、五感に訴える表現。読んで食べたくなる臨場感。',
+      'お知らせ系': '新鮮な食材や今夜のおすすめを自然体で伝える。押しつけがましくなく、さりげなく寄りたくなる。'
+    };
+
+    const POST_RULES = `【投稿文のルール】
+- 200〜250字（スペース除く本文のみ）
+- 押しつけがましくない、じんわり伝わる文体
+- 絵文字は1〜2個のみ、控えめに
+- 「来てください」より「寄りたくなる」表現
+- 改行を適度に入れて読みやすくする
+【ハッシュタグのルール】
+- 15〜20個、店・地域・料理・季節・雰囲気に関するもの
+- ${SHOP.hashtags} を必ず含める`;
+
+    const SHORT_RULES = `【投稿文のルール】
+- 100〜150字（短くテンポよく）
+- 絵文字は1〜2個のみ
+- 自然体で、押しつけがましくない
+【ハッシュタグのルール】
+- 10〜15個
+- ${SHOP.hashtags} を必ず含める`;
+
+    let currentType = 'food';
+
+    function switchType(type, btn) {
+      currentType = type;
+      document.querySelectorAll('.type-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.type-form').forEach(f => f.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('form-' + type).classList.add('active');
+      document.getElementById('outputSection').classList.remove('visible');
+      document.getElementById('errorMsg').classList.remove('visible');
+    }
+
+    function buildPrompt() {
+      const v = id => (document.getElementById(id) || {}).value || '';
+
+      switch(currentType) {
+        case 'food': {
+          const food = v('foodInput').trim();
+          if (!food) return { error: '今日の料理・食材を入力してください。' };
+          const season = v('season'), tone = v('tone');
+          return { prompt: `${SHOP_INTRO}
+
+【今日の投稿情報】
+- 料理・食材：${food}
+- 季節：${season}
+- 投稿トーン：${tone}（${TONE_GUIDE[tone]}）
+- 京丹後・地酒・季節感を自然に織り込む
+
+${POST_RULES}
+
+以下のJSON形式のみで返答してください：
+{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
+        }
+
+        case 'staff': {
+          const name = v('staffName').trim();
+          if (!name) return { error: 'スタッフ名を入力してください。' };
+          const role = v('staffRole'), episode = v('staffEpisode'), specialty = v('staffSpecialty');
+          return { prompt: `${SHOP_INTRO}
+
+【スタッフ紹介投稿】
+- 名前：${name}
+- 役割・ポジション：${role || '未記入'}
+- 人柄・エピソード：${episode || '未記入'}
+- 得意料理・こだわり：${specialty || '未記入'}
+
+スタッフの人柄が伝わる、親しみやすく温かい紹介文を作成してください。
+${POST_RULES}
+
+{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
+        }
+
+        case 'seats': {
+          const status = v('seatsStatus'), time = v('seatsTime'), comment = v('seatsComment'), season = v('seatsSeason');
+          return { prompt: `${SHOP_INTRO}
+
+【本日の空き状況投稿】
+- 空き状況：${status}
+- おすすめ時間帯：${time || '特になし'}
+- 今夜のひと言：${comment || '特になし'}
+- 季節：${season}
+
+今夜の来店を自然に誘う、押しつけがましくない空き状況告知を作成してください。
+${SHORT_RULES}
+
+{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
+        }
+
+        case 'full': {
+          const next = v('fullNextDate').trim();
+          if (!next) return { error: '次の空き日時を入力してください。' };
+          const thanks = v('fullThanks'), contact = v('fullContact');
+          return { prompt: `${SHOP_INTRO}
+
+【満席御礼＋次回予約誘導投稿】
+- 次の空き日時：${next}
+- 感謝のひと言：${thanks || ''}
+- 予約先・連絡先：${contact || ''}
+
+満席のお礼と感謝を伝えながら、自然に次回予約につなげる文章を作成してください。
+${SHORT_RULES}
+
+{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
+        }
+
+        case 'ingredient': {
+          const name = v('ingredientName').trim();
+          if (!name) return { error: '食材名を入力してください。' };
+          const origin = v('ingredientOrigin'), episode = v('ingredientEpisode');
+          const season = v('ingredientSeason'), tone = v('ingredientTone');
+          return { prompt: `${SHOP_INTRO}
+
+【食材・こだわり紹介投稿】
+- 食材名：${name}
+- 産地・仕入れ先：${origin || ''}
+- こだわり・エピソード：${episode || ''}
+- 季節：${season}
+- トーン：${tone}（${TONE_GUIDE[tone]}）
+
+食材への愛情と職人のこだわりが伝わる紹介文を作成してください。
+${POST_RULES}
+
+{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
+        }
+
+        case 'newmenu': {
+          const name = v('newmenuName').trim();
+          if (!name) return { error: 'メニュー名を入力してください。' };
+          const desc = v('newmenuDesc'), period = v('newmenuPeriod'), season = v('newmenuSeason');
+          return { prompt: `${SHOP_INTRO}
+
+【新メニュー告知投稿】
+- メニュー名：${name}
+- 特徴・説明：${desc || ''}
+- 提供期間：${period || ''}
+- 季節：${season}
+
+期待感を高めながら自然体で伝える新メニュー告知を作成してください。
+${POST_RULES}
+
+{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
+        }
+
+        case 'notice': {
+          const type = v('noticeType'), content = v('noticeContent').trim();
+          if (!content) return { error: 'お知らせ内容を入力してください。' };
+          return { prompt: `${SHOP_INTRO}
+
+【お知らせ投稿】
+- 種類：${type}
+- 内容：${content}
+
+簡潔で丁寧、お客様への感謝と誠意が伝わるお知らせ文を作成してください。
+${SHORT_RULES}
+
+{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
+        }
+      }
+    }
+
+    async function generatePost() {
+      const errorMsg = document.getElementById('errorMsg');
+      const loading = document.getElementById('loading');
+      const outputSection = document.getElementById('outputSection');
+      const generateBtn = document.getElementById('generateBtn');
+
+      errorMsg.classList.remove('visible');
+
+      const result = buildPrompt();
+      if (result.error) { showError(result.error); return; }
+
+      generateBtn.disabled = true;
+      loading.classList.add('visible');
+      outputSection.classList.remove('visible');
+
+      try {
+        const res = await fetch('/api/proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-5',
+            max_tokens: 1000,
+            messages: [{ role: 'user', content: result.prompt }]
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error?.message || `APIエラー (${res.status})`);
+        }
+
+        const data = await res.json();
+        const raw = data.content[0].text.trim();
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error('レスポンスの解析に失敗しました。もう一度お試しください。');
+
+        const parsed = JSON.parse(jsonMatch[0]);
+        const postText = parsed.post || '';
+        const hashtagText = parsed.hashtags || '';
+
+        document.getElementById('postText').textContent = postText;
+        document.getElementById('hashtagText').textContent = hashtagText;
+        const charCount = postText.replace(/\s/g, '').length;
+        document.getElementById('charCount').textContent = `${charCount}字`;
+
+        ['copyPost', 'copyTags', 'copyAll'].forEach(id => {
+          const btn = document.getElementById(id);
+          btn.classList.remove('copied');
+          btn.childNodes[btn.childNodes.length - 1].textContent =
+            id === 'copyAll' ? '投稿文＋ハッシュタグをまとめてコピー' : 'コピー';
+        });
+
+        outputSection.classList.add('visible');
+        outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (e) {
+        showError(e.message);
+      } finally {
+        generateBtn.disabled = false;
+        loading.classList.remove('visible');
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+
+    async function copyText(textId, btnId) {
+      const text = document.getElementById(textId).innerText;
+      try {
+        await navigator.clipboard.writeText(text);
+        const btn = document.getElementById(btnId);
+        btn.classList.add('copied');
+        const textNode = btn.childNodes[btn.childNodes.length - 1];
+        textNode.textContent = 'コピー済';
+        setTimeout(() => { btn.classList.remove('copied'); textNode.textContent = 'コピー'; }, 2000);
+      } catch (e) { alert('コピーに失敗しました。手動でコピーしてください。'); }
+    }
+
+    async function copyAll() {
+      const post = document.getElementById('postText').innerText;
+      const tags = document.getElementById('hashtagText').textContent;
+      try {
+        await navigator.clipboard.writeText(post + '\n\n' + tags);
+        const btn = document.getElementById('copyAll');
+        btn.classList.add('copied');
+        btn.childNodes[btn.childNodes.length - 1].textContent = 'コピー済！';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.childNodes[btn.childNodes.length - 1].textContent = '投稿文＋ハッシュタグをまとめてコピー';
+        }, 2000);
+      } catch (e) { alert('コピーに失敗しました。手動でコピーしてください。'); }
+    }
+
+    // 季節を現在の月から自動設定
+    (function() {
+      const m = new Date().getMonth() + 1;
+      const season = (m <= 2 || m === 12) ? '冬' : m <= 6 ? '春' : m <= 9 ? '夏' : '秋';
+      ['season','seatsSeason','ingredientSeason','newmenuSeason'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = season;
+      });
+      const dbg = document.getElementById('seasonDebug');
+      if (dbg) dbg.textContent = '（' + m + '月 → ' + season + ' を自動選択）';
+    })();
+
+    document.getElementById('postText').addEventListener('input', () => {
+      const text = document.getElementById('postText').innerText;
+      document.getElementById('charCount').textContent = text.replace(/\s/g, '').length + '字';
+    });
+
+    document.getElementById('foodInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && e.metaKey) generatePost();
+    });
+  </script>
+</body>
+</html>

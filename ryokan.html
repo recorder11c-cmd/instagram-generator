@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>山の音 Instagram投稿文ジェネレーター</title>
+  <style>
+    :root {
+      --cream: #f5f0e8; --cream-dark: #ede5d8;
+      --indigo: #3d5a7a; --indigo-dark: #2d4560; --indigo-light: #5a7a9a;
+      --pine: #4a6741; --pine-light: #6a9460;
+      --charcoal: #2a2a35; --charcoal-soft: #4a4a5a;
+      --white-warm: #fdfaf5; --border: #cfd8dc; --gold: #b8960c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Hiragino Mincho ProN','Yu Mincho','YuMincho',Georgia,serif; background: var(--cream); color: var(--charcoal); min-height: 100vh; background-image: repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(61,90,122,.03) 60px,rgba(61,90,122,.03) 61px),repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(61,90,122,.03) 60px,rgba(61,90,122,.03) 61px); }
+    .container { max-width: 680px; margin: 0 auto; padding: 32px 20px 60px; }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 32px; }
+    .header-deco { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 10px; }
+    .header-deco::before,.header-deco::after { content: ''; display: block; width: 48px; height: 1px; background: var(--indigo-light); }
+    .header-deco span { color: var(--gold); font-size: 18px; }
+    .shop-name { font-size: 28px; font-weight: normal; letter-spacing: .3em; color: var(--charcoal); margin-bottom: 6px; }
+    .shop-subtitle { font-size: 12px; color: var(--indigo-light); letter-spacing: .2em; font-family: 'Hiragino Sans','Yu Gothic',sans-serif; }
+
+    /* Card */
+    .card { background: var(--white-warm); border: 1px solid var(--border); border-radius: 4px; padding: 24px 28px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(42,42,53,.07); }
+    .card-title { font-size: 13px; letter-spacing: .18em; color: var(--indigo); margin-bottom: 18px; padding-bottom: 10px; border-bottom: 1px solid var(--cream-dark); font-family: 'Hiragino Sans','Yu Gothic',sans-serif; font-weight: normal; display: flex; align-items: center; gap: 8px; }
+    .card-title::before { content: ''; display: inline-block; width: 3px; height: 14px; background: var(--indigo); border-radius: 2px; }
+
+    /* Form */
+    .form-group { margin-bottom: 18px; }
+    .form-group:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 13px; color: var(--charcoal-soft); letter-spacing: .1em; margin-bottom: 7px; font-family: 'Hiragino Sans','Yu Gothic',sans-serif; font-weight: normal; }
+    input[type=text], textarea, select { width: 100%; padding: 10px 14px; background: var(--cream); border: 1px solid var(--border); border-radius: 3px; font-size: 14px; font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; color: var(--charcoal); outline: none; transition: border-color .2s,background .2s; appearance: none; }
+    input[type=text]:focus, textarea:focus, select:focus { border-color: var(--indigo-light); background: var(--white-warm); }
+    textarea { resize: vertical; min-height: 80px; line-height: 1.7; }
+    .select-wrapper { position: relative; }
+    .select-wrapper::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--indigo-light); font-size: 12px; pointer-events: none; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+    /* Tone chips */
+    .tone-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tone-chip { padding: 8px 14px; border: 1px solid var(--border); border-radius: 20px; background: var(--cream); color: var(--indigo); font-size: 13px; font-family: 'Hiragino Sans','Yu Gothic',sans-serif; cursor: pointer; transition: all .2s; letter-spacing: .05em; }
+    .tone-chip:hover { border-color: var(--indigo-light); }
+    .tone-chip.active { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+
+    /* Target chips */
+    .target-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+    .target-chip { padding: 7px 14px; border: 1px solid var(--border); border-radius: 20px; background: var(--cream); color: var(--charcoal-soft); font-size: 12px; font-family: 'Hiragino Sans','Yu Gothic',sans-serif; cursor: pointer; transition: all .2s; }
+    .target-chip:hover { border-color: var(--indigo-light); color: var(--indigo); }
+    .target-chip.active { background: var(--indigo-light); color: #fff; border-color: var(--indigo-light); }
+
+    /* Type Tabs */
+    .type-tabs { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 4px; scrollbar-width: none; }
+    .type-tabs::-webkit-scrollbar { display: none; }
+    .type-tab { flex-shrink: 0; padding: 7px 12px; border: 1px solid var(--border); border-radius: 20px; background: var(--cream); color: var(--indigo); font-size: 12px; font-family: inherit; cursor: pointer; transition: all .2s; white-space: nowrap; }
+    .type-tab:hover { border-color: var(--indigo-light); }
+    .type-tab.active { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+    .type-form { display: none; }
+    .type-form.active { display: block; }
+
+    /* Buttons */
+    .btn-generate { width: 100%; padding: 14px; background: var(--indigo); color: var(--white-warm); border: none; border-radius: 3px; font-size: 15px; letter-spacing: .25em; font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; cursor: pointer; transition: background .2s,transform .1s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 20px; }
+    .btn-generate:hover:not(:disabled) { background: var(--indigo-dark); }
+    .btn-generate:active:not(:disabled) { transform: scale(.99); }
+    .btn-generate:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* Loading */
+    .loading { display: none; text-align: center; padding: 20px; color: var(--indigo-light); font-size: 13px; font-family: 'Hiragino Sans','Yu Gothic',sans-serif; letter-spacing: .12em; }
+    .loading.visible { display: block; }
+    .loading-dots { display: inline-flex; gap: 5px; margin-top: 10px; }
+    .loading-dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--indigo-light); animation: dot-pulse 1.2s ease-in-out infinite; }
+    .loading-dots span:nth-child(2) { animation-delay: .2s; }
+    .loading-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes dot-pulse { 0%,80%,100%{opacity:.3;transform:scale(.8);}40%{opacity:1;transform:scale(1);} }
+
+    /* Output */
+    .output-section { display: none; }
+    .output-section.visible { display: block; }
+    .output-card { background: var(--white-warm); border: 1px solid var(--border); border-radius: 4px; padding: 22px 26px; margin-bottom: 14px; box-shadow: 0 2px 12px rgba(42,42,53,.07); }
+    .output-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--cream-dark); }
+    .output-label { font-size: 12px; letter-spacing: .18em; color: var(--indigo); font-family: 'Hiragino Sans','Yu Gothic',sans-serif; font-weight: normal; display: flex; align-items: center; gap: 8px; }
+    .output-label::before { content: ''; display: inline-block; width: 3px; height: 13px; background: var(--indigo); border-radius: 2px; }
+    .lang-badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; font-family: 'Hiragino Sans','Yu Gothic',sans-serif; letter-spacing: .05em; }
+    .lang-badge.ja { background: rgba(61,90,122,.12); color: var(--indigo); }
+    .lang-badge.en { background: rgba(74,103,65,.15); color: var(--pine); }
+    .char-count { font-size: 11px; color: var(--indigo-light); font-family: 'Hiragino Sans','Yu Gothic',sans-serif; }
+    .output-text { font-size: 15px; line-height: 1.9; color: var(--charcoal); white-space: pre-wrap; word-break: break-all; min-height: 60px; outline: none; border-radius: 3px; transition: background .2s,box-shadow .2s; padding: 4px 6px; margin: -4px -6px; }
+    .output-text[contenteditable=true]:hover { background: rgba(61,90,122,.04); }
+    .output-text[contenteditable=true]:focus { background: var(--white-warm); box-shadow: 0 0 0 2px rgba(61,90,122,.2); }
+    .edit-hint { font-size: 11px; color: var(--indigo-light); margin-top: 6px; font-family: 'Hiragino Sans','Yu Gothic',sans-serif; }
+    .en-text { font-size: 14px; line-height: 1.9; color: var(--charcoal); white-space: pre-wrap; word-break: break-all; min-height: 50px; outline: none; border-radius: 3px; transition: background .2s; padding: 4px 6px; margin: -4px -6px; font-family: Georgia, serif; }
+    .en-text[contenteditable=true]:hover { background: rgba(74,103,65,.04); }
+    .en-text[contenteditable=true]:focus { background: var(--white-warm); box-shadow: 0 0 0 2px rgba(74,103,65,.2); }
+    .hashtag-list { font-size: 13px; line-height: 2; color: var(--indigo-dark); word-break: break-all; font-family: 'Hiragino Sans','Yu Gothic',sans-serif; }
+
+    .btn-copy { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: transparent; border: 1px solid var(--border); border-radius: 3px; font-size: 12px; letter-spacing: .1em; color: var(--indigo); font-family: 'Hiragino Sans','Yu Gothic',sans-serif; cursor: pointer; transition: all .2s; }
+    .btn-copy:hover { background: var(--cream-dark); }
+    .btn-copy.copied { border-color: var(--indigo-light); color: var(--indigo); background: rgba(61,90,122,.05); }
+    .btn-copy svg { width: 13px; height: 13px; }
+
+    .btn-translate { width: 100%; padding: 11px; background: var(--cream-dark); border: 1px solid var(--border); border-radius: 3px; font-size: 13px; letter-spacing: .15em; color: var(--pine); font-family: 'Hiragino Sans','Yu Gothic',sans-serif; cursor: pointer; transition: all .2s; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-translate:hover:not(:disabled) { background: var(--border); }
+    .btn-translate:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-translate.translating { color: var(--indigo-light); }
+
+    .btn-copy-all { width: 100%; padding: 11px; background: var(--cream-dark); border: 1px solid var(--border); border-radius: 3px; font-size: 13px; letter-spacing: .15em; color: var(--charcoal-soft); font-family: 'Hiragino Sans','Yu Gothic',sans-serif; cursor: pointer; transition: all .2s; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-copy-all:hover { background: var(--border); }
+    .btn-copy-all.copied { border-color: var(--indigo-light); color: var(--indigo); background: rgba(61,90,122,.06); }
+
+    .error-msg { display: none; padding: 12px 16px; background: #f0f4f8; border: 1px solid #a0b4c8; border-radius: 3px; color: #2d4560; font-size: 13px; font-family: 'Hiragino Sans','Yu Gothic',sans-serif; line-height: 1.6; margin-bottom: 16px; }
+    .error-msg.visible { display: block; }
+
+    .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .footer-text { font-size: 11px; color: var(--indigo-light); letter-spacing: .15em; font-family: 'Hiragino Sans','Yu Gothic',sans-serif; }
+    .footer-deco { margin-top: 8px; font-size: 14px; color: var(--gold); letter-spacing: .3em; }
+
+    @media(max-width:500px) { .form-row,.form-row-3 { grid-template-columns:1fr; } .card { padding:20px 16px; } }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header class="header">
+    <div class="header-deco"><span>✦</span></div>
+    <h1 class="shop-name">山の音</h1>
+    <p class="shop-subtitle">Instagram 投稿文ジェネレーター ─ 京都・嵐山</p>
+  </header>
+
+  <!-- 共通設定 -->
+  <div class="card">
+    <h2 class="card-title">今日の旅館情報</h2>
+
+    <div class="form-group">
+      <label>今日の天気・季節感</label>
+      <input type="text" id="weather" placeholder="例：秋晴れ、朝霧が美しい、紅葉が七分咲き、雪化粧の庭園…">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>おすすめの景色・部屋タイプ（任意）</label>
+        <input type="text" id="view" placeholder="例：露天風呂から嵐山の紅葉 / 川沿いの離れ">
+      </div>
+      <div class="form-group">
+        <label>今月の特別料理・イベント（任意）</label>
+        <input type="text" id="special" placeholder="例：松茸会席 / 紅葉ライトアップ">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>ターゲット</label>
+      <div class="target-chips">
+        <button class="target-chip active" onclick="selectTarget(this,'カップル・記念日')">💑 カップル・記念日</button>
+        <button class="target-chip" onclick="selectTarget(this,'ご家族')">👨‍👩‍👧 ご家族</button>
+        <button class="target-chip" onclick="selectTarget(this,'一人旅')">🧳 一人旅</button>
+        <button class="target-chip" onclick="selectTarget(this,'グループ・女子旅')">👯 グループ・女子旅</button>
+        <button class="target-chip" onclick="selectTarget(this,'インバウンド')">🌏 インバウンド</button>
+      </div>
+      <input type="hidden" id="targetVal" value="カップル・記念日">
+    </div>
+
+    <div class="form-group">
+      <label>投稿トーン</label>
+      <div class="tone-chips">
+        <button class="tone-chip active" onclick="selectTone(this,'静寂系')">🌙 静寂系<br><small style="font-size:10px;opacity:.7">詩的・余韻重視</small></button>
+        <button class="tone-chip" onclick="selectTone(this,'ワクワク系')">✨ ワクワク系<br><small style="font-size:10px;opacity:.7">旅の期待感</small></button>
+        <button class="tone-chip" onclick="selectTone(this,'おもてなし系')">🍵 おもてなし系<br><small style="font-size:10px;opacity:.7">温かい気遣い</small></button>
+      </div>
+      <input type="hidden" id="toneVal" value="静寂系">
+    </div>
+  </div>
+
+  <!-- 投稿タイプ -->
+  <div class="card">
+    <h2 class="card-title">投稿タイプを選ぶ</h2>
+    <div class="type-tabs">
+      <button class="type-tab active" onclick="switchType('room',this)">🏯 部屋・景色</button>
+      <button class="type-tab" onclick="switchType('meal',this)">🍱 お食事</button>
+      <button class="type-tab" onclick="switchType('vacancy',this)">🌿 空室案内</button>
+      <button class="type-tab" onclick="switchType('full',this)">🎉 ご予約御礼</button>
+      <button class="type-tab" onclick="switchType('season',this)">🌸 季節・体験</button>
+      <button class="type-tab" onclick="switchType('onsen',this)">♨️ 温泉・施設</button>
+      <button class="type-tab" onclick="switchType('notice',this)">📣 お知らせ</button>
+    </div>
+
+    <!-- 部屋・景色 -->
+    <div class="type-form active" id="form-room">
+      <div class="form-group">
+        <label>部屋名・タイプ</label>
+        <input type="text" id="roomName" placeholder="例：月見の間 / 露天風呂付き離れ / 川沿い和室">
+      </div>
+      <div class="form-group">
+        <label>このお部屋のいちばんの魅力</label>
+        <textarea id="roomFeature" placeholder="例：縁側から嵐山を一望できる。秋は紅葉が窓いっぱいに広がり、夜は川音だけが聞こえる静寂の中に…"></textarea>
+      </div>
+    </div>
+
+    <!-- お食事 -->
+    <div class="type-form" id="form-meal">
+      <div class="form-group">
+        <label>食事の種類</label>
+        <div class="select-wrapper">
+          <select id="mealType">
+            <option>夕食（会席）</option>
+            <option>朝食</option>
+            <option>特別コース</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>今月の献立・食材のこだわり</label>
+        <textarea id="mealContent" placeholder="例：丹波の松茸と鴨川の鮎。地元農家から直接仕入れた京野菜を中心に、料理長がその日の状態で献立を決める。"></textarea>
+      </div>
+    </div>
+
+    <!-- 空室案内 -->
+    <div class="type-form" id="form-vacancy">
+      <div class="form-row">
+        <div class="form-group">
+          <label>空室状況</label>
+          <div class="select-wrapper">
+            <select id="vacancyStatus">
+              <option value="余裕あり">余裕あり 🟢</option>
+              <option value="残り少なめ">残り少なめ 🟡</option>
+              <option value="残りわずか">残りわずか 🔴</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>おすすめ日程（任意）</label>
+          <input type="text" id="vacancyDate" placeholder="例：今週末 / 平日がねらい目">
+        </div>
+      </div>
+    </div>
+
+    <!-- ご予約御礼 -->
+    <div class="type-form" id="form-full">
+      <div class="form-group">
+        <label>次の空き日程</label>
+        <input type="text" id="fullNextDate" placeholder="例：来月初旬 / 平日ならご案内できます">
+      </div>
+      <div class="form-group">
+        <label>感謝のひと言（任意）</label>
+        <input type="text" id="fullThanks" placeholder="例：紅葉シーズンに多くのお客様をお迎えできました">
+      </div>
+    </div>
+
+    <!-- 季節・体験 -->
+    <div class="type-form" id="form-season">
+      <div class="form-group">
+        <label>今の見どころ・体験</label>
+        <input type="text" id="seasonSpot" placeholder="例：竹林の朝散歩 / 嵐山の紅葉ライトアップ / 保津川の霧">
+      </div>
+      <div class="form-group">
+        <label>旅人へのメッセージ</label>
+        <textarea id="seasonDetail" placeholder="例：夜明け前の竹林は人もなく、光と影のコントラストが幻想的。宿から徒歩3分。早朝5時台がいちばん美しい。"></textarea>
+      </div>
+    </div>
+
+    <!-- 温泉・施設 -->
+    <div class="type-form" id="form-onsen">
+      <div class="form-group">
+        <label>施設の種類</label>
+        <div class="select-wrapper">
+          <select id="onsenType">
+            <option>大浴場・温泉</option>
+            <option>露天風呂</option>
+            <option>貸切風呂</option>
+            <option>庭園・散策路</option>
+            <option>ラウンジ・図書室</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>今の魅力・特徴</label>
+        <textarea id="onsenFeature" placeholder="例：露天風呂からの紅葉が今が見頃。源泉かけ流しの炭酸水素塩泉。夜は満天の星と川音だけ…"></textarea>
+      </div>
+    </div>
+
+    <!-- お知らせ -->
+    <div class="type-form" id="form-notice">
+      <div class="form-group">
+        <label>お知らせの種類</label>
+        <div class="select-wrapper">
+          <select id="noticeType">
+            <option>期間限定プラン</option>
+            <option>記念日・特別プラン</option>
+            <option>臨時休館・メンテナンス</option>
+            <option>イベント・体験</option>
+            <option>感謝・周年</option>
+            <option>その他</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>内容</label>
+        <textarea id="noticeContent" placeholder="例：秋の特別プランを開始しました。紅葉鑑賞×会席×貸切風呂がセットに。12月末まで。"></textarea>
+      </div>
+    </div>
+
+    <button class="btn-generate" id="generateBtn" onclick="generatePost()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      投稿文を生成する
+    </button>
+  </div>
+
+  <div class="loading" id="loading">言葉を紡いでいます<div class="loading-dots"><span></span><span></span><span></span></div></div>
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- 出力 -->
+  <div class="output-section" id="outputSection">
+
+    <!-- 日本語 -->
+    <div class="output-card">
+      <div class="output-header">
+        <span class="output-label">Instagram 投稿文 <span class="lang-badge ja">日本語</span></span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="char-count" id="charCount"></span>
+          <button class="btn-copy" id="copyPost" onclick="copyText('postText','copyPost')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>コピー
+          </button>
+        </div>
+      </div>
+      <div class="output-text" id="postText" contenteditable="true" spellcheck="false"></div>
+      <p class="edit-hint">✏️ クリックして直接編集できます</p>
+    </div>
+
+    <!-- 英語翻訳ボタン -->
+    <button class="btn-translate" id="translateBtn" onclick="translateToEnglish()">
+      🌏 英語に翻訳（インバウンド向け）
+    </button>
+
+    <!-- 英語投稿（翻訳後に表示） -->
+    <div class="output-card" id="enOutputCard" style="display:none">
+      <div class="output-header">
+        <span class="output-label">English Post <span class="lang-badge en">English</span></span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="char-count" id="enCharCount"></span>
+          <button class="btn-copy" id="copyEnPost" onclick="copyText('enPostText','copyEnPost')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy
+          </button>
+        </div>
+      </div>
+      <div class="en-text" id="enPostText" contenteditable="true" spellcheck="false"></div>
+      <p class="edit-hint">✏️ Click to edit directly</p>
+    </div>
+
+    <!-- ハッシュタグ -->
+    <div class="output-card">
+      <div class="output-header">
+        <span class="output-label">ハッシュタグ</span>
+        <button class="btn-copy" id="copyTags" onclick="copyText('hashtagText','copyTags')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>コピー
+        </button>
+      </div>
+      <div class="hashtag-list" id="hashtagText"></div>
+    </div>
+
+    <button class="btn-copy-all" id="copyAll" onclick="copyAll()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      投稿文＋ハッシュタグをまとめてコピー
+    </button>
+  </div>
+
+  <footer class="footer">
+    <p class="footer-text">非日常のひとときを、ていねいに。</p>
+    <p class="footer-deco">─ ✦ ─</p>
+  </footer>
+
+</div>
+<script>
+  const RYOKAN = {
+    name: '山の音',
+    location: '京都・嵐山',
+    genre: '温泉旅館',
+    concept: '非日常のひとときを、ていねいに',
+    description: '嵐山の自然に抱かれた全12室の小さな旅館。季節ごとに表情を変える庭園と、丹波・京野菜を中心にした会席料理',
+    facilities: '源泉かけ流しの露天風呂、嵐山を一望できる大浴場、貸切風呂（要予約）',
+    hashtags: '#山の音 #嵐山旅館 #京都旅館'
+  };
+
+  const TONE_GUIDE = {
+    '静寂系': '静寂な余韻の中に旅館の深みを感じさせる詩的な文体。語りかけるように、しみじみと。',
+    'ワクワク系': '旅の期待感と発見の喜びが伝わる、明るくエネルギッシュな表現。読んで行きたくなる臨場感。',
+    'おもてなし系': '温かいホスピタリティとお客様への気遣いが伝わる丁寧な表現。品よく、寄り添うように。'
+  };
+
+  const POST_RULES = '【投稿文のルール】\n- 200〜250字（スペース除く本文のみ）\n- 「季節×景色×体験」を主役に、旅館の魅力を自然に織り込む\n- 絵文字は1〜2個のみ、控えめに\n- 「泊まってください」より「訪れたくなる」表現\n- 改行を適度に入れて読みやすくする\n【ハッシュタグのルール】\n- 15〜20個、旅館・地域・季節・体験・旅に関するもの\n- ' + RYOKAN.hashtags + ' を必ず含める';
+
+  const SHORT_RULES = '【投稿文のルール】\n- 100〜150字（短くテンポよく）\n- 絵文字は1〜2個のみ、品よく\n【ハッシュタグのルール】\n- 10〜15個\n- ' + RYOKAN.hashtags + ' を必ず含める';
+
+  let currentType = 'room';
+  let currentTone = '静寂系';
+  let currentTarget = 'カップル・記念日';
+
+  function selectTone(btn, tone) {
+    document.querySelectorAll('.tone-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTone = tone;
+    document.getElementById('toneVal').value = tone;
+  }
+
+  function selectTarget(btn, target) {
+    document.querySelectorAll('.target-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentTarget = target;
+    document.getElementById('targetVal').value = target;
+  }
+
+  function switchType(type, btn) {
+    currentType = type;
+    document.querySelectorAll('.type-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.type-form').forEach(f => f.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('form-' + type).classList.add('active');
+    document.getElementById('outputSection').classList.remove('visible');
+    document.getElementById('errorMsg').classList.remove('visible');
+  }
+
+  function getCommonContext() {
+    const v = id => (document.getElementById(id)||{}).value||'';
+    return {
+      weather: v('weather'),
+      view: v('view'),
+      special: v('special'),
+      target: currentTarget,
+      tone: currentTone
+    };
+  }
+
+  function buildIntro(ctx) {
+    return 'あなたは' + RYOKAN.location + 'にある' + RYOKAN.genre + '「' + RYOKAN.name + '」のInstagram担当者です。\n' +
+      '【施設情報】' + RYOKAN.description + '。' + RYOKAN.facilities + '。コンセプト：' + RYOKAN.concept + '\n' +
+      '【今日の情報】天気・季節感：' + (ctx.weather || '不明') +
+      (ctx.view ? ' / おすすめ景色・部屋：' + ctx.view : '') +
+      (ctx.special ? ' / 今月の特別：' + ctx.special : '') + '\n' +
+      '【ターゲット】' + ctx.target + '\n' +
+      '【投稿トーン】' + ctx.tone + '（' + (TONE_GUIDE[ctx.tone]||'') + '）';
+  }
+
+  function buildPrompt() {
+    const v = id => (document.getElementById(id)||{}).value||'';
+    const ctx = getCommonContext();
+    const intro = buildIntro(ctx);
+
+    switch(currentType) {
+      case 'room': {
+        const name = v('roomName').trim(), feature = v('roomFeature').trim();
+        if (!name && !feature) return { error: '部屋名か特徴を入力してください。' };
+        return { prompt: intro + '\n\n【お部屋・景色の投稿】\n' +
+          (name ? '- 部屋名・タイプ：' + name + '\n' : '') +
+          (feature ? '- 魅力・特徴：' + feature + '\n' : '') +
+          '\nこのお部屋と今の季節感が伝わる、泊まりたくなる投稿文を作成してください。\n' +
+          POST_RULES + '\n\n以下のJSON形式のみで返答してください：\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}' };
+      }
+      case 'meal': {
+        const content = v('mealContent').trim();
+        if (!content) return { error: '献立・食材のこだわりを入力してください。' };
+        const mealType = v('mealType');
+        return { prompt: intro + '\n\n【お食事の投稿】\n- 食事の種類：' + mealType + '\n- 献立・こだわり：' + content + '\n\n季節の食材と料理の豊かさが伝わる、食べたくなる投稿文を作成してください。\n' + POST_RULES + '\n\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}' };
+      }
+      case 'vacancy': {
+        const status = v('vacancyStatus'), date = v('vacancyDate');
+        return { prompt: intro + '\n\n【空室案内の投稿】\n- 空室状況：' + status + (date ? '\n- おすすめ日程：' + date : '') + '\n\n今の季節感を活かして自然に宿泊を誘う空室案内を作成してください。\n' + SHORT_RULES + '\n\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}' };
+      }
+      case 'full': {
+        const next = v('fullNextDate').trim();
+        if (!next) return { error: '次の空き日程を入力してください。' };
+        const thanks = v('fullThanks');
+        return { prompt: intro + '\n\n【ご予約御礼の投稿】\n- 次の空き日程：' + next + (thanks ? '\n- 感謝のひと言：' + thanks : '') + '\n\n満室への感謝を伝えながら次回訪問を自然に促す投稿を作成してください。\n' + SHORT_RULES + '\n\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}' };
+      }
+      case 'season': {
+        const spot = v('seasonSpot').trim(), detail = v('seasonDetail').trim();
+        if (!spot && !detail) return { error: '見どころ・体験を入力してください。' };
+        return { prompt: intro + '\n\n【季節・体験の投稿】\n' + (spot ? '- 見どころ・体験：' + spot + '\n' : '') + (detail ? '- 詳細：' + detail + '\n' : '') + '\n旅人の心をつかむ、季節と体験の魅力が伝わる投稿を作成してください。\n' + POST_RULES + '\n\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}' };
+      }
+      case 'onsen': {
+        const feature = v('onsenFeature').trim();
+        if (!feature) return { error: '施設の魅力・特徴を入力してください。' };
+        const type = v('onsenType');
+        return { prompt: intro + '\n\n【温泉・施設の投稿】\n- 施設：' + type + '\n- 今の魅力：' + feature + '\n\n施設の心地よさと非日常感が伝わる、訪れたくなる投稿を作成してください。\n' + POST_RULES + '\n\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}' };
+      }
+      case 'notice': {
+        const content = v('noticeContent').trim();
+        if (!content) return { error: 'お知らせ内容を入力してください。' };
+        const type = v('noticeType');
+        return { prompt: intro + '\n\n【お知らせの投稿】\n- 種類：' + type + '\n- 内容：' + content + '\n\n品よく丁寧に、旅館らしい言葉でお知らせを作成してください。\n' + SHORT_RULES + '\n\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}' };
+      }
+    }
+  }
+
+  async function generatePost() {
+    const errorMsg = document.getElementById('errorMsg');
+    const loading = document.getElementById('loading');
+    const outputSection = document.getElementById('outputSection');
+    const generateBtn = document.getElementById('generateBtn');
+    errorMsg.classList.remove('visible');
+
+    const result = buildPrompt();
+    if (result.error) { showError(result.error); return; }
+
+    generateBtn.disabled = true;
+    loading.classList.add('visible');
+    outputSection.classList.remove('visible');
+    document.getElementById('enOutputCard').style.display = 'none';
+
+    try {
+      const res = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1000, messages: [{ role: 'user', content: result.prompt }] })
+      });
+      if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error?.message || 'APIエラー (' + res.status + ')'); }
+      const data = await res.json();
+      const raw = data.content[0].text.trim();
+      const m = raw.match(/\{[\s\S]*\}/);
+      if (!m) throw new Error('レスポンスの解析に失敗しました。');
+      const parsed = JSON.parse(m[0]);
+      document.getElementById('postText').textContent = parsed.post || '';
+      document.getElementById('hashtagText').textContent = parsed.hashtags || '';
+      document.getElementById('charCount').textContent = (parsed.post||'').replace(/\s/g,'').length + '字';
+      ['copyPost','copyTags','copyAll'].forEach(id => {
+        const btn = document.getElementById(id); btn.classList.remove('copied');
+        btn.childNodes[btn.childNodes.length-1].textContent = id === 'copyAll' ? '投稿文＋ハッシュタグをまとめてコピー' : 'コピー';
+      });
+      document.getElementById('translateBtn').disabled = false;
+      document.getElementById('translateBtn').classList.remove('translating');
+      document.getElementById('translateBtn').textContent = '🌏 英語に翻訳（インバウンド向け）';
+      outputSection.classList.add('visible');
+      outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch(e) { showError(e.message); }
+    finally { generateBtn.disabled = false; loading.classList.remove('visible'); }
+  }
+
+  async function translateToEnglish() {
+    const btn = document.getElementById('translateBtn');
+    const jaText = document.getElementById('postText').innerText.trim();
+    const hashtags = document.getElementById('hashtagText').textContent.trim();
+    if (!jaText) { showError('先に日本語の投稿文を生成してください。'); return; }
+
+    btn.disabled = true;
+    btn.textContent = '翻訳中…';
+    btn.classList.add('translating');
+
+    const prompt = 'You are translating a Japanese inn\'s Instagram post to natural English for international travelers.\n\n' +
+      '【Inn Info】' + RYOKAN.name + ' in ' + RYOKAN.location + ', ' + RYOKAN.genre + '. Concept: ' + RYOKAN.concept + '\n\n' +
+      '【Japanese post】\n' + jaText + '\n\n' +
+      '【Japanese hashtags】\n' + hashtags + '\n\n' +
+      'Please translate to natural, engaging English for Instagram. Keep the tone and atmosphere. For hashtags, provide English equivalents while keeping important Japanese location/name tags.\n\n' +
+      'Return JSON only:\n{"post":"English post text","hashtags":"#tag1 #tag2 ..."}';
+
+    try {
+      const res = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 800, messages: [{ role: 'user', content: prompt }] })
+      });
+      if (!res.ok) throw new Error('翻訳エラー');
+      const data = await res.json();
+      const raw = data.content[0].text.trim();
+      const m = raw.match(/\{[\s\S]*\}/);
+      if (!m) throw new Error('翻訳結果を読み取れませんでした。');
+      const parsed = JSON.parse(m[0]);
+      document.getElementById('enPostText').textContent = parsed.post || '';
+      document.getElementById('enCharCount').textContent = (parsed.post||'').replace(/\s/g,'').length + ' chars';
+      document.getElementById('enOutputCard').style.display = 'block';
+      document.getElementById('enOutputCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      btn.textContent = '🌏 再翻訳する';
+    } catch(e) { showError('翻訳エラー：' + e.message); btn.textContent = '🌏 英語に翻訳（インバウンド向け）'; }
+    finally { btn.disabled = false; btn.classList.remove('translating'); }
+  }
+
+  function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.classList.add('visible'); }
+
+  async function copyText(textId, btnId) {
+    const text = document.getElementById(textId).innerText;
+    try {
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById(btnId); btn.classList.add('copied');
+      const t = btn.childNodes[btn.childNodes.length-1]; t.textContent = 'コピー済';
+      setTimeout(() => { btn.classList.remove('copied'); t.textContent = 'コピー'; }, 2000);
+    } catch(e) { alert('コピーに失敗しました。'); }
+  }
+
+  async function copyAll() {
+    const post = document.getElementById('postText').innerText;
+    const tags = document.getElementById('hashtagText').textContent;
+    try {
+      await navigator.clipboard.writeText(post + '\n\n' + tags);
+      const btn = document.getElementById('copyAll'); btn.classList.add('copied');
+      btn.childNodes[btn.childNodes.length-1].textContent = 'コピー済！';
+      setTimeout(() => { btn.classList.remove('copied'); btn.childNodes[btn.childNodes.length-1].textContent = '投稿文＋ハッシュタグをまとめてコピー'; }, 2000);
+    } catch(e) { alert('コピーに失敗しました。'); }
+  }
+
+  document.getElementById('postText').addEventListener('input', () => {
+    document.getElementById('charCount').textContent = document.getElementById('postText').innerText.replace(/\s/g,'').length + '字';
+  });
+</script>
+</body>
+</html>

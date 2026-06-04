@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram投稿ジェネレーター 制作アンケート</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    :root {
+      --cream: #f5f0e8;
+      --cream-dark: #ede5d8;
+      --terracotta: #c4704a;
+      --terracotta-dark: #a85a37;
+      --terracotta-light: #d98b68;
+      --wood: #8b6340;
+      --wood-light: #b08860;
+      --charcoal: #3a3028;
+      --charcoal-soft: #5a4a3a;
+      --white-warm: #fdfaf5;
+      --border: #d4c4a8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      background-color: var(--cream);
+      color: var(--charcoal);
+      min-height: 100vh;
+    }
+
+    .container { max-width: 700px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 36px; }
+    .header-deco { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 10px; }
+    .header-deco::before, .header-deco::after { content: ''; display: block; width: 40px; height: 1px; background: var(--wood-light); }
+    .header-deco span { color: var(--terracotta); font-size: 16px; }
+    .main-title { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 22px; font-weight: normal; letter-spacing: 0.2em; margin-bottom: 6px; }
+    .main-sub { font-size: 12px; color: var(--wood-light); letter-spacing: 0.15em; }
+
+    /* Progress */
+    .progress { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 36px; }
+    .progress-step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .progress-step .dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); background: var(--white-warm); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--wood-light); font-weight: bold; transition: all 0.3s; }
+    .progress-step .dot.active { border-color: var(--terracotta); background: var(--terracotta); color: #fff; }
+    .progress-step .dot.done { border-color: var(--terracotta-light); background: var(--terracotta-light); color: #fff; }
+    .progress-step .label { font-size: 10px; color: var(--wood-light); letter-spacing: 0.1em; white-space: nowrap; }
+    .progress-step .label.active { color: var(--terracotta); }
+    .progress-line { width: 48px; height: 1px; background: var(--border); margin-bottom: 18px; flex-shrink: 0; }
+
+    /* Card */
+    .card { background: var(--white-warm); border: 1px solid var(--border); border-radius: 4px; padding: 28px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(58,48,40,0.07); }
+    .card-title { font-size: 14px; letter-spacing: 0.15em; color: var(--wood); margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--cream-dark); display: flex; align-items: center; gap: 8px; font-weight: normal; font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; }
+    .card-title::before { content: ''; display: inline-block; width: 3px; height: 14px; background: var(--terracotta); border-radius: 2px; }
+
+    /* Upload */
+    .upload-area { border: 2px dashed var(--border); border-radius: 4px; background: var(--cream); cursor: pointer; transition: all 0.2s; overflow: hidden; }
+    .upload-area:hover, .upload-area.drag-over { border-color: var(--terracotta-light); background: rgba(196,112,74,0.04); }
+    .upload-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 40px 20px; color: var(--wood-light); }
+    .upload-placeholder svg { width: 36px; height: 36px; opacity: 0.4; }
+    .upload-placeholder p { font-size: 14px; letter-spacing: 0.1em; }
+    .upload-placeholder small { font-size: 11px; opacity: 0.7; }
+
+    .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; padding: 12px; }
+    .preview-item { position: relative; aspect-ratio: 1; }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; border-radius: 3px; }
+    .preview-item .remove { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; background: rgba(58,48,40,0.75); border: none; border-radius: 50%; color: #fff; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .upload-hint { font-size: 11px; color: var(--wood-light); margin-top: 10px; text-align: center; }
+
+    /* Form */
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 12px; color: var(--charcoal-soft); letter-spacing: 0.12em; margin-bottom: 7px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; padding: 10px 14px; background: var(--cream); border: 1px solid var(--border);
+      border-radius: 3px; font-size: 14px; font-family: inherit; color: var(--charcoal);
+      outline: none; transition: border-color 0.2s, background 0.2s; appearance: none;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--terracotta-light); background: var(--white-warm); }
+    .form-group textarea { resize: vertical; min-height: 72px; line-height: 1.7; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-hint { font-size: 11px; color: var(--wood-light); margin-top: 5px; }
+
+    /* Buttons */
+    .btn-primary { width: 100%; padding: 14px; background: var(--terracotta); color: var(--white-warm); border: none; border-radius: 3px; font-size: 14px; letter-spacing: 0.2em; font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; cursor: pointer; transition: background 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .btn-primary:hover:not(:disabled) { background: var(--terracotta-dark); }
+    .btn-primary:active:not(:disabled) { transform: scale(0.99); }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+    .btn-secondary { width: 100%; padding: 12px; background: var(--cream-dark); color: var(--charcoal-soft); border: 1px solid var(--border); border-radius: 3px; font-size: 13px; letter-spacing: 0.15em; font-family: inherit; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
+    .btn-secondary:hover { background: var(--border); }
+
+    /* Loading */
+    .loading-wrap { text-align: center; padding: 40px 20px; }
+    .loading-icon { font-size: 28px; animation: spin 2s linear infinite; display: inline-block; margin-bottom: 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 14px; color: var(--charcoal-soft); letter-spacing: 0.15em; margin-bottom: 8px; }
+    .loading-sub { font-size: 12px; color: var(--wood-light); }
+
+    /* Settings */
+    .settings-card { background: var(--cream-dark); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin-bottom: 20px; }
+    .settings-toggle { font-size: 12px; color: var(--wood); letter-spacing: 0.12em; cursor: pointer; display: flex; align-items: center; gap: 8px; background: none; border: none; padding: 0; font-family: inherit; }
+    .settings-toggle:hover { color: var(--terracotta); }
+    .settings-body { margin-top: 14px; display: none; }
+    .settings-body.open { display: block; }
+    .settings-hint { font-size: 11px; color: var(--wood-light); margin-top: 5px; line-height: 1.6; }
+
+    /* Done */
+    .done-wrap { text-align: center; padding: 30px 20px 20px; }
+    .done-icon { font-size: 40px; margin-bottom: 16px; }
+    .done-title { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 20px; font-weight: normal; letter-spacing: 0.2em; color: var(--charcoal); margin-bottom: 10px; }
+    .done-sub { font-size: 13px; color: var(--charcoal-soft); line-height: 1.8; margin-bottom: 20px; }
+    .deploy-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .btn-deploy-manual { padding: 12px; background: var(--cream-dark); border: 1px solid var(--border); border-radius: 3px; font-size: 12px; letter-spacing: 0.12em; color: var(--charcoal-soft); font-family: inherit; cursor: pointer; transition: background 0.2s; }
+    .btn-deploy-manual:hover { background: var(--border); }
+    .btn-deploy-auto { padding: 12px; background: var(--terracotta); color: #fff; border: none; border-radius: 3px; font-size: 12px; letter-spacing: 0.12em; font-family: inherit; cursor: pointer; transition: background 0.2s; }
+    .btn-deploy-auto:hover:not(:disabled) { background: var(--terracotta-dark); }
+    .btn-deploy-auto:disabled { opacity: 0.5; cursor: not-allowed; }
+    .deploy-status { font-size: 13px; color: var(--charcoal-soft); text-align: center; padding: 10px; display: none; }
+    .deploy-status.visible { display: block; }
+    .deploy-result { background: #f0f7f0; border: 1px solid #a0c8a0; border-radius: 3px; padding: 14px 16px; text-align: left; display: none; }
+    .deploy-result.visible { display: block; }
+    .deploy-result .url { font-size: 13px; color: var(--terracotta); word-break: break-all; margin-top: 6px; font-family: monospace; }
+    .done-steps { text-align: left; background: var(--cream); border-radius: 4px; padding: 14px 18px; font-size: 12px; color: var(--charcoal-soft); line-height: 2.2; }
+    .done-steps strong { color: var(--terracotta); }
+
+    /* Error */
+    .error-msg { display: none; padding: 12px 16px; background: #fdf0ec; border: 1px solid #e8b4a0; border-radius: 3px; color: #9b4a2a; font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+    .error-msg.visible { display: block; }
+
+    /* Footer */
+    .footer { text-align: center; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); }
+    .footer-text { font-size: 11px; color: var(--wood-light); letter-spacing: 0.15em; }
+
+    @media (max-width: 500px) {
+      .form-row { grid-template-columns: 1fr; }
+      .card { padding: 20px 16px; }
+      .progress-line { width: 24px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header class="header">
+    <div class="header-deco"><span>✦</span></div>
+    <h1 class="main-title">制作アンケート</h1>
+    <p class="main-sub">Instagram 投稿文ジェネレーター ─ お客様専用ツール作成</p>
+  </header>
+
+  <!-- Settings -->
+  <div class="settings-card">
+    <button class="settings-toggle" onclick="toggleSettings()">
+      ⚙ 自動デプロイ設定（一度だけ入力）
+    </button>
+    <div class="settings-body open" id="settingsBody">
+      <div class="form-group" style="margin-top:12px;margin-bottom:12px">
+        <label>Vercel Token</label>
+        <input type="password" id="vercelToken" placeholder="xxxxxxxxxxxxxxxxxxxxxx" oninput="saveSettings()">
+        <p class="settings-hint">
+          <a href="https://vercel.com/account/tokens" target="_blank" style="color:var(--terracotta)">vercel.com → Account Settings → Tokens → Create</a> で発行
+        </p>
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Anthropic API キー（クライアントサイトに設定されます）</label>
+        <input type="password" id="anthropicKeyStore" placeholder="sk-ant-..." oninput="saveSettings()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress">
+    <div class="progress-step">
+      <div class="dot active" id="dot1">1</div>
+      <div class="label active" id="lbl1">スクショ</div>
+    </div>
+    <div class="progress-line"></div>
+    <div class="progress-step">
+      <div class="dot" id="dot2">2</div>
+      <div class="label" id="lbl2">解析中</div>
+    </div>
+    <div class="progress-line"></div>
+    <div class="progress-step">
+      <div class="dot" id="dot3">3</div>
+      <div class="label" id="lbl3">確認・編集</div>
+    </div>
+    <div class="progress-line"></div>
+    <div class="progress-step">
+      <div class="dot" id="dot4">4</div>
+      <div class="label" id="lbl4">完成</div>
+    </div>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- Step 1: Upload -->
+  <div id="step1">
+    <div class="card">
+      <h2 class="card-title">Instagramのスクリーンショットをアップロード</h2>
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)">
+        <div class="upload-placeholder" id="uploadPlaceholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <p>クリックまたはドラッグ＆ドロップ</p>
+          <small>プロフィールページ＋投稿画面のスクショを複数枚（最大5枚）</small>
+        </div>
+        <div class="preview-grid" id="previewGrid" style="display:none"></div>
+      </div>
+      <p class="upload-hint">※ プロフィール・bio・投稿の雰囲気がわかるスクリーンショットを入れると精度が上がります</p>
+    </div>
+
+    <!-- ウェブサイトURL入力 -->
+    <div class="card" style="margin-top: 0">
+      <h2 class="card-title">店舗ウェブサイト（任意）</h2>
+      <div class="form-group" style="margin-bottom: 0">
+        <label>店舗のウェブサイトURL</label>
+        <div style="display:flex; gap:8px; align-items:center">
+          <input type="url" id="shopWebUrl" placeholder="https://www.johkoya.com"
+            style="flex:1; font-family:monospace; font-size:13px"
+            oninput="updateAnalyzeBtn()">
+          <button onclick="testFetchUrl()" id="fetchTestBtn"
+            style="padding:10px 14px; background:var(--cream-dark); border:1px solid var(--border); border-radius:3px; font-size:12px; color:var(--charcoal-soft); cursor:pointer; white-space:nowrap; font-family:inherit; flex-shrink:0">
+            接続確認
+          </button>
+        </div>
+        <p class="form-hint" id="fetchStatus" style="margin-top:6px"></p>
+        <p class="form-hint">公式サイト・食べログ・ぐるなびなど何でも可。スクショと合わせると精度が上がります</p>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="analyzeBtn" onclick="analyzeImages()" disabled>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Claudeで解析する
+    </button>
+    <button class="btn-secondary" onclick="skipToForm()">スクショなしで手動入力する</button>
+  </div>
+
+  <!-- Step 2: Analyzing -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="loading-wrap">
+        <div class="loading-icon">✦</div>
+        <p class="loading-text">画像を解析しています</p>
+        <p class="loading-sub">店名・コンセプト・雰囲気を読み取っています…</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Review/Edit -->
+  <div id="step3" style="display:none">
+    <div class="card">
+      <h2 class="card-title">店舗情報を確認・編集</h2>
+      <p style="font-size:12px;color:var(--wood-light);margin-bottom:18px;line-height:1.7">Claudeが抽出した情報です。内容を確認・修正してください。</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>店名 *</label>
+          <input type="text" id="shopName" placeholder="上古屋">
+        </div>
+        <div class="form-group">
+          <label>料理ジャンル *</label>
+          <input type="text" id="foodGenre" placeholder="和食居酒屋">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>所在地 *</label>
+          <input type="text" id="location" placeholder="京都・西洞院蛸薬師">
+        </div>
+        <div class="form-group">
+          <label>URL用英語名 <small style="color:var(--wood-light);font-weight:normal">（例: johkoya）</small></label>
+          <input type="text" id="urlSlug" placeholder="johkoya" style="font-family:monospace" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9-]/g,'')">
+          <p class="settings-hint" style="margin-top:4px">半角英数字・ハイフンのみ。URLが <strong>入力値.vercel.app</strong> になります</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>コンセプト・キャッチコピー</label>
+        <input type="text" id="concept" placeholder="じんわり良い酒、良い食事">
+      </div>
+
+      <div class="form-group">
+        <label>店の雰囲気・特徴</label>
+        <textarea id="description" placeholder="京町家を改装した木のぬくもりある居酒屋。カウンター8席、テーブル14席。"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>こだわりの食材・料理の特徴</label>
+        <textarea id="foodSpecialty" placeholder="店主の地元・京丹後の食材と地酒にこだわる。旬の魚介を中心に。"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>ターゲット客層</label>
+        <input type="text" id="target" placeholder="仕事帰りのゆったりしたい大人">
+      </div>
+
+      <div class="form-group">
+        <label>投稿トーンの傾向</label>
+        <select id="defaultTone">
+          <option value="しみじみ系">しみじみ系（静かで詩的）</option>
+          <option value="食欲そそる系">食欲そそる系（五感に訴える）</option>
+          <option value="お知らせ系">お知らせ系（自然体で伝える）</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>よく使うハッシュタグ（スペース区切り）</label>
+        <textarea id="baseHashtags" placeholder="#上古屋 #京都居酒屋 #西洞院 #京丹後 #和食 #地酒 #京都グルメ"></textarea>
+        <p class="form-hint">生成時に自動追加される固定ハッシュタグです</p>
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="generateAndDownload()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      専用ジェネレーターを生成
+    </button>
+    <button class="btn-secondary" onclick="setStep(1)" style="margin-top:10px">
+      ← 解析しなおす（スクショ・URLを変えて再解析）
+    </button>
+  </div>
+
+  <!-- Step 4: Done -->
+  <div id="step4" style="display:none">
+    <div class="card">
+      <div class="done-wrap">
+        <div class="done-icon">✦</div>
+        <h2 class="done-title" id="doneTitle">完成しました</h2>
+        <p class="done-sub">デプロイ方法を選んでください</p>
+        <div class="deploy-options">
+          <button class="btn-deploy-manual" onclick="triggerManualDownload()">
+            ↓ ZIPをダウンロード<br><small style="opacity:.7">手動でVercelにデプロイ</small>
+          </button>
+          <button class="btn-deploy-auto" id="autoDeployBtn" onclick="autoDeployToVercel()">
+            ⚡ Vercelに自動デプロイ<br><small style="opacity:.85">URLまで自動で完了</small>
+          </button>
+        </div>
+        <div class="deploy-status" id="deployStatus"></div>
+        <div class="deploy-result" id="deployResult">
+          <div style="font-size:13px;color:#2d6a2d;font-weight:bold;margin-bottom:4px">✓ デプロイ完了！</div>
+          <div style="font-size:12px;color:var(--charcoal-soft);margin-bottom:4px">お客様専用URL：</div>
+          <div class="url" id="deployUrl"></div>
+          <button onclick="copyDeployUrl()" style="margin-top:10px;padding:6px 14px;background:var(--terracotta);color:#fff;border:none;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit">URLをコピー</button>
+        </div>
+        <div class="done-steps" id="manualSteps" style="margin-top:16px">
+          <strong>手動の場合：</strong><br>
+          <strong>① </strong>ZIPを解凍<br>
+          <strong>② </strong>ターミナルで解凍フォルダに移動し <code>vercel --prod</code> を実行<br>
+          <strong>③ </strong>Vercel ダッシュボード → Environment Variables に <code>ANTHROPIC_API_KEY</code> を設定<br>
+          <strong>④ </strong>再デプロイしてURLをお客様に共有
+        </div>
+      </div>
+    </div>
+    <button class="btn-secondary" onclick="restart()">別のお客様のジェネレーターを作る</button>
+  </div>
+
+  <footer class="footer">
+    <p class="footer-text">Powered by Claude ✦ Anthropic</p>
+  </footer>
+</div>
+
+<script>
+  let uploadedImages = [];
+  let generatedZipBlob = null;
+  let currentShopName = '';
+  let currentUrlSlug = '';
+
+  // ── Settings ──────────────────────────────────────────────
+  function toggleSettings() {
+    const b = document.getElementById('settingsBody');
+    b.classList.toggle('open');
+  }
+  function saveSettings() {
+    localStorage.setItem('vercelToken', document.getElementById('vercelToken').value);
+    localStorage.setItem('anthropicKey', document.getElementById('anthropicKeyStore').value);
+  }
+  (function loadSettings() {
+    const t = localStorage.getItem('vercelToken');
+    const k = localStorage.getItem('anthropicKey');
+    if (t) document.getElementById('vercelToken').value = t;
+    if (k) document.getElementById('anthropicKeyStore').value = k;
+  })();
+
+  // ── Image handling ──────────────────────────────────────
+  function resizeImage(dataUrl, maxPx, quality) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w > h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else       { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = dataUrl;
+    });
+  }
+
+  function handleFiles(files) {
+    const remaining = 5 - uploadedImages.length;
+    const toAdd = Array.from(files).slice(0, remaining);
+    toAdd.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = async e => {
+        const resized = await resizeImage(e.target.result, 1200, 0.82);
+        uploadedImages.push({
+          base64: resized.split(',')[1],
+          mediaType: 'image/jpeg',
+          dataUrl: resized
+        });
+        renderPreviews();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderPreviews() {
+    const grid = document.getElementById('previewGrid');
+    const placeholder = document.getElementById('uploadPlaceholder');
+    grid.innerHTML = '';
+    uploadedImages.forEach((img, i) => {
+      const div = document.createElement('div');
+      div.className = 'preview-item';
+      div.innerHTML = '<img src="' + img.dataUrl + '" alt=""><button class="remove" onclick="removeImage(' + i + ',event)">×</button>';
+      grid.appendChild(div);
+    });
+    if (uploadedImages.length > 0) {
+      placeholder.style.display = 'none';
+      grid.style.display = 'grid';
+    } else {
+      placeholder.style.display = 'flex';
+      grid.style.display = 'none';
+    }
+    updateAnalyzeBtn();
+  }
+
+  function removeImage(i, e) {
+    e.stopPropagation();
+    uploadedImages.splice(i, 1);
+    renderPreviews();
+  }
+
+  const uploadArea = document.getElementById('uploadArea');
+  uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('drag-over'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('drag-over'));
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadArea.classList.remove('drag-over');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  // ── Progress ─────────────────────────────────────────────
+  function setStep(n) {
+    [1,2,3,4].forEach(i => {
+      document.getElementById('step' + i).style.display = i === n ? 'block' : 'none';
+      const dot = document.getElementById('dot' + i);
+      const lbl = document.getElementById('lbl' + i);
+      dot.className = 'dot' + (i < n ? ' done' : i === n ? ' active' : '');
+      lbl.className = 'label' + (i === n ? ' active' : '');
+    });
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('errorMsg');
+    el.textContent = msg;
+    el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), 6000);
+  }
+
+  // ── URL接続確認 ──────────────────────────────────────────
+  function updateAnalyzeBtn() {
+    const hasImages = uploadedImages.length > 0;
+    const hasUrl = document.getElementById('shopWebUrl').value.trim() !== '';
+    document.getElementById('analyzeBtn').disabled = !hasImages && !hasUrl;
+  }
+
+  async function testFetchUrl() {
+    const url = document.getElementById('shopWebUrl').value.trim();
+    if (!url) { showError('URLを入力してください'); return; }
+    const btn = document.getElementById('fetchTestBtn');
+    const status = document.getElementById('fetchStatus');
+    btn.disabled = true;
+    status.textContent = '接続中…';
+    status.style.color = 'var(--wood-light)';
+    try {
+      const res = await fetch('/fetch-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'エラー');
+      const chars = data.text.length;
+      status.textContent = `✓ 取得成功（約${Math.round(chars/100)/10}KB のテキストを読み込みました）`;
+      status.style.color = '#2d6a2d';
+    } catch(e) {
+      status.textContent = '✗ ' + e.message;
+      status.style.color = '#c0392b';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  // ── Analyze ───────────────────────────────────────────────
+  async function analyzeImages() {
+    setStep(2);
+    document.getElementById('errorMsg').classList.remove('visible');
+
+    const msgContent = [];
+    let webText = '';
+
+    // ウェブページを取得（URLが入力されている場合）
+    const webUrl = document.getElementById('shopWebUrl').value.trim();
+    if (webUrl) {
+      try {
+        const fetchRes = await fetch('/fetch-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: webUrl })
+        });
+        const fetchData = await fetchRes.json();
+        if (fetchRes.ok && fetchData.text) {
+          webText = fetchData.text;
+        }
+      } catch(e) {
+        // ウェブページ取得失敗は無視して続行
+      }
+    }
+
+    // 画像を追加
+    uploadedImages.forEach(img => {
+      msgContent.push({
+        type: 'image',
+        source: { type: 'base64', media_type: img.mediaType, data: img.base64 }
+      });
+    });
+
+    // プロンプトを構築
+    let promptText = '';
+    if (uploadedImages.length > 0 && webText) {
+      promptText = 'これらはあるお店のInstagramのスクリーンショットと、お店のウェブサイトのテキストです。両方の情報を組み合わせて店舗情報を読み取ってください。';
+    } else if (uploadedImages.length > 0) {
+      promptText = 'これらはあるお店のInstagramのスクリーンショットです。店舗情報をできる限り読み取ってください。';
+    } else if (webText) {
+      promptText = 'これはあるお店のウェブサイトのテキストです。店舗情報を読み取ってください。';
+    }
+
+    if (webText) {
+      promptText += '\n\n【ウェブサイトテキスト（' + webUrl + '）】\n' + webText.slice(0, 20000);
+    }
+
+    promptText += '\n\n以下のJSON形式のみで返答してください。わからない項目は空文字にしてください。\n\n{\n  "shopName": "店名",\n  "location": "所在地（都市・エリア）",\n  "foodGenre": "料理ジャンル（例：和食居酒屋）",\n  "concept": "コンセプト・キャッチコピー",\n  "description": "店の雰囲気・特徴（100字程度）",\n  "foodSpecialty": "こだわりの食材・料理の特徴",\n  "target": "ターゲット客層",\n  "defaultTone": "しみじみ系 または 食欲そそる系 または お知らせ系",\n  "baseHashtags": "よく使いそうなハッシュタグ15個（スペース区切り、#付き）"\n}';
+
+    msgContent.push({ type: 'text', text: promptText });
+
+    try {
+      const res = await fetch('/api/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 1500,
+          messages: [{ role: 'user', content: msgContent }]
+        })
+      });
+      if (!res.ok) throw new Error('APIエラー (' + res.status + ')');
+      const data = await res.json();
+      const raw = data.content[0].text.trim();
+      const match = raw.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error('解析結果を読み取れませんでした');
+      const info = JSON.parse(match[0]);
+      fillForm(info);
+      setStep(3);
+    } catch(e) {
+      setStep(1);
+      showError('解析エラー：' + e.message);
+    }
+  }
+
+  function fillForm(info) {
+    const set = (id, val) => { if (val && document.getElementById(id)) document.getElementById(id).value = val; };
+    set('shopName', info.shopName);
+    set('location', info.location);
+    set('foodGenre', info.foodGenre);
+    set('concept', info.concept);
+    set('description', info.description);
+    set('foodSpecialty', info.foodSpecialty);
+    set('target', info.target);
+    set('baseHashtags', info.baseHashtags);
+    if (info.defaultTone) {
+      const sel = document.getElementById('defaultTone');
+      ['しみじみ系','食欲そそる系','お知らせ系'].forEach(v => {
+        if (info.defaultTone.includes(v.replace('系','')) || info.defaultTone === v) sel.value = v;
+      });
+    }
+  }
+
+  function skipToForm() {
+    setStep(3);
+  }
+
+  // ── Generate HTML ─────────────────────────────────────────
+  function generateAndDownload() {
+    const shopName    = document.getElementById('shopName').value.trim() || 'お店';
+    const urlSlug     = document.getElementById('urlSlug').value.trim();
+    const location    = document.getElementById('location').value.trim() || '';
+    const foodGenre   = document.getElementById('foodGenre').value.trim() || '飲食店';
+    const concept     = document.getElementById('concept').value.trim() || '';
+    const description = document.getElementById('description').value.trim() || '';
+    const foodSpecialty = document.getElementById('foodSpecialty').value.trim() || '';
+    const target      = document.getElementById('target').value.trim() || 'お客様';
+    const defaultTone = document.getElementById('defaultTone').value;
+    const baseHashtags = document.getElementById('baseHashtags').value.trim() || '';
+
+    if (!shopName) { showError('店名を入力してください。'); return; }
+
+    const html = buildGeneratorHTML({ shopName, location, foodGenre, concept, description, foodSpecialty, target, defaultTone, baseHashtags });
+
+    const proxyJs = `const https = require('https');
+
+module.exports = async (req, res) => {
+  if (req.method !== 'POST') {
+    res.status(405).send('Method Not Allowed');
+    return;
+  }
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    res.status(500).json({ error: 'APIキーが設定されていません' });
+    return;
+  }
+  const chunks = [];
+  for await (const chunk of req) { chunks.push(chunk); }
+  const data = Buffer.concat(chunks).toString();
+  await new Promise((resolve) => {
+    const options = {
+      hostname: 'api.anthropic.com', path: '/v1/messages', method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'Content-Length': Buffer.byteLength(data) }
+    };
+    const apiReq = https.request(options, (apiRes) => {
+      let body = '';
+      apiRes.on('data', chunk => body += chunk);
+      apiRes.on('end', () => { res.status(apiRes.statusCode).setHeader('Content-Type','application/json').send(body); resolve(); });
+    });
+    apiReq.on('error', (e) => { res.status(500).json({ error: e.message }); resolve(); });
+    apiReq.write(data); apiReq.end();
+  });
+};`;
+
+    const vercelJson = `{\n  "functions": {\n    "api/proxy.js": {\n      "memory": 128,\n      "maxDuration": 30\n    }\n  }\n}\n`;
+
+    const zip = new JSZip();
+    zip.file('index.html', html);
+    zip.folder('api').file('proxy.js', proxyJs);
+    zip.file('vercel.json', vercelJson);
+
+    currentShopName = shopName;
+    currentUrlSlug = urlSlug || shopName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 20);
+    zip.generateAsync({ type: 'blob' }).then(blob => {
+      generatedZipBlob = blob;
+      document.getElementById('doneTitle').textContent = shopName + 'のジェネレーター完成！';
+      document.getElementById('deployResult').classList.remove('visible');
+      document.getElementById('deployStatus').classList.remove('visible');
+      setStep(4);
+    });
+  }
+
+  function triggerManualDownload() {
+    if (!generatedZipBlob) return;
+    const name = (currentShopName || 'shop').replace(/[^\w\u3040-\u9FFF]/g, '_');
+    const url = URL.createObjectURL(generatedZipBlob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name + '_generator.zip'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function autoDeployToVercel() {
+    const token  = document.getElementById('vercelToken').value.trim();
+    const apiKey = document.getElementById('anthropicKeyStore').value.trim();
+    if (!token || !apiKey) {
+      const body = document.getElementById('settingsBody');
+      body.classList.add('open');
+      document.querySelector('.settings-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showError(!token ? 'Vercel Token を上の設定欄に入力してください。' : 'Anthropic API キー を上の設定欄に入力してください。');
+      return;
+    }
+    if (!generatedZipBlob) { showError('先にジェネレーターを生成してください。'); return; }
+
+    const btn = document.getElementById('autoDeployBtn');
+    const status = document.getElementById('deployStatus');
+    const result = document.getElementById('deployResult');
+    btn.disabled = true;
+    result.classList.remove('visible');
+
+    const setStatus = msg => { status.textContent = msg; status.classList.add('visible'); };
+
+    const vApi = async (path, opts = {}) => {
+      const res = await fetch('https://api.vercel.com' + path, {
+        ...opts,
+        headers: { 'Authorization': 'Bearer ' + token, ...(opts.headers || {}) }
+      });
+      const text = await res.text();
+      let json;
+      try { json = JSON.parse(text); } catch { throw new Error(text.slice(0, 200)); }
+      if (!res.ok) throw new Error((json.error && json.error.message) || json.message || ('HTTP ' + res.status));
+      return json;
+    };
+
+    try {
+      // 1. ZIPからファイルを展開してVercel形式に変換
+      setStatus('① ファイルを準備中…');
+      const JSZipLib = window.JSZip;
+      const zip = await JSZipLib.loadAsync(generatedZipBlob);
+      const files = [];
+      const filePromises = [];
+      zip.forEach((relPath, zipEntry) => {
+        if (!zipEntry.dir) {
+          filePromises.push(
+            zipEntry.async('text').then(content => {
+              files.push({ file: relPath, data: content, encoding: 'utf-8' });
+            })
+          );
+        }
+      });
+      await Promise.all(filePromises);
+
+      // 2. プロジェクト名を生成（URL用英語名を優先）
+      const baseSlug = (currentUrlSlug || currentShopName || 'shop')
+        .toLowerCase()
+        .replace(/[\u3040-\u9FFF\u4E00-\u9FFF]/g, 'shop')
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 24);
+      const safeName = baseSlug + '-' + Math.random().toString(36).slice(2, 6);
+
+      // 3. 1回目のデプロイ（プロジェクト作成）
+      setStatus('② Vercelにデプロイ中…');
+      const deploy1 = await vApi('/v13/deployments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: safeName,
+          files: files,
+          projectSettings: { framework: null },
+          target: 'production'
+        })
+      });
+
+      const projectId = deploy1.projectId;
+      if (!projectId) throw new Error('プロジェクトIDを取得できませんでした');
+
+      // 4. 環境変数を設定
+      setStatus('③ APIキーを設定中…');
+      await vApi('/v10/projects/' + projectId + '/env', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          key: 'ANTHROPIC_API_KEY',
+          value: apiKey,
+          type: 'encrypted',
+          target: ['production', 'preview']
+        })
+      });
+
+      // 5. 2回目のデプロイ（環境変数を反映）
+      setStatus('④ 環境変数を反映して再デプロイ中…');
+      const deploy2 = await vApi('/v13/deployments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: safeName,
+          files: files,
+          projectSettings: { framework: null },
+          target: 'production'
+        })
+      });
+
+      // 6. Deployment Protection を無効化（誰でも開けるように）
+      setStatus('⑤ 公開設定中…');
+      await vApi('/v9/projects/' + projectId, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ssoProtection: null, passwordProtection: null })
+      });
+
+      // 7. デプロイ完了待ち
+      setStatus('⑥ 公開処理中…（20〜40秒）');
+      const deployId = deploy2.id;
+      let siteUrl = 'https://' + safeName + '.vercel.app';
+      for (let i = 0; i < 20; i++) {
+        await new Promise(r => setTimeout(r, 3000));
+        const d = await vApi('/v13/deployments/' + deployId);
+        if (d.readyState === 'READY' || d.state === 'READY') {
+          break;
+        }
+        if (d.readyState === 'ERROR' || d.state === 'ERROR') {
+          throw new Error('デプロイに失敗しました。Vercelダッシュボードで詳細を確認してください。');
+        }
+      }
+
+      status.classList.remove('visible');
+      document.getElementById('deployUrl').textContent = siteUrl;
+      result.classList.add('visible');
+
+    } catch(e) {
+      status.classList.remove('visible');
+      showError('デプロイエラー: ' + e.message);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+  function copyDeployUrl() {
+    const url = document.getElementById('deployUrl').textContent;
+    navigator.clipboard.writeText(url).then(() => alert('コピーしました！'));
+  }
+
+  function restart() {
+    uploadedImages = [];
+    renderPreviews();
+    document.getElementById('fileInput').value = '';
+    ['shopName','urlSlug','location','foodGenre','concept','description','foodSpecialty','target','baseHashtags'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    setStep(1);
+  }
+
+  // ── Template Builder ──────────────────────────────────────
+  function buildGeneratorHTML(d) {
+    const esc = s => s.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+    const shopName      = esc(d.shopName);
+    const location      = esc(d.location);
+    const foodGenre     = esc(d.foodGenre);
+    const concept       = esc(d.concept);
+    const description   = esc(d.description);
+    const foodSpecialty = esc(d.foodSpecialty);
+    const target        = esc(d.target);
+    const defaultTone   = esc(d.defaultTone);
+    const baseHashtags  = esc(d.baseHashtags);
+
+    return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${d.shopName} Instagram投稿文ジェネレーター</title>
+  <style>
+    :root{--cream:#f5f0e8;--cream-dark:#ede5d8;--terracotta:#c4704a;--terracotta-dark:#a85a37;--terracotta-light:#d98b68;--wood:#8b6340;--wood-light:#b08860;--charcoal:#3a3028;--charcoal-soft:#5a4a3a;--white-warm:#fdfaf5;--border:#d4c4a8;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Hiragino Mincho ProN','Yu Mincho','YuMincho',Georgia,serif;background-color:var(--cream);color:var(--charcoal);min-height:100vh;background-image:repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(139,99,64,.04) 60px,rgba(139,99,64,.04) 61px),repeating-linear-gradient(0deg,transparent,transparent 60px,rgba(139,99,64,.04) 60px,rgba(139,99,64,.04) 61px);}
+    .container{max-width:680px;margin:0 auto;padding:32px 20px 60px;}
+    .header{text-align:center;margin-bottom:36px;}
+    .header-deco{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:10px;}
+    .header-deco::before,.header-deco::after{content:'';display:block;width:48px;height:1px;background:var(--wood-light);}
+    .header-deco span{color:var(--terracotta);font-size:18px;}
+    .shop-name{font-size:28px;font-weight:normal;letter-spacing:.25em;color:var(--charcoal);margin-bottom:6px;}
+    .shop-subtitle{font-size:12px;color:var(--wood-light);letter-spacing:.2em;font-family:'Hiragino Sans','Yu Gothic',sans-serif;}
+    .card{background:var(--white-warm);border:1px solid var(--border);border-radius:4px;padding:28px;margin-bottom:20px;box-shadow:0 2px 12px rgba(58,48,40,.07);}
+    .card-title{font-size:13px;letter-spacing:.18em;color:var(--wood);margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--cream-dark);font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-weight:normal;display:flex;align-items:center;gap:8px;}
+    .card-title::before{content:'';display:inline-block;width:3px;height:14px;background:var(--terracotta);border-radius:2px;}
+    .form-group{margin-bottom:20px;}
+    label{display:block;font-size:13px;color:var(--charcoal-soft);letter-spacing:.12em;margin-bottom:8px;font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-weight:normal;}
+    input[type=text],textarea,select{width:100%;padding:10px 14px;background:var(--cream);border:1px solid var(--border);border-radius:3px;font-size:14px;font-family:'Hiragino Mincho ProN','Yu Mincho',serif;color:var(--charcoal);outline:none;transition:border-color .2s,background .2s;appearance:none;}
+    input[type=text]:focus,textarea:focus,select:focus{border-color:var(--terracotta-light);background:var(--white-warm);}
+    textarea{resize:vertical;min-height:80px;line-height:1.7;}
+    .select-wrapper{position:relative;}
+    .select-wrapper::after{content:'▾';position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--wood-light);font-size:12px;pointer-events:none;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .type-tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:20px;padding-bottom:4px;scrollbar-width:none;}
+    .type-tabs::-webkit-scrollbar{display:none;}
+    .type-tab{flex-shrink:0;padding:7px 13px;border:1px solid var(--border);border-radius:20px;background:var(--cream);color:var(--wood);font-size:12px;font-family:inherit;cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:.05em;}
+    .type-tab:hover{border-color:var(--terracotta-light);color:var(--terracotta);}
+    .type-tab.active{background:var(--terracotta);color:#fff;border-color:var(--terracotta);}
+    .type-form{display:none;}
+    .type-form.active{display:block;}
+    .btn-generate{width:100%;padding:14px;background:var(--terracotta);color:var(--white-warm);border:none;border-radius:3px;font-size:15px;letter-spacing:.25em;font-family:'Hiragino Mincho ProN','Yu Mincho',serif;cursor:pointer;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:10px;}
+    .btn-generate:hover:not(:disabled){background:var(--terracotta-dark);}
+    .btn-generate:active:not(:disabled){transform:scale(.99);}
+    .btn-generate:disabled{opacity:.6;cursor:not-allowed;}
+    .loading{display:none;text-align:center;padding:20px;color:var(--wood-light);font-size:13px;font-family:'Hiragino Sans','Yu Gothic',sans-serif;letter-spacing:.12em;}
+    .loading.visible{display:block;}
+    .loading-dots{display:inline-flex;gap:5px;margin-top:10px;}
+    .loading-dots span{width:5px;height:5px;border-radius:50%;background:var(--terracotta-light);animation:dot-pulse 1.2s ease-in-out infinite;}
+    .loading-dots span:nth-child(2){animation-delay:.2s;}
+    .loading-dots span:nth-child(3){animation-delay:.4s;}
+    @keyframes dot-pulse{0%,80%,100%{opacity:.3;transform:scale(.8);}40%{opacity:1;transform:scale(1);}}
+    .output-section{display:none;}
+    .output-section.visible{display:block;}
+    .output-card{background:var(--white-warm);border:1px solid var(--border);border-radius:4px;padding:24px 28px;margin-bottom:16px;box-shadow:0 2px 12px rgba(58,48,40,.07);}
+    .output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--cream-dark);}
+    .output-label{font-size:12px;letter-spacing:.18em;color:var(--wood);font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-weight:normal;display:flex;align-items:center;gap:8px;}
+    .output-label::before{content:'';display:inline-block;width:3px;height:13px;background:var(--terracotta);border-radius:2px;}
+    .char-count{font-size:11px;color:var(--wood-light);font-family:'Hiragino Sans','Yu Gothic',sans-serif;}
+    .output-text{font-size:15px;line-height:1.9;color:var(--charcoal);white-space:pre-wrap;word-break:break-all;min-height:60px;outline:none;border-radius:3px;transition:background .2s,box-shadow .2s;padding:4px 6px;margin:-4px -6px;}
+    .output-text[contenteditable=true]:hover{background:rgba(196,112,74,.04);}
+    .output-text[contenteditable=true]:focus{background:var(--white-warm);box-shadow:0 0 0 2px rgba(196,112,74,.25);}
+    .edit-hint{font-size:11px;color:var(--wood-light);margin-top:6px;font-family:'Hiragino Sans','Yu Gothic',sans-serif;}
+    .hashtag-list{font-size:13px;line-height:2;color:var(--terracotta-dark);word-break:break-all;font-family:'Hiragino Sans','Yu Gothic',sans-serif;}
+    .btn-copy{display:flex;align-items:center;gap:6px;padding:7px 14px;background:transparent;border:1px solid var(--border);border-radius:3px;font-size:12px;letter-spacing:.12em;color:var(--wood);font-family:'Hiragino Sans','Yu Gothic',sans-serif;cursor:pointer;transition:all .2s;}
+    .btn-copy:hover{background:var(--cream-dark);border-color:var(--wood-light);}
+    .btn-copy.copied{border-color:var(--terracotta-light);color:var(--terracotta);background:rgba(196,112,74,.05);}
+    .btn-copy svg{width:13px;height:13px;}
+    .btn-copy-all{width:100%;padding:11px;background:var(--cream-dark);border:1px solid var(--border);border-radius:3px;font-size:13px;letter-spacing:.18em;color:var(--charcoal-soft);font-family:'Hiragino Sans','Yu Gothic',sans-serif;cursor:pointer;transition:all .2s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-copy-all:hover{background:var(--border);}
+    .btn-copy-all.copied{border-color:var(--terracotta-light);color:var(--terracotta);background:rgba(196,112,74,.06);}
+    .error-msg{display:none;padding:12px 16px;background:#fdf0ec;border:1px solid #e8b4a0;border-radius:3px;color:#9b4a2a;font-size:13px;font-family:'Hiragino Sans','Yu Gothic',sans-serif;line-height:1.6;margin-bottom:16px;}
+    .error-msg.visible{display:block;}
+    .footer{text-align:center;margin-top:40px;padding-top:20px;border-top:1px solid var(--border);}
+    .footer-text{font-size:11px;color:var(--wood-light);letter-spacing:.15em;font-family:'Hiragino Sans','Yu Gothic',sans-serif;}
+    .footer-deco{margin-top:8px;font-size:14px;color:var(--terracotta-light);letter-spacing:.3em;}
+    @media(max-width:500px){.form-row{grid-template-columns:1fr;}.card{padding:20px 18px;}.output-card{padding:20px 18px;}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="header-deco"><span>✦</span></div>
+    <h1 class="shop-name">${d.shopName}</h1>
+    <p class="shop-subtitle">Instagram 投稿文ジェネレーター${d.location ? ' ─ ' + d.location : ''}</p>
+  </header>
+
+  <div class="card">
+    <h2 class="card-title">投稿タイプを選ぶ</h2>
+    <div class="type-tabs">
+      <button class="type-tab active" onclick="switchType('food',this)">🍽️ 今日のおすすめ</button>
+      <button class="type-tab" onclick="switchType('staff',this)">🧑‍🍳 スタッフ紹介</button>
+      <button class="type-tab" onclick="switchType('seats',this)">📅 空き状況</button>
+      <button class="type-tab" onclick="switchType('full',this)">🎉 満席御礼</button>
+      <button class="type-tab" onclick="switchType('ingredient',this)">🌿 食材紹介</button>
+      <button class="type-tab" onclick="switchType('newmenu',this)">🆕 新メニュー</button>
+      <button class="type-tab" onclick="switchType('notice',this)">📣 お知らせ</button>
+    </div>
+
+    <div class="type-form active" id="form-food">
+      <div class="form-group">
+        <label>今日の料理・食材</label>
+        <textarea id="foodInput" placeholder="例：本日入荷の地魚のお刺身、旬の野菜の焼き物…"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>季節</label>
+          <div class="select-wrapper">
+            <select id="season">
+              <option value="春">春</option><option value="夏">夏</option>
+              <option value="秋">秋</option><option value="冬">冬</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>投稿トーン</label>
+          <div class="select-wrapper">
+            <select id="tone">
+              <option value="しみじみ系">しみじみ系</option>
+              <option value="食欲そそる系">食欲そそる系</option>
+              <option value="お知らせ系">お知らせ系</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="type-form" id="form-staff">
+      <div class="form-row">
+        <div class="form-group">
+          <label>スタッフ名</label>
+          <input type="text" id="staffName" placeholder="例：田中さん">
+        </div>
+        <div class="form-group">
+          <label>役割・ポジション</label>
+          <input type="text" id="staffRole" placeholder="例：板前・ホール担当">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>人柄・エピソード</label>
+        <textarea id="staffEpisode" placeholder="例：笑顔が絶えない20代。地元食材への愛情が人一倍強い。"></textarea>
+      </div>
+      <div class="form-group">
+        <label>得意料理・こだわり（任意）</label>
+        <input type="text" id="staffSpecialty" placeholder="例：だし巻き卵、鯖の棒寿司">
+      </div>
+    </div>
+
+    <div class="type-form" id="form-seats">
+      <div class="form-row">
+        <div class="form-group">
+          <label>本日の空き状況</label>
+          <div class="select-wrapper">
+            <select id="seatsStatus">
+              <option value="余裕あり">余裕あり 🟢</option>
+              <option value="残り少なめ">残り少なめ 🟡</option>
+              <option value="残りわずか">残りわずか 🔴</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>おすすめ時間帯（任意）</label>
+          <input type="text" id="seatsTime" placeholder="例：18時〜19時半">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>今夜のひと言（任意）</label>
+        <input type="text" id="seatsComment" placeholder="例：今夜は鰹のたたきと地酒が揃ってます">
+      </div>
+      <div class="form-group">
+        <label>季節</label>
+        <div class="select-wrapper">
+          <select id="seatsSeason">
+            <option value="春">春</option><option value="夏">夏</option>
+            <option value="秋">秋</option><option value="冬">冬</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="type-form" id="form-full">
+      <div class="form-group">
+        <label>次の空き日時</label>
+        <input type="text" id="fullNextDate" placeholder="例：来週木曜・金曜 / 今週末のランチ">
+      </div>
+      <div class="form-group">
+        <label>感謝のひと言（任意）</label>
+        <input type="text" id="fullThanks" placeholder="例：おかげさまで連日満席が続いています">
+      </div>
+      <div class="form-group">
+        <label>予約先・連絡先（任意）</label>
+        <input type="text" id="fullContact" placeholder="例：DMまたはお電話にて">
+      </div>
+    </div>
+
+    <div class="type-form" id="form-ingredient">
+      <div class="form-row">
+        <div class="form-group">
+          <label>食材名</label>
+          <input type="text" id="ingredientName" placeholder="例：松葉ガニ">
+        </div>
+        <div class="form-group">
+          <label>産地・仕入れ先（任意）</label>
+          <input type="text" id="ingredientOrigin" placeholder="例：間人漁港">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>こだわり・エピソード</label>
+        <textarea id="ingredientEpisode" placeholder="例：今年初の間人ガニ。水揚げ直後に仕入れる活け蟹で、甘みと旨みが格段に違う。"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>季節</label>
+          <div class="select-wrapper">
+            <select id="ingredientSeason">
+              <option value="春">春</option><option value="夏">夏</option>
+              <option value="秋">秋</option><option value="冬">冬</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>投稿トーン</label>
+          <div class="select-wrapper">
+            <select id="ingredientTone">
+              <option value="しみじみ系">しみじみ系</option>
+              <option value="食欲そそる系">食欲そそる系</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="type-form" id="form-newmenu">
+      <div class="form-group">
+        <label>メニュー名</label>
+        <input type="text" id="newmenuName" placeholder="例：丹後野菜の炊き合わせ">
+      </div>
+      <div class="form-group">
+        <label>特徴・説明</label>
+        <textarea id="newmenuDesc" placeholder="例：春野菜を丁寧にだしで炊いた新作。タケノコ・菜の花…旬の恵みをそのままに。"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>提供期間（任意）</label>
+          <input type="text" id="newmenuPeriod" placeholder="例：〜5月末 / 数量限定 / 通年">
+        </div>
+        <div class="form-group">
+          <label>季節</label>
+          <div class="select-wrapper">
+            <select id="newmenuSeason">
+              <option value="春">春</option><option value="夏">夏</option>
+              <option value="秋">秋</option><option value="冬">冬</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="type-form" id="form-notice">
+      <div class="form-group">
+        <label>お知らせの種類</label>
+        <div class="select-wrapper">
+          <select id="noticeType">
+            <option value="臨時休業・定休変更">臨時休業・定休変更</option>
+            <option value="イベント・特別企画">イベント・特別企画</option>
+            <option value="記念・感謝">記念・感謝</option>
+            <option value="営業時間変更">営業時間変更</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>お知らせ内容</label>
+        <textarea id="noticeContent" placeholder="例：5月3〜5日はGW休業とさせていただきます。6日（月）より通常営業。"></textarea>
+      </div>
+    </div>
+
+    <button class="btn-generate" id="generateBtn" onclick="generatePost()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      投稿文を生成する
+    </button>
+  </div>
+
+  <div class="loading" id="loading">言葉を紡いでいます<div class="loading-dots"><span></span><span></span><span></span></div></div>
+  <div class="error-msg" id="errorMsg"></div>
+
+  <div class="output-section" id="outputSection">
+    <div class="output-card">
+      <div class="output-header">
+        <span class="output-label">Instagram 投稿文</span>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="char-count" id="charCount"></span>
+          <button class="btn-copy" id="copyPost" onclick="copyText('postText','copyPost')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>コピー
+          </button>
+        </div>
+      </div>
+      <div class="output-text" id="postText" contenteditable="true" spellcheck="false"></div>
+      <p class="edit-hint">✏️ クリックして直接編集できます</p>
+    </div>
+    <div class="output-card">
+      <div class="output-header">
+        <span class="output-label">ハッシュタグ</span>
+        <button class="btn-copy" id="copyTags" onclick="copyText('hashtagText','copyTags')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>コピー
+        </button>
+      </div>
+      <div class="hashtag-list" id="hashtagText"></div>
+    </div>
+    <button class="btn-copy-all" id="copyAll" onclick="copyAll()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      投稿文＋ハッシュタグをまとめてコピー
+    </button>
+  </div>
+
+  <footer class="footer">
+    <p class="footer-text">${d.concept || 'じんわり良い酒、良い食事。'}</p>
+    <p class="footer-deco">─ ✦ ─</p>
+  </footer>
+</div>
+
+<script>
+  var SHOP = {
+    name: \`${shopName}\`,
+    location: \`${location}\`,
+    genre: \`${foodGenre}\`,
+    concept: \`${concept}\`,
+    description: \`${description}\`,
+    specialty: \`${foodSpecialty}\`,
+    target: \`${target}\`,
+    hashtags: \`${baseHashtags}\`
+  };
+
+  var SHOP_INTRO = 'あなたは'+SHOP.location+'にある'+SHOP.genre+'「'+SHOP.name+'」のInstagram担当者です。\\n【店舗情報】'+SHOP.description+'。'+SHOP.specialty+'。コンセプト：'+SHOP.concept+'。ターゲット：'+SHOP.target+'。';
+
+  var TONE_GUIDE = {
+    'しみじみ系': 'しみじみとした余韻を大切に、静かで詩的な文体。日常のちょっとした豊かさを感じさせる。',
+    '食欲そそる系': '料理の香りや食感が伝わるような、五感に訴える表現。読んで食べたくなる臨場感。',
+    'お知らせ系': '新鮮な食材や今夜のおすすめを自然体で伝える。押しつけがましくなく、さりげなく寄りたくなる。'
+  };
+
+  var POST_RULES = '【投稿文のルール】\\n- 200〜250字（スペース除く本文のみ）\\n- 押しつけがましくない、じんわり伝わる文体\\n- 絵文字は1〜2個のみ、控えめに\\n- 「来てください」より「寄りたくなる」表現\\n- 改行を適度に入れて読みやすくする\\n【ハッシュタグのルール】\\n- 15〜20個、店・地域・料理・季節・雰囲気に関するもの\\n- '+SHOP.hashtags+' を必ず含める';
+
+  var SHORT_RULES = '【投稿文のルール】\\n- 100〜150字（短くテンポよく）\\n- 絵文字は1〜2個のみ\\n- 自然体で、押しつけがましくない\\n【ハッシュタグのルール】\\n- 10〜15個\\n- '+SHOP.hashtags+' を必ず含める';
+
+  var currentType = 'food';
+
+  function switchType(type, btn) {
+    currentType = type;
+    document.querySelectorAll('.type-tab').forEach(function(b){b.classList.remove('active');});
+    document.querySelectorAll('.type-form').forEach(function(f){f.classList.remove('active');});
+    btn.classList.add('active');
+    document.getElementById('form-'+type).classList.add('active');
+    document.getElementById('outputSection').classList.remove('visible');
+    document.getElementById('errorMsg').classList.remove('visible');
+  }
+
+  function buildPrompt() {
+    var v = function(id){ var el=document.getElementById(id); return el?el.value:''; };
+    switch(currentType) {
+      case 'food': {
+        var food = v('foodInput').trim();
+        if(!food) return {error:'今日の料理・食材を入力してください。'};
+        var season=v('season'), tone=v('tone');
+        return {prompt: SHOP_INTRO+'\\n\\n【今日の投稿情報】\\n- 料理・食材：'+food+'\\n- 季節：'+season+'\\n- 投稿トーン：'+tone+'（'+(TONE_GUIDE[tone]||'')+'）\\n\\n'+POST_RULES+'\\n\\n以下のJSON形式のみで返答してください：\\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ...'+'"}' };
+      }
+      case 'staff': {
+        var name = v('staffName').trim();
+        if(!name) return {error:'スタッフ名を入力してください。'};
+        var role=v('staffRole'), episode=v('staffEpisode'), specialty=v('staffSpecialty');
+        return {prompt: SHOP_INTRO+'\\n\\n【スタッフ紹介投稿】\\n- 名前：'+name+'\\n- 役割・ポジション：'+(role||'未記入')+'\\n- 人柄・エピソード：'+(episode||'未記入')+'\\n- 得意料理・こだわり：'+(specialty||'未記入')+'\\n\\nスタッフの人柄が伝わる、親しみやすく温かい紹介文を作成してください。\\n'+POST_RULES+'\\n\\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ...'+'"}' };
+      }
+      case 'seats': {
+        var status=v('seatsStatus'), time=v('seatsTime'), comment=v('seatsComment'), season=v('seatsSeason');
+        return {prompt: SHOP_INTRO+'\\n\\n【本日の空き状況投稿】\\n- 空き状況：'+status+'\\n- おすすめ時間帯：'+(time||'特になし')+'\\n- 今夜のひと言：'+(comment||'特になし')+'\\n- 季節：'+season+'\\n\\n今夜の来店を自然に誘う、押しつけがましくない空き状況告知を作成してください。\\n'+SHORT_RULES+'\\n\\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ...'+'"}' };
+      }
+      case 'full': {
+        var next = v('fullNextDate').trim();
+        if(!next) return {error:'次の空き日時を入力してください。'};
+        var thanks=v('fullThanks'), contact=v('fullContact');
+        return {prompt: SHOP_INTRO+'\\n\\n【満席御礼＋次回予約誘導投稿】\\n- 次の空き日時：'+next+'\\n- 感謝のひと言：'+(thanks||'')+'\\n- 予約先・連絡先：'+(contact||'')+'\\n\\n満席のお礼と感謝を伝えながら、自然に次回予約につなげる文章を作成してください。\\n'+SHORT_RULES+'\\n\\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ...'+'"}' };
+      }
+      case 'ingredient': {
+        var name = v('ingredientName').trim();
+        if(!name) return {error:'食材名を入力してください。'};
+        var origin=v('ingredientOrigin'), episode=v('ingredientEpisode'), season=v('ingredientSeason'), tone=v('ingredientTone');
+        return {prompt: SHOP_INTRO+'\\n\\n【食材・こだわり紹介投稿】\\n- 食材名：'+name+'\\n- 産地・仕入れ先：'+(origin||'')+'\\n- こだわり・エピソード：'+(episode||'')+'\\n- 季節：'+season+'\\n- トーン：'+tone+'（'+(TONE_GUIDE[tone]||'')+'）\\n\\n食材への愛情と職人のこだわりが伝わる紹介文を作成してください。\\n'+POST_RULES+'\\n\\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ...'+'"}' };
+      }
+      case 'newmenu': {
+        var name = v('newmenuName').trim();
+        if(!name) return {error:'メニュー名を入力してください。'};
+        var desc=v('newmenuDesc'), period=v('newmenuPeriod'), season=v('newmenuSeason');
+        return {prompt: SHOP_INTRO+'\\n\\n【新メニュー告知投稿】\\n- メニュー名：'+name+'\\n- 特徴・説明：'+(desc||'')+'\\n- 提供期間：'+(period||'')+'\\n- 季節：'+season+'\\n\\n期待感を高めながら自然体で伝える新メニュー告知を作成してください。\\n'+POST_RULES+'\\n\\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ...'+'"}' };
+      }
+      case 'notice': {
+        var type=v('noticeType'), noticeContent=v('noticeContent').trim();
+        if(!noticeContent) return {error:'お知らせ内容を入力してください。'};
+        return {prompt: SHOP_INTRO+'\\n\\n【お知らせ投稿】\\n- 種類：'+type+'\\n- 内容：'+noticeContent+'\\n\\n簡潔で丁寧、お客様への感謝と誠意が伝わるお知らせ文を作成してください。\\n'+SHORT_RULES+'\\n\\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ...'+'"}' };
+      }
+    }
+  }
+
+  (function(){
+    var m=new Date().getMonth()+1;
+    var s=(m<=2||m===12)?'冬':m<=6?'春':m<=9?'夏':'秋';
+    ['season','seatsSeason','ingredientSeason','newmenuSeason'].forEach(function(id){
+      var el=document.getElementById(id);if(el)el.value=s;
+    });
+    var tone=document.getElementById('tone');
+    if(tone&&'${defaultTone}') tone.value='${defaultTone}';
+  })();
+
+  async function generatePost() {
+    var errorMsg=document.getElementById('errorMsg');
+    var loading=document.getElementById('loading');
+    var outputSection=document.getElementById('outputSection');
+    var generateBtn=document.getElementById('generateBtn');
+    errorMsg.classList.remove('visible');
+    var result=buildPrompt();
+    if(result.error){showError(result.error);return;}
+    generateBtn.disabled=true;
+    loading.classList.add('visible');
+    outputSection.classList.remove('visible');
+    try{
+      var res=await fetch('/api/proxy',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:1000,messages:[{role:'user',content:result.prompt}]})
+      });
+      if(!res.ok){var e=await res.json().catch(function(){return{};});throw new Error(e.error&&e.error.message?e.error.message:'APIエラー ('+res.status+')');}
+      var data=await res.json();
+      var raw=data.content[0].text.trim();
+      var m=raw.match(/\\{[\\s\\S]*\\}/);
+      if(!m)throw new Error('レスポンスの解析に失敗しました。もう一度お試しください。');
+      var parsed=JSON.parse(m[0]);
+      var postEl=document.getElementById('postText');
+      postEl.textContent=parsed.post||'';
+      document.getElementById('hashtagText').textContent=parsed.hashtags||'';
+      document.getElementById('charCount').textContent=(parsed.post||'').replace(/\\s/g,'').length+'字';
+      ['copyPost','copyTags','copyAll'].forEach(function(id){
+        var btn=document.getElementById(id);btn.classList.remove('copied');
+        btn.childNodes[btn.childNodes.length-1].textContent=id==='copyAll'?'投稿文＋ハッシュタグをまとめてコピー':'コピー';
+      });
+      outputSection.classList.add('visible');
+      outputSection.scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(e){showError(e.message);}
+    finally{generateBtn.disabled=false;loading.classList.remove('visible');}
+  }
+
+  function showError(msg){var el=document.getElementById('errorMsg');el.textContent=msg;el.classList.add('visible');}
+
+  async function copyText(textId,btnId){
+    var text=document.getElementById(textId).innerText;
+    try{
+      await navigator.clipboard.writeText(text);
+      var btn=document.getElementById(btnId);btn.classList.add('copied');
+      var t=btn.childNodes[btn.childNodes.length-1];t.textContent='コピー済';
+      setTimeout(function(){btn.classList.remove('copied');t.textContent='コピー';},2000);
+    }catch(e){alert('コピーに失敗しました。');}
+  }
+
+  async function copyAll(){
+    var post=document.getElementById('postText').innerText;
+    var tags=document.getElementById('hashtagText').textContent;
+    try{
+      await navigator.clipboard.writeText(post+'\\n\\n'+tags);
+      var btn=document.getElementById('copyAll');btn.classList.add('copied');
+      btn.childNodes[btn.childNodes.length-1].textContent='コピー済！';
+      setTimeout(function(){btn.classList.remove('copied');btn.childNodes[btn.childNodes.length-1].textContent='投稿文＋ハッシュタグをまとめてコピー';},2000);
+    }catch(e){alert('コピーに失敗しました。');}
+  }
+
+  document.getElementById('postText').addEventListener('input',function(){
+    var text=document.getElementById('postText').innerText;
+    document.getElementById('charCount').textContent=text.replace(/\\s/g,'').length+'字';
+  });
+
+  document.getElementById('foodInput').addEventListener('keydown',function(e){if(e.key==='Enter'&&e.metaKey)generatePost();});
+<\/script>
+</body>
+</html>`;
+  }
+
+</script>
+</body>
+</html>
