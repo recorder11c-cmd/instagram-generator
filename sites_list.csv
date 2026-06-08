@@ -1,0 +1,10 @@
+名前,用途,URL,対象,備考
+サービスLP,営業・申し込みページ,https://kato-insta-support.vercel.app,見込み客,料金プラン・申し込みフォーム・Formspree通知
+制作アンケート,ジェネレーター作成用,https://kato-insta-support.vercel.app/onboarding.html,加藤さんのみ,クライアントのInstagram解析→ジェネ自動生成・再デプロイ機能あり
+ジェネレーター（johkoya専用）,投稿文自動生成,https://kato-insta-support.vercel.app/gen.html,上古屋,8種類の投稿パターン対応（お酒・ドリンク追加）
+デモ版ジェネレーター,同業者・営業デモ用,https://kato-insta-support.vercel.app/demo.html,見込み客・同業者,特定店舗に紐づかない汎用デモ
+営業キット,DM文・投稿テンプレ集,https://kato-insta-support.vercel.app/sales_kit.html,加藤さんのみ,LINEメッセージ・投稿6本・DM文
+フィードバックフォーム,モニター感想収集,https://kato-insta-support.vercel.app/feedback.html,クライアント,月次フィードバック用
+クライアント管理,試用期間・契約管理,ローカルのみ（clients.html）,加藤さんのみ,残枠・MRR・期限アラート機能あり
+ロゴプレビュー,k-staロゴ3案,ローカルのみ（logo_preview.html）,加藤さんのみ,SVGダウンロード・コピー機能あり
+旅館ジェネレーター,投稿文自動生成（宿泊）,https://yamanone-ryokan-gen-8068.vercel.app,将来用,英語翻訳機能あり・現在は非公開
