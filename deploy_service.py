@@ -14,11 +14,13 @@ BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
 # pitch.html を index.html として、他ファイルも含めてデプロイ
 DEPLOY_FILES = {
     'index.html':       'pitch.html',
+    'gen.html':         'index.html',      # ジェネレーター（デモ用）
     'onboarding.html':  'onboarding.html',
     'sales_kit.html':   'sales_kit.html',
     'feedback.html':    'feedback.html',
     'api/proxy.js':     'api/proxy.js',
     'vercel.json':      'vercel.json',
+    'demo.html':        'demo.html',
 }
 
 def vapi(path, data=None, method=None):

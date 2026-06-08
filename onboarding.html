@@ -109,7 +109,17 @@
     .done-icon { font-size: 40px; margin-bottom: 16px; }
     .done-title { font-family: 'Hiragino Mincho ProN','Yu Mincho',serif; font-size: 20px; font-weight: normal; letter-spacing: 0.2em; color: var(--charcoal); margin-bottom: 10px; }
     .done-sub { font-size: 13px; color: var(--charcoal-soft); line-height: 1.8; margin-bottom: 20px; }
-    .deploy-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .deploy-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .redeploy-section { border-top: 1px solid var(--border); margin-top: 12px; padding-top: 14px; text-align: left; }
+    .redeploy-toggle { background: none; border: none; font-size: 12px; color: var(--charcoal-soft); cursor: pointer; font-family: inherit; letter-spacing: 0.08em; text-decoration: underline; padding: 0; margin-bottom: 10px; display: block; width: 100%; text-align: center; }
+    .redeploy-toggle:hover { color: var(--terracotta); }
+    .redeploy-form { display: none; }
+    .redeploy-form.open { display: block; }
+    .redeploy-form label { font-size: 12px; color: var(--charcoal-soft); display: block; margin-bottom: 4px; }
+    .redeploy-form input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 3px; font-size: 12px; font-family: monospace; box-sizing: border-box; margin-bottom: 8px; }
+    .btn-redeploy { width: 100%; padding: 10px; background: var(--charcoal); color: #fff; border: none; border-radius: 3px; font-size: 12px; letter-spacing: 0.12em; font-family: inherit; cursor: pointer; transition: background 0.2s; }
+    .btn-redeploy:hover:not(:disabled) { background: #555; }
+    .btn-redeploy:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-deploy-manual { padding: 12px; background: var(--cream-dark); border: 1px solid var(--border); border-radius: 3px; font-size: 12px; letter-spacing: 0.12em; color: var(--charcoal-soft); font-family: inherit; cursor: pointer; transition: background 0.2s; }
     .btn-deploy-manual:hover { background: var(--border); }
     .btn-deploy-auto { padding: 12px; background: var(--terracotta); color: #fff; border: none; border-radius: 3px; font-size: 12px; letter-spacing: 0.12em; font-family: inherit; cursor: pointer; transition: background 0.2s; }
@@ -218,7 +228,7 @@
       <div class="form-group" style="margin-bottom: 0">
         <label>店舗のウェブサイトURL</label>
         <div style="display:flex; gap:8px; align-items:center">
-          <input type="url" id="shopWebUrl" placeholder="https://www.johkoya.com"
+          <input type="url" id="shopWebUrl" placeholder="https://www.restaurant-example.com"
             style="flex:1; font-family:monospace; font-size:13px"
             oninput="updateAnalyzeBtn()">
           <button onclick="testFetchUrl()" id="fetchTestBtn"
@@ -310,7 +320,7 @@
       <div class="form-group">
         <label>よく使うハッシュタグ（スペース区切り）</label>
         <textarea id="baseHashtags" placeholder="#上古屋 #京都居酒屋 #西洞院 #京丹後 #和食 #地酒 #京都グルメ"></textarea>
-        <p class="form-hint">生成時に自動追加される固定ハッシュタグです</p>
+        <p class="form-hint">投稿生成のたびに、この中から5個が自動で選ばれてハッシュタグに追加されます</p>
       </div>
     </div>
 
@@ -344,6 +354,15 @@
           <div style="font-size:12px;color:var(--charcoal-soft);margin-bottom:4px">お客様専用URL：</div>
           <div class="url" id="deployUrl"></div>
           <button onclick="copyDeployUrl()" style="margin-top:10px;padding:6px 14px;background:var(--terracotta);color:#fff;border:none;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit">URLをコピー</button>
+        </div>
+
+        <div class="redeploy-section">
+          <button class="redeploy-toggle" onclick="toggleRedeployForm()">🔄 既存ジェネレーターを最新版に更新する</button>
+          <div class="redeploy-form" id="redeployForm">
+            <label>既存のジェネレーターURL</label>
+            <input type="text" id="redeployUrl" placeholder="例：https://johkoya-gen-w1dh.vercel.app">
+            <button class="btn-redeploy" id="redeployBtn" onclick="redeployExisting()">⚡ このURLを最新版に更新する</button>
+          </div>
         </div>
         <div class="done-steps" id="manualSteps" style="margin-top:16px">
           <strong>手動の場合：</strong><br>
@@ -557,7 +576,7 @@
       promptText += '\n\n【ウェブサイトテキスト（' + webUrl + '）】\n' + webText.slice(0, 20000);
     }
 
-    promptText += '\n\n以下のJSON形式のみで返答してください。わからない項目は空文字にしてください。\n\n{\n  "shopName": "店名",\n  "location": "所在地（都市・エリア）",\n  "foodGenre": "料理ジャンル（例：和食居酒屋）",\n  "concept": "コンセプト・キャッチコピー",\n  "description": "店の雰囲気・特徴（100字程度）",\n  "foodSpecialty": "こだわりの食材・料理の特徴",\n  "target": "ターゲット客層",\n  "defaultTone": "しみじみ系 または 食欲そそる系 または お知らせ系",\n  "baseHashtags": "よく使いそうなハッシュタグ15個（スペース区切り、#付き）"\n}';
+    promptText += '\n\n以下のJSON形式のみで返答してください。わからない項目は空文字にしてください。\n\n{\n  "shopName": "店名",\n  "instagramHandle": "Instagramアカウント名（@なし・半角英数字とアンダースコアのみ。例: johkoya）",\n  "location": "所在地（都市・エリア）",\n  "foodGenre": "料理ジャンル（例：和食居酒屋）",\n  "concept": "コンセプト・キャッチコピー",\n  "description": "店の雰囲気・特徴（100字程度）",\n  "foodSpecialty": "こだわりの食材・料理の特徴",\n  "target": "ターゲット客層",\n  "defaultTone": "しみじみ系 または 食欲そそる系 または お知らせ系",\n  "baseHashtags": "よく使いそうなハッシュタグ15個（スペース区切り、#付き）"\n}';
 
     msgContent.push({ type: 'text', text: promptText });
 
@@ -588,6 +607,11 @@
   function fillForm(info) {
     const set = (id, val) => { if (val && document.getElementById(id)) document.getElementById(id).value = val; };
     set('shopName', info.shopName);
+    // InstagramアカウントIDをurlSlugに自動セット
+    if (info.instagramHandle) {
+      const handle = info.instagramHandle.replace(/^@/, '').toLowerCase().replace(/[^a-z0-9-]/g, '');
+      set('urlSlug', handle);
+    }
     set('location', info.location);
     set('foodGenre', info.foodGenre);
     set('concept', info.concept);
@@ -662,7 +686,9 @@ module.exports = async (req, res) => {
     zip.file('vercel.json', vercelJson);
 
     currentShopName = shopName;
-    currentUrlSlug = urlSlug || shopName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 20);
+    // Instagram handle (@johkoya → johkoya) を優先的にslugとして使う
+    const instaHandle = (urlSlug || '').replace(/^@/, '').toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+    currentUrlSlug = instaHandle || shopName.toLowerCase().replace(/[぀-鿿一-鿿]/g,'').replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g,'').slice(0, 18) || 'shop';
     zip.generateAsync({ type: 'blob' }).then(blob => {
       generatedZipBlob = blob;
       document.getElementById('doneTitle').textContent = shopName + 'のジェネレーター完成！';
@@ -734,12 +760,13 @@ module.exports = async (req, res) => {
       // 2. プロジェクト名を生成（URL用英語名を優先）
       const baseSlug = (currentUrlSlug || currentShopName || 'shop')
         .toLowerCase()
-        .replace(/[\u3040-\u9FFF\u4E00-\u9FFF]/g, 'shop')
+        .replace(/[\u3040-\u9FFF\u4E00-\u9FFF]/g, '')
         .replace(/[^a-z0-9]/g, '-')
         .replace(/-+/g, '-')
         .replace(/^-|-$/g, '')
-        .slice(0, 24);
-      const safeName = baseSlug + '-' + Math.random().toString(36).slice(2, 6);
+        .slice(0, 18)
+        .replace(/^-|-$/g, '') || 'shop';
+      const safeName = baseSlug + '-gen-' + Math.random().toString(36).slice(2, 6);
 
       // 3. 1回目のデプロイ（プロジェクト作成）
       setStatus('② Vercelにデプロイ中…');
@@ -820,6 +847,113 @@ module.exports = async (req, res) => {
   function copyDeployUrl() {
     const url = document.getElementById('deployUrl').textContent;
     navigator.clipboard.writeText(url).then(() => alert('コピーしました！'));
+  }
+
+  function toggleRedeployForm() {
+    const form = document.getElementById('redeployForm');
+    form.classList.toggle('open');
+  }
+
+  async function redeployExisting() {
+    const urlInput = document.getElementById('redeployUrl').value.trim();
+    if (!urlInput) { alert('既存のURLを入力してください。'); return; }
+
+    // URLからプロジェクト名を抽出（例：https://johkoya-gen-w1dh.vercel.app → johkoya-gen-w1dh）
+    let projectName = urlInput
+      .replace(/^https?:\/\//, '')
+      .replace(/\.vercel\.app.*$/, '')
+      .trim();
+    if (!projectName) { alert('URLの形式が正しくありません。'); return; }
+
+    if (!generatedZipBlob) { alert('先にジェネレーターを生成してください。'); return; }
+
+    const token = document.getElementById('vercelToken').value.trim();
+    const apiKey = document.getElementById('anthropicKey').value.trim();
+    if (!token) { alert('Vercelトークンを設定してください（上部の設定欄）。'); return; }
+    if (!apiKey) { alert('Anthropic APIキーを設定してください（上部の設定欄）。'); return; }
+
+    const btn = document.getElementById('redeployBtn');
+    const status = document.getElementById('deployStatus');
+    btn.disabled = true;
+    status.textContent = '① ファイルを準備中…';
+    status.classList.add('visible');
+
+    const vApi = async (path, opts = {}) => {
+      const res = await fetch('https://api.vercel.com' + path, {
+        ...opts,
+        headers: { 'Authorization': 'Bearer ' + token, ...(opts.headers || {}) }
+      });
+      const text = await res.text();
+      let json;
+      try { json = JSON.parse(text); } catch { throw new Error(text.slice(0, 200)); }
+      if (!res.ok) throw new Error((json.error && json.error.message) || json.message || ('HTTP ' + res.status));
+      return json;
+    };
+
+    try {
+      // ZIPからファイル展開
+      const JSZipLib = window.JSZip;
+      const zip = await JSZipLib.loadAsync(generatedZipBlob);
+      const files = [];
+      const filePromises = [];
+      zip.forEach((relPath, zipEntry) => {
+        if (!zipEntry.dir) {
+          filePromises.push(
+            zipEntry.async('text').then(content => {
+              files.push({ file: relPath, data: content, encoding: 'utf-8' });
+            })
+          );
+        }
+      });
+      await Promise.all(filePromises);
+
+      // 同じプロジェクト名でデプロイ → 既存URLを上書き更新
+      status.textContent = '② 既存プロジェクトを更新中…（' + projectName + '）';
+      const deploy = await vApi('/v13/deployments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: projectName,
+          files: files,
+          projectSettings: { framework: null },
+          target: 'production'
+        })
+      });
+
+      const projectId = deploy.projectId;
+      const deployId = deploy.id;
+
+      // Deployment Protection を無効化
+      status.textContent = '③ 公開設定中…';
+      try {
+        await vApi('/v9/projects/' + projectId, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ssoProtection: null, passwordProtection: null })
+        });
+      } catch(e) { /* 既に解除済みの場合スキップ */ }
+
+      // 完了待ち
+      status.textContent = '④ 公開処理中…（20〜40秒）';
+      for (let i = 0; i < 20; i++) {
+        await new Promise(r => setTimeout(r, 3000));
+        const d = await vApi('/v13/deployments/' + deployId);
+        if (d.readyState === 'READY' || d.state === 'READY') break;
+        if (d.readyState === 'ERROR' || d.state === 'ERROR') throw new Error('デプロイに失敗しました。');
+      }
+
+      status.classList.remove('visible');
+      const result = document.getElementById('deployResult');
+      document.getElementById('deployUrl').textContent = 'https://' + projectName + '.vercel.app';
+      result.classList.add('visible');
+      alert('✅ 更新完了！\n' + projectName + '.vercel.app が最新版になりました。');
+
+    } catch(e) {
+      status.classList.remove('visible');
+      showError('更新エラー: ' + e.message);
+    } finally {
+      btn.disabled = false;
+    }
   }
 
   function restart() {
@@ -936,12 +1070,13 @@ module.exports = async (req, res) => {
       <button class="type-tab" onclick="switchType('ingredient',this)">🌿 食材紹介</button>
       <button class="type-tab" onclick="switchType('newmenu',this)">🆕 新メニュー</button>
       <button class="type-tab" onclick="switchType('notice',this)">📣 お知らせ</button>
+      <button class="type-tab" onclick="switchType('drink',this)">🍶 お酒・ドリンク</button>
     </div>
 
     <div class="type-form active" id="form-food">
       <div class="form-group">
         <label>今日の料理・食材</label>
-        <textarea id="foodInput" placeholder="例：本日入荷の地魚のお刺身、旬の野菜の焼き物…"></textarea>
+        <textarea id="foodInput" placeholder="例：本日の刺身盛り合わせ、鶏の唐揚げ、牛すじ煮込み…"></textarea>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -960,6 +1095,8 @@ module.exports = async (req, res) => {
               <option value="しみじみ系">しみじみ系</option>
               <option value="食欲そそる系">食欲そそる系</option>
               <option value="お知らせ系">お知らせ系</option>
+              <option value="PR強め系">PR強め系🔥</option>
+              <option value="バズ狙い系">バズ狙い系⚡</option>
             </select>
           </div>
         </div>
@@ -1006,7 +1143,7 @@ module.exports = async (req, res) => {
       </div>
       <div class="form-group">
         <label>今夜のひと言（任意）</label>
-        <input type="text" id="seatsComment" placeholder="例：今夜は鰹のたたきと地酒が揃ってます">
+        <input type="text" id="seatsComment" placeholder="例：今夜は旬のおすすめ料理が揃ってます">
       </div>
       <div class="form-group">
         <label>季節</label>
@@ -1038,11 +1175,11 @@ module.exports = async (req, res) => {
       <div class="form-row">
         <div class="form-group">
           <label>食材名</label>
-          <input type="text" id="ingredientName" placeholder="例：松葉ガニ">
+          <input type="text" id="ingredientName" placeholder="例：黒毛和牛、鮮魚の盛り合わせ、旬の野菜">
         </div>
         <div class="form-group">
           <label>産地・仕入れ先（任意）</label>
-          <input type="text" id="ingredientOrigin" placeholder="例：間人漁港">
+          <input type="text" id="ingredientOrigin" placeholder="例：地元農家、朝採れ野菜、近海漁港">
         </div>
       </div>
       <div class="form-group">
@@ -1065,6 +1202,8 @@ module.exports = async (req, res) => {
             <select id="ingredientTone">
               <option value="しみじみ系">しみじみ系</option>
               <option value="食欲そそる系">食欲そそる系</option>
+              <option value="PR強め系">PR強め系🔥</option>
+              <option value="バズ狙い系">バズ狙い系⚡</option>
             </select>
           </div>
         </div>
@@ -1074,7 +1213,7 @@ module.exports = async (req, res) => {
     <div class="type-form" id="form-newmenu">
       <div class="form-group">
         <label>メニュー名</label>
-        <input type="text" id="newmenuName" placeholder="例：丹後野菜の炊き合わせ">
+        <input type="text" id="newmenuName" placeholder="例：季節野菜の炊き合わせ、黒毛和牛のたたき">
       </div>
       <div class="form-group">
         <label>特徴・説明</label>
@@ -1113,6 +1252,29 @@ module.exports = async (req, res) => {
       <div class="form-group">
         <label>お知らせ内容</label>
         <textarea id="noticeContent" placeholder="例：5月3〜5日はGW休業とさせていただきます。6日（月）より通常営業。"></textarea>
+      </div>
+    </div>
+
+    <div class="type-form" id="form-drink">
+      <div class="form-group">
+        <label>お酒・ドリンク名</label>
+        <input type="text" id="drinkName" placeholder="例：〆張鶴 純、山崎ハイボール、自家製レモンサワー">
+      </div>
+      <div class="form-group">
+        <label>一言メモ <span style="font-size:12px;color:#999">（任意）</span></label>
+        <input type="text" id="drinkMemo" placeholder="例：今月入荷の限定品、辛口で食中酒向き、夏季限定">
+      </div>
+      <div class="form-group">
+        <label>投稿トーン</label>
+        <div class="select-wrapper">
+          <select id="drinkTone">
+            <option value="しみじみ系">しみじみ系</option>
+            <option value="食欲そそる系">食欲そそる系</option>
+            <option value="お知らせ系">お知らせ系</option>
+            <option value="PR強め系">PR強め系🔥</option>
+            <option value="バズ狙い系">バズ狙い系⚡</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -1177,12 +1339,14 @@ module.exports = async (req, res) => {
   var TONE_GUIDE = {
     'しみじみ系': 'しみじみとした余韻を大切に、静かで詩的な文体。日常のちょっとした豊かさを感じさせる。',
     '食欲そそる系': '料理の香りや食感が伝わるような、五感に訴える表現。読んで食べたくなる臨場感。',
-    'お知らせ系': '新鮮な食材や今夜のおすすめを自然体で伝える。押しつけがましくなく、さりげなく寄りたくなる。'
+    'お知らせ系': '新鮮な食材や今夜のおすすめを自然体で伝える。押しつけがましくなく、さりげなく寄りたくなる。',
+    'PR強め系': '今すぐ予約したいと思わせる背中を押す文体。限定感・希少性・緊張感を自然に盛り込む。数字や具体的な制限（残り◯席・今夜限り等）を使う。',
+    'バズ狙い系': '1行目で必ず足を止めさせる強いフック。意外性・共感・驚きのある書き出し。短文・改行多め・テンポよく読める構成。シェアしたくなる言葉選び。'
   };
 
-  var POST_RULES = '【投稿文のルール】\\n- 200〜250字（スペース除く本文のみ）\\n- 押しつけがましくない、じんわり伝わる文体\\n- 絵文字は1〜2個のみ、控えめに\\n- 「来てください」より「寄りたくなる」表現\\n- 改行を適度に入れて読みやすくする\\n【ハッシュタグのルール】\\n- 15〜20個、店・地域・料理・季節・雰囲気に関するもの\\n- '+SHOP.hashtags+' を必ず含める';
+  var POST_RULES = '【投稿文のルール】\\n- 200〜250字（スペース除く本文のみ）\\n- 押しつけがましくない、じんわり伝わる文体\\n- 絵文字は1〜2個のみ、控えめに\\n- 「来てください」より「寄りたくなる」表現\\n- 改行を適度に入れて読みやすくする\\n【ハッシュタグのルール】\\n- 必ず5個以内（6個以上は無効になるため厳守）\\n- 店・料理・季節に関連するものを厳選\\n- '+SHOP.hashtags+' を必ず含める';
 
-  var SHORT_RULES = '【投稿文のルール】\\n- 100〜150字（短くテンポよく）\\n- 絵文字は1〜2個のみ\\n- 自然体で、押しつけがましくない\\n【ハッシュタグのルール】\\n- 10〜15個\\n- '+SHOP.hashtags+' を必ず含める';
+  var SHORT_RULES = '【投稿文のルール】\\n- 100〜150字（短くテンポよく）\\n- 絵文字は1〜2個のみ\\n- 自然体で、押しつけがましくない\\n【ハッシュタグのルール】\\n- 必ず5個以内（6個以上は無効になるため厳守）\\n- 店・料理・季節に関連するものを厳選\\n- '+SHOP.hashtags+' を必ず含める';
 
   var currentType = 'food';
 
@@ -1238,6 +1402,12 @@ module.exports = async (req, res) => {
         if(!noticeContent) return {error:'お知らせ内容を入力してください。'};
         return {prompt: SHOP_INTRO+'\\n\\n【お知らせ投稿】\\n- 種類：'+type+'\\n- 内容：'+noticeContent+'\\n\\n簡潔で丁寧、お客様への感謝と誠意が伝わるお知らせ文を作成してください。\\n'+SHORT_RULES+'\\n\\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ...'+'"}' };
       }
+      case 'drink': {
+        var drinkName=v('drinkName').trim();
+        if(!drinkName) return {error:'お酒・ドリンク名を入力してください。'};
+        var drinkMemo=v('drinkMemo'), drinkTone=v('drinkTone');
+        return {prompt: SHOP_INTRO+'\\n\\n【お酒・ドリンク紹介投稿】\\n- お酒・ドリンク名：'+drinkName+'\\n- 特徴・メモ：'+(drinkMemo||'特になし')+'\\n- 投稿トーン：'+drinkTone+'（'+TONE_GUIDE[drinkTone]+'）\\n\\nお酒の魅力と飲んだときの情景が浮かぶ紹介文を作成してください。料理との相性や季節感も自然に織り込んでください。\\n'+POST_RULES+'\\n\\n{"post":"投稿文","hashtags":"#タグ1 #タグ2 ...'+'"}' };
+      }
     }
   }
 
@@ -1276,7 +1446,8 @@ module.exports = async (req, res) => {
       var parsed=JSON.parse(m[0]);
       var postEl=document.getElementById('postText');
       postEl.textContent=parsed.post||'';
-      document.getElementById('hashtagText').textContent=parsed.hashtags||'';
+      var rawTags=(parsed.hashtags||'').replace(/#/g,' ').split(/[\s,、]+/).filter(function(w){return w.length>0;}).slice(0,5).map(function(w){return '#'+w;}).join(' ');
+      document.getElementById('hashtagText').textContent=rawTags;
       document.getElementById('charCount').textContent=(parsed.post||'').replace(/\\s/g,'').length+'字';
       ['copyPost','copyTags','copyAll'].forEach(function(id){
         var btn=document.getElementById(id);btn.classList.remove('copied');
@@ -1288,7 +1459,14 @@ module.exports = async (req, res) => {
     finally{generateBtn.disabled=false;loading.classList.remove('visible');}
   }
 
-  function showError(msg){var el=document.getElementById('errorMsg');el.textContent=msg;el.classList.add('visible');}
+  function showError(msg){
+    var el=document.getElementById('errorMsg');
+    var msgMap={'overloaded':'AIが混み合っています。少し待ってからもう一度お試しください。','rate_limit':'リクエストが多すぎます。1〜2分後にもう一度お試しください。','timeout':'時間がかかりすぎています。もう一度お試しください。','network':'ネットワークエラーが発生しました。接続を確認してお試しください。','api error':'APIエラーが発生しました。しばらく経ってからお試しください。'};
+    var lower=(msg||'').toLowerCase();
+    var displayMsg=msg;
+    for(var key in msgMap){if(lower.indexOf(key)!==-1){displayMsg=msgMap[key];break;}}
+    el.textContent=displayMsg;el.classList.add('visible');
+  }
 
   async function copyText(textId,btnId){
     var text=document.getElementById(textId).innerText;

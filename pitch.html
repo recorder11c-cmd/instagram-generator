@@ -87,7 +87,7 @@
   <p class="hero-deco">✦ Instagram投稿文ジェネレーター ✦</p>
   <h1>毎日の投稿文を<br>30秒で。</h1>
   <p class="hero-sub">飲食店のInstagram担当者が抱える「文章を考える時間」をゼロにする</p>
-  <span class="hero-badge">今なら無料でお試し提供中</span>
+  <span class="hero-badge">残り<span id="hero-slots">5</span>店舗・6月末まで無料</span>
 </div>
 
 <div class="page">
@@ -298,7 +298,22 @@
     <p class="section-label">APPLY</p>
     <h2 class="section-title">無料モニターに申し込む</h2>
     <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:4px;padding:28px;">
-      <p style="font-size:13px;color:#6a5a4a;margin-bottom:24px;line-height:1.8">以下をご記入いただくと、内容をコピーして加藤へ送ることができます。<br>Instagram DM <strong style="color:var(--terracotta)">@kato_insta_support</strong> へお送りください。</p>
+
+      <!-- 残枠・締切バナー -->
+      <div id="slots-banner" style="background:var(--charcoal);color:#fff;border-radius:4px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:14px;">
+          🔥 残り<strong style="color:var(--terracotta);font-size:18px;" id="slots-num">5</strong>店舗
+        </div>
+        <div style="font-size:12px;color:#b0a090;">締切：2026年6月30日</div>
+      </div>
+
+      <!-- 満員表示（残0のとき） -->
+      <div id="slots-full" style="display:none;background:#fde8e8;border:1px solid #e0a0a0;border-radius:4px;padding:20px;margin-bottom:20px;text-align:center;">
+        <div style="font-size:16px;font-weight:bold;color:#8a2020;margin-bottom:8px">受付終了</div>
+        <div style="font-size:13px;color:#6a3030;line-height:1.8">現在のモニター枠は満員です。<br>キャンセル待ちをご希望の方は Instagram DM <strong>@kato_insta_support</strong> までご連絡ください。</div>
+      </div>
+
+      <p style="font-size:13px;color:#6a5a4a;margin-bottom:24px;line-height:1.8">Instagram DM <strong style="color:var(--terracotta)">@kato_insta_support</strong> へお送りください。</p>
 
       <div style="margin-bottom:16px">
         <label style="display:block;font-size:12px;color:#6a5a4a;margin-bottom:6px;letter-spacing:.1em">店名 *</label>
@@ -414,6 +429,22 @@
       document.getElementById('period-' + key).textContent = isAnnual ? val.periodA : val.periodM;
     }
   }
+
+  // ★ 残枠数をここで管理（申し込みが来たら数字を減らしてデプロイ）
+  const SLOTS_REMAINING = 5;
+
+  // 残枠表示の初期化
+  (function initSlots() {
+    document.getElementById('slots-num').textContent = SLOTS_REMAINING;
+    document.getElementById('hero-slots').textContent = SLOTS_REMAINING;
+    if (SLOTS_REMAINING <= 0) {
+      document.getElementById('slots-banner').style.display = 'none';
+      document.getElementById('slots-full').style.display = 'block';
+      document.getElementById('applyBtn').style.display = 'none';
+    } else if (SLOTS_REMAINING <= 2) {
+      document.getElementById('slots-banner').style.background = '#8a2020';
+    }
+  })();
 
   // ★ Formspree フォームIDをここに入れる（formspree.io で取得）
   const FORMSPREE_ID = 'xvznowgk';
