@@ -111,6 +111,8 @@
       <li><a href="#sec3"><span class="toc-num">3</span>Instagram投稿文（最初の6本）</a></li>
       <li><a href="#sec4"><span class="toc-num">4</span>DM文テンプレート（コールドDM）</a></li>
       <li><a href="#sec5"><span class="toc-num">5</span>フォローアップDM</a></li>
+      <li><a href="#sec6"><span class="toc-num">6</span>スクショDM（パーソナライズ版）</a></li>
+      <li><a href="#sec7"><span class="toc-num">7</span>送付タイミングガイド</a></li>
     </ul>
   </div>
 
@@ -468,6 +470,105 @@ https://kato-insta-support.vercel.app
 
 実際に触っていただくのが一番早いかと思います。
 ご返信は不要ですので、ぜひ一度お試しください。</div>
+  </div>
+
+  <!-- Section 6: Screenshot DM -->
+  <div class="section" id="sec6">
+    <p class="section-label">SECTION 06</p>
+    <h2 class="section-title">スクショDM（パーソナライズ版）</h2>
+    <p class="section-desc">相手のお店のメニューで実際に投稿文を生成→スクショを添付して送る。自分のお店の名前が見えた瞬間に反応率が上がります。</p>
+
+    <div style="background:rgba(196,112,74,0.08);border:1px solid var(--border);border-radius:4px;padding:16px 20px;margin-bottom:20px;font-size:13px;line-height:1.9;color:var(--charcoal)">
+      <strong>📋 事前準備</strong><br>
+      ① 相手のInstagramで最近の投稿メニューを確認<br>
+      ② <a href="https://kato-insta-support.vercel.app/gen.html" target="_blank" style="color:var(--terracotta)">gen.html</a> でそのメニュー名を入力して投稿文を生成<br>
+      ③ スクショを撮影<br>
+      ④ 下のDM文＋スクショを添付して送付
+    </div>
+
+    <div class="dm-block">
+      <div class="dm-header">
+        <span class="dm-label">1通目（スクショ添付）</span>
+        <button class="btn-copy" onclick="copyText(this, 'dm-screenshot')">コピー</button>
+      </div>
+      <div class="text-box" id="dm-screenshot">はじめまして、加藤と申します。
+
+○○さんの投稿、料理の雰囲気がすごく好きで
+思わずご連絡してしまいました。
+
+試しに「△△（実際のメニュー名）」で
+投稿文を作ってみたので、よかったら見てください。
+↓
+［スクショ添付］
+
+お店専用にカスタマイズもできます。
+今なら無料でお試しいただけます。
+
+ご興味あればお気軽にどうぞ！</div>
+    </div>
+
+    <div class="dm-block">
+      <div class="dm-header">
+        <span class="dm-label">2通目（返信あり→URL案内）</span>
+        <button class="btn-copy" onclick="copyText(this, 'dm-screenshot-2')">コピー</button>
+      </div>
+      <div class="text-box" id="dm-screenshot-2">ありがとうございます！
+
+こちらから実際に触っていただけます。
+→ https://kato-insta-support.vercel.app
+
+料理名を入れるだけで30秒で完成します。
+無料モニターは残り○枠なので、
+よかったらお早めにどうぞ！</div>
+    </div>
+
+    <div class="dm-block">
+      <div class="dm-header">
+        <span class="dm-label">2通目（返信なし・2日後フォロー）</span>
+        <button class="btn-copy" onclick="copyText(this, 'dm-screenshot-followup')">コピー</button>
+      </div>
+      <div class="text-box" id="dm-screenshot-followup">先日スクショをお送りした加藤です。
+
+ご覧いただけましたか？
+実際に触っていただくのが一番早いかと思いまして。
+
+→ https://kato-insta-support.vercel.app
+
+ご返信は不要ですので、
+よかったらお気軽にどうぞ！</div>
+    </div>
+  </div>
+
+  <!-- Section 7: Timing Guide -->
+  <div class="section" id="sec7">
+    <p class="section-label">SECTION 07</p>
+    <h2 class="section-title">送付タイミングガイド</h2>
+    <p class="section-desc">飲食店・居酒屋オーナーがInstagramを見やすい時間帯に送ると反応率が上がります。</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px">
+      <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:4px;padding:16px;text-align:center">
+        <div style="font-size:22px;margin-bottom:6px">🌅</div>
+        <div style="font-weight:bold;color:var(--terracotta);margin-bottom:4px">9:00〜11:00</div>
+        <div style="font-size:12px;color:var(--wood)">仕込み前・開店前<br>最もゆとりがある時間</div>
+      </div>
+      <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:4px;padding:16px;text-align:center">
+        <div style="font-size:22px;margin-bottom:6px">☕</div>
+        <div style="font-weight:bold;color:var(--terracotta);margin-bottom:4px">14:30〜16:30</div>
+        <div style="font-size:12px;color:var(--wood)">ランチ終わり〜<br>ディナー準備前の谷間</div>
+      </div>
+      <div style="background:var(--white-warm);border:1px solid var(--border);border-radius:4px;padding:16px;text-align:center">
+        <div style="font-size:22px;margin-bottom:6px">🌙</div>
+        <div style="font-weight:bold;color:var(--terracotta);margin-bottom:4px">22:00〜23:00</div>
+        <div style="font-size:12px;color:var(--wood)">閉店後・片付け終わり<br>ひと息タイム</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(196,112,74,0.08);border:1px solid var(--border);border-radius:4px;padding:16px 20px;font-size:13px;line-height:2;color:var(--charcoal)">
+      <strong>⚠️ 避ける時間帯</strong>　11:30〜13:30（ランチ繁忙）／ 18:00〜21:00（ディナー繁忙）<br>
+      <strong>📅 1日の上限</strong>　20〜30件（超えるとInstagramアカウント制限の恐れあり）<br>
+      <strong>⏱ 2通目のタイミング</strong>　1通目から2日後（1日は早すぎ・3日以上は忘れられる）<br>
+      <strong>🔗 リンクの扱い</strong>　1通目には入れない。返信があってから2通目でURLを案内
+    </div>
   </div>
 
 </div>
