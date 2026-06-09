@@ -505,12 +505,12 @@
       <!-- Type 1: 今日のおすすめ -->
       <div class="type-form active" id="form-food">
         <div class="form-group">
-          <label>今日の料理・食材</label>
+          <label>今日の料理・食材 <span style="font-size:11px;color:#999;font-weight:normal">─ 料理名だけでOK！</span></label>
           <textarea id="foodInput" placeholder="例：本日の刺身盛り合わせ、鶏の唐揚げ、牛すじ煮込み…"></textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>季節</label>
+            <label>季節 <span style="font-size:11px;color:#999;font-weight:normal">（自動）</span></label>
             <div class="select-wrapper">
               <select id="season">
                 <option value="春" selected>春</option>
@@ -522,7 +522,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label>投稿トーン</label>
+            <label>投稿トーン <span style="font-size:11px;color:#999;font-weight:normal">（任意）</span></label>
             <div class="select-wrapper">
               <select id="tone">
                 <option value="しみじみ系">しみじみ系</option>
@@ -756,6 +756,7 @@
         </div>
         <div class="output-text" id="postText" contenteditable="true" spellcheck="false"></div>
         <p class="edit-hint">✏️ クリックして直接編集できます</p>
+        <p style="font-size:11px;color:#999;margin-top:8px;line-height:1.6">⚠️ AIの生成内容です。事実と異なる場合があります。投稿前に必ずご確認ください。</p>
       </div>
 
       <div class="output-card">
