@@ -5,6 +5,7 @@ import urllib.error
 import urllib.parse
 import re
 import os
+from dotenv import load_dotenv; load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))
 
 API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
 

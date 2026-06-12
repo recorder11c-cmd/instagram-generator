@@ -37,3 +37,13 @@
 | 2026-06-08 | ハッシュタグが5個を超える | JS側でslice(0,5)で強制カット | ✅ 対応済 |
 | 2026-06-08 | 英語エラーメッセージ | 日本語説明文に変更 | ✅ 対応済 |
 | 2026-06-08 | 投稿の引きが弱い | PR強め系・バズ狙い系トーン追加 | ✅ 対応済 |
+
+---
+
+## 開発作業ログ（2026-06-12）
+
+- APIキー管理を`.env`ファイルに移行
+- `server.py` / `deploy_service.py` / `deploy_to_vercel.py` / `deploy_ryokan.py` に `python-dotenv` を導入
+- `.gitignore`に`.claude/`を追加（キー漏洩防止）
+- Anthropic APIキー・Vercelトークンを新規発行・旧キー削除
+- Vercel上の`ANTHROPIC_API_KEY`を新キーに更新・再デプロイ完了

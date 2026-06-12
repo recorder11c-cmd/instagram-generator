@@ -5,6 +5,7 @@ Vercel デプロイスクリプト
   VERCEL_TOKEN=xxx ANTHROPIC_API_KEY=sk-ant-xxx python3 deploy_to_vercel.py
 """
 import os, json, urllib.request, urllib.error, base64, time, sys
+from dotenv import load_dotenv; load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))
 
 VERCEL_TOKEN = os.environ.get('VERCEL_TOKEN', '')
 API_KEY      = os.environ.get('ANTHROPIC_API_KEY', '')
