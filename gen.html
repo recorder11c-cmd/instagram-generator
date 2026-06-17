@@ -465,10 +465,18 @@
           <label for="season">季節</label>
           <div class="select-wrapper">
             <select id="season">
-              <option value="春">春</option>
-              <option value="夏">夏</option>
-              <option value="秋">秋</option>
-              <option value="冬" selected>冬</option>
+              <option value="1月">1月</option>
+              <option value="2月">2月</option>
+              <option value="3月">3月</option>
+              <option value="4月">4月</option>
+              <option value="5月">5月</option>
+              <option value="6月">6月</option>
+              <option value="7月">7月</option>
+              <option value="8月">8月</option>
+              <option value="9月">9月</option>
+              <option value="10月">10月</option>
+              <option value="11月">11月</option>
+              <option value="12月">12月</option>
             </select>
           </div>
         </div>
@@ -717,6 +725,13 @@
     document.getElementById('foodInput').addEventListener('keydown', e => {
       if (e.key === 'Enter' && e.metaKey) generatePost();
     });
+
+    // 現在の月を自動選択
+    (function() {
+      const m = new Date().getMonth() + 1;
+      const el = document.getElementById('season');
+      if (el) el.value = m + '月';
+    })();
   </script>
 </body>
 </html>
