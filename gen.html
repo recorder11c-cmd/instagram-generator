@@ -652,7 +652,13 @@
 
         const parsed = JSON.parse(jsonMatch[0]);
         const postText = parsed.post || '';
-        const hashtagText = parsed.hashtags || '';
+        const hashtagText = (parsed.hashtags || '')
+          .replace(/#/g, ' ')
+          .split(/[\s,、]+/)
+          .filter(w => w.length > 0)
+          .slice(0, 5)
+          .map(w => '#' + w)
+          .join(' ');
 
         // Display
         document.getElementById('postText').textContent = postText;
