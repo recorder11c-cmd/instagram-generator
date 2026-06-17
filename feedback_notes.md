@@ -40,6 +40,17 @@
 
 ---
 
+## 活動ログ（2026-06-17 セッション②）
+
+- sales_kit Section10追加：追いメッセージ3パターン（友人・面識あり・コールドDM）
+- onboarding.html 季節セレクターを春夏秋冬→1〜12月に修正（制作アンケート・生成テンプレート両方）
+- onboarding.html ハッシュタグ処理改善：#付き/なし両対応・1行1タグ表示・フォールバック追加
+- onboarding.html 既存ジェネレーター更新ボタンのAPIキーIDバグ修正（anthropicKey→anthropicKeyStore）
+- index.html 価格表示を税込¥4,980・¥9,800に修正
+- sales_kit Section11追加：専用ジェネ体験後→LP営業DM（モニター転換・コールドフォロー）
+
+---
+
 ## 活動ログ（2026-06-17）
 
 - Dine Tokyo事例をもとにマネタイズ基盤を整備
