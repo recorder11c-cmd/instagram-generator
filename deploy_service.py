@@ -21,6 +21,7 @@ DEPLOY_FILES = {
     'api/proxy.js':     'api/proxy.js',
     'vercel.json':      'vercel.json',
     'demo.html':        'demo.html',
+    'setup.html':       'setup.html',
 }
 
 def vapi(path, data=None, method=None):

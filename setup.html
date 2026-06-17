@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お店情報の入力｜k-sta</title>
+  <style>
+    :root {
+      --cream: #f5f0e8;
+      --terracotta: #c4704a;
+      --terracotta-dark: #a85a37;
+      --wood: #8b6340;
+      --wood-light: #b08860;
+      --charcoal: #3a3028;
+      --border: #d4c4a8;
+      --white-warm: #fdfaf5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      background: var(--cream);
+      color: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 80px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .header-deco {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; margin-bottom: 12px;
+    }
+    .header-deco::before, .header-deco::after {
+      content: ''; display: block; width: 40px; height: 1px; background: var(--wood-light);
+    }
+    .header-deco span { color: var(--terracotta); font-size: 18px; }
+    .header h1 {
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      font-size: clamp(18px, 5vw, 24px);
+      font-weight: normal;
+      letter-spacing: 0.15em;
+      margin-bottom: 10px;
+    }
+    .header p {
+      font-size: 13px;
+      color: var(--wood);
+      line-height: 1.9;
+    }
+
+    .card {
+      background: var(--white-warm);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 560px;
+      box-shadow: 0 2px 16px rgba(58,48,40,0.06);
+    }
+
+    .step-badge {
+      display: inline-block;
+      background: rgba(196,112,74,0.1);
+      color: var(--terracotta);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-group { margin-bottom: 22px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+      color: var(--charcoal);
+    }
+    .form-group label .required {
+      color: var(--terracotta);
+      font-size: 11px;
+      margin-left: 6px;
+      font-weight: normal;
+    }
+    .form-group label .optional {
+      color: var(--wood-light);
+      font-size: 11px;
+      margin-left: 6px;
+      font-weight: normal;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      font-size: 15px;
+      font-family: inherit;
+      color: var(--charcoal);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .form-group input:focus {
+      border-color: var(--terracotta);
+      background: var(--white-warm);
+    }
+    .form-group .hint {
+      font-size: 11px;
+      color: var(--wood-light);
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: var(--terracotta);
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      font-size: 15px;
+      font-family: inherit;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 4px;
+    }
+    .btn-submit:hover { background: var(--terracotta-dark); }
+    .btn-submit:disabled { background: var(--wood-light); cursor: not-allowed; }
+
+    .privacy-note {
+      font-size: 11px;
+      color: var(--wood-light);
+      text-align: center;
+      margin-top: 14px;
+      line-height: 1.7;
+    }
+
+    /* Success */
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 48px 20px;
+    }
+    .success-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    .success-screen h2 {
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      font-size: 22px;
+      font-weight: normal;
+      letter-spacing: 0.15em;
+      margin-bottom: 12px;
+      color: var(--charcoal);
+    }
+    .success-screen p {
+      font-size: 14px;
+      color: var(--wood);
+      line-height: 1.9;
+    }
+
+    @media (max-width: 520px) {
+      .card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-deco"><span>✦</span></div>
+  <h1>お店情報の入力</h1>
+  <p>以下の情報をご入力いただくと、<br>お店専用のジェネレーターを作成いたします。</p>
+</div>
+
+<div class="card" id="formCard">
+  <div class="step-badge">所要時間：約1分</div>
+
+  <form id="setupForm" action="https://formspree.io/f/xqeojrpr" method="POST">
+    <input type="hidden" name="_subject" value="【k-sta】お店情報入力フォーム">
+
+    <div class="form-group">
+      <label>店舗名<span class="required">必須</span></label>
+      <input type="text" name="shop_name" placeholder="例：上古屋、CRAZY TACOS 京都駅前店" required>
+    </div>
+
+    <div class="form-group">
+      <label>Instagramアカウント<span class="required">必須</span></label>
+      <input type="text" name="instagram" placeholder="例：@johkoya または https://www.instagram.com/johkoya" required>
+      <p class="hint">@アカウント名 または InstagramページのURLをそのまま貼り付けてください</p>
+    </div>
+
+    <hr class="divider">
+
+    <div class="form-group">
+      <label>お店のウェブサイト<span class="optional">任意</span></label>
+      <input type="url" name="website" placeholder="例：https://johkoya.com">
+      <p class="hint">公式サイト・食べログ・ぐるなびなど何でも可</p>
+    </div>
+
+    <div class="form-group">
+      <label>その他SNS<span class="optional">任意</span></label>
+      <input type="text" name="other_sns" placeholder="例：X（Twitter）@johkoya、TikTok @johkoya">
+      <p class="hint">X・TikTok・Facebook などあればご記入ください</p>
+    </div>
+
+    <div class="form-group">
+      <label>メールアドレス<span class="required">必須</span></label>
+      <input type="email" name="email" placeholder="例：info@example.com" required>
+      <p class="hint">完成したジェネレーターのURLをこちらにお送りします</p>
+    </div>
+
+    <button type="submit" class="btn-submit" id="submitBtn">送信する</button>
+    <p class="privacy-note">入力いただいた情報は、ジェネレーター作成のみに使用します。<br>第三者への提供はいたしません。</p>
+  </form>
+</div>
+
+<div class="success-screen" id="successScreen">
+  <div class="success-icon">✦</div>
+  <h2>送信完了しました</h2>
+  <p>ありがとうございます。<br>通常2〜3営業日以内に、<br>専用ジェネレーターのURLをメールでお送りします。<br><br>しばらくお待ちください。</p>
+</div>
+
+<script>
+  const form = document.getElementById('setupForm');
+  const card = document.getElementById('formCard');
+  const success = document.getElementById('successScreen');
+  const btn = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = '送信中…';
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        card.style.display = 'none';
+        success.style.display = 'block';
+      } else {
+        throw new Error();
+      }
+    } catch {
+      btn.disabled = false;
+      btn.textContent = '送信する';
+      alert('送信に失敗しました。時間をおいて再度お試しください。');
+    }
+  });
+</script>
+
+</body>
+</html>
