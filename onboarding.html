@@ -1455,8 +1455,15 @@ module.exports = async (req, res) => {
       var parsed=JSON.parse(m[0]);
       var postEl=document.getElementById('postText');
       postEl.textContent=parsed.post||'';
-      var rawTags=(parsed.hashtags||'').replace(/#/g,' ').split(/[\s,、]+/).filter(function(w){return w.length>0;}).slice(0,5).map(function(w){return '#'+w;}).join(' ');
-      if(!rawTags){var extracted=(parsed.post||'').match(/#[\\w\\u3040-\\u9FFF\\u4E00-\\u9FFF]+/g)||[];rawTags=extracted.slice(0,5).join(' ');}
+      var hStr=(parsed.hashtags||'').trim();
+      var hArr=[];
+      if(hStr){
+        var withHash=hStr.match(/#[^\\s#]+/g)||[];
+        if(withHash.length>0){hArr=withHash;}
+        else{hArr=hStr.split(/[\\s,、]+/).filter(function(w){return w.length>0;}).map(function(w){return '#'+w;});}
+      }
+      if(hArr.length===0){hArr=(parsed.post||'').match(/#[^\\s#]+/g)||[];}
+      var rawTags=hArr.slice(0,5).join('\\n');
       document.getElementById('hashtagText').textContent=rawTags;
       document.getElementById('charCount').textContent=(parsed.post||'').replace(/\\s/g,'').length+'字';
       ['copyPost','copyTags','copyAll'].forEach(function(id){
