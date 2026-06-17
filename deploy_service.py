@@ -12,10 +12,9 @@ API_KEY      = os.environ.get('ANTHROPIC_API_KEY', '')
 PROJECT_NAME = 'kato-insta-support'
 BASE_DIR     = os.path.dirname(os.path.abspath(__file__))
 
-# pitch.html を index.html として、他ファイルも含めてデプロイ
 DEPLOY_FILES = {
-    'index.html':       'pitch.html',
-    'gen.html':         'index.html',      # ジェネレーター（デモ用）
+    'index.html':       'index.html',      # LP（料金・申し込み）
+    'gen.html':         'gen.html',        # 上古屋専用ジェネレーター
     'onboarding.html':  'onboarding.html',
     'sales_kit.html':   'sales_kit.html',
     'feedback.html':    'feedback.html',

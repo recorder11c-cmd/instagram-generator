@@ -3,1130 +3,456 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>上古屋 Instagram投稿文ジェネレーター</title>
+  <title>k-sta｜飲食店のInstagram投稿文を30秒で</title>
   <style>
     :root {
       --cream: #f5f0e8;
       --cream-dark: #ede5d8;
       --terracotta: #c4704a;
       --terracotta-dark: #a85a37;
-      --terracotta-light: #d98b68;
       --wood: #8b6340;
       --wood-light: #b08860;
       --charcoal: #3a3028;
-      --charcoal-soft: #5a4a3a;
-      --white-warm: #fdfaf5;
       --border: #d4c4a8;
+      --white-warm: #fdfaf5;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', Georgia, serif;
-      background-color: var(--cream);
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      background: var(--cream);
       color: var(--charcoal);
-      min-height: 100vh;
-      background-image:
-        repeating-linear-gradient(
-          90deg,
-          transparent,
-          transparent 60px,
-          rgba(139,99,64,0.04) 60px,
-          rgba(139,99,64,0.04) 61px
-        ),
-        repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 60px,
-          rgba(139,99,64,0.04) 60px,
-          rgba(139,99,64,0.04) 61px
-        );
+      line-height: 1.8;
     }
 
-    .container {
-      max-width: 680px;
-      margin: 0 auto;
-      padding: 32px 20px 60px;
-    }
-
-    /* Header */
-    .header {
+    /* ── Hero ── */
+    .hero {
+      background: var(--charcoal);
+      color: #fff;
       text-align: center;
+      padding: 72px 24px 64px;
+    }
+    .hero-label {
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      color: var(--wood-light);
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      font-size: clamp(22px, 5vw, 36px);
+      font-weight: normal;
+      letter-spacing: 0.15em;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--terracotta);
+    }
+    .hero-sub {
+      font-size: 14px;
+      color: #b0a090;
+      margin-bottom: 36px;
+      line-height: 1.8;
+    }
+    .hero-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--terracotta);
+      color: #fff;
+      padding: 14px 36px;
+      border-radius: 3px;
+      font-size: 15px;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--terracotta-dark); }
+    .btn-ghost {
+      display: inline-block;
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 14px 28px;
+      border-radius: 3px;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
+
+    /* ── Monitor banner ── */
+    .monitor-banner {
+      background: var(--terracotta);
+      color: #fff;
+      text-align: center;
+      padding: 14px 24px;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+    .monitor-banner strong { font-size: 15px; }
+
+    /* ── Section wrapper ── */
+    .section { padding: 64px 24px; }
+    .section-inner { max-width: 760px; margin: 0 auto; }
+    .section-alt { background: var(--white-warm); }
+    .section-label {
+      font-size: 11px;
+      color: var(--terracotta);
+      letter-spacing: 0.35em;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      font-size: clamp(18px, 4vw, 26px);
+      font-weight: normal;
+      letter-spacing: 0.15em;
+      margin-bottom: 12px;
+    }
+    .section-desc {
+      font-size: 14px;
+      color: var(--wood);
+      line-height: 1.9;
       margin-bottom: 36px;
     }
 
-    .header-deco {
+    /* ── Steps ── */
+    .steps { display: flex; flex-direction: column; gap: 24px; }
+    .step {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-
-    .header-deco::before,
-    .header-deco::after {
-      content: '';
-      display: block;
-      width: 48px;
-      height: 1px;
-      background: var(--wood-light);
-    }
-
-    .header-deco span {
-      color: var(--terracotta);
-      font-size: 18px;
-    }
-
-    .shop-name {
-      font-size: 28px;
-      font-weight: normal;
-      letter-spacing: 0.25em;
-      color: var(--charcoal);
-      margin-bottom: 6px;
-    }
-
-    .shop-subtitle {
-      font-size: 12px;
-      color: var(--wood-light);
-      letter-spacing: 0.2em;
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-    }
-
-    /* Card */
-    .card {
-      background: var(--white-warm);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 28px 28px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 12px rgba(58,48,40,0.07);
-    }
-
-    .card-title {
-      font-size: 13px;
-      letter-spacing: 0.18em;
-      color: var(--wood);
-      margin-bottom: 18px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--cream-dark);
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-      font-weight: normal;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .card-title::before {
-      content: '';
-      display: inline-block;
-      width: 3px;
-      height: 14px;
-      background: var(--terracotta);
-      border-radius: 2px;
-    }
-
-    /* Form */
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      color: var(--charcoal-soft);
-      letter-spacing: 0.12em;
-      margin-bottom: 8px;
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-      font-weight: normal;
-    }
-
-    input[type="text"],
-    textarea,
-    select {
-      width: 100%;
-      padding: 10px 14px;
+      gap: 20px;
+      align-items: flex-start;
       background: var(--cream);
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      font-size: 14px;
-      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
-      color: var(--charcoal);
-      outline: none;
-      transition: border-color 0.2s, background 0.2s;
-      appearance: none;
-    }
-
-    input[type="text"]:focus,
-    textarea:focus,
-    select:focus {
-      border-color: var(--terracotta-light);
-      background: var(--white-warm);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-      line-height: 1.7;
-    }
-
-    .select-wrapper {
-      position: relative;
-    }
-
-    .select-wrapper::after {
-      content: '▾';
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--wood-light);
-      font-size: 12px;
-      pointer-events: none;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    /* Generate Button */
-    .btn-generate {
-      width: 100%;
-      padding: 14px;
-      background: var(--terracotta);
-      color: var(--white-warm);
-      border: none;
-      border-radius: 3px;
-      font-size: 15px;
-      letter-spacing: 0.25em;
-      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .btn-generate:hover:not(:disabled) {
-      background: var(--terracotta-dark);
-    }
-
-    .btn-generate:active:not(:disabled) {
-      transform: scale(0.99);
-    }
-
-    .btn-generate:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .btn-icon {
-      width: 18px;
-      height: 18px;
-    }
-
-    /* Loading */
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 20px;
-      color: var(--wood-light);
-      font-size: 13px;
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-      letter-spacing: 0.12em;
-    }
-
-    .loading.visible { display: block; }
-
-    .loading-dots {
-      display: inline-flex;
-      gap: 5px;
-      margin-top: 10px;
-    }
-
-    .loading-dots span {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--terracotta-light);
-      animation: dot-pulse 1.2s ease-in-out infinite;
-    }
-
-    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes dot-pulse {
-      0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
-      40% { opacity: 1; transform: scale(1); }
-    }
-
-    /* Output */
-    .output-section {
-      display: none;
-    }
-
-    .output-section.visible {
-      display: block;
-    }
-
-    .output-card {
-      background: var(--white-warm);
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 24px 28px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 12px rgba(58,48,40,0.07);
     }
+    .step-num {
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      font-size: 32px;
+      color: var(--terracotta);
+      line-height: 1;
+      min-width: 40px;
+      padding-top: 2px;
+    }
+    .step-body h3 { font-size: 16px; letter-spacing: 0.1em; margin-bottom: 6px; font-weight: bold; }
+    .step-body p { font-size: 13px; color: var(--wood); line-height: 1.8; }
 
-    .output-header {
-      display: flex;
+    /* ── Before/After ── */
+    .ba-grid {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--cream-dark);
+      margin-bottom: 32px;
     }
-
-    .output-label {
-      font-size: 12px;
-      letter-spacing: 0.18em;
-      color: var(--wood);
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-      font-weight: normal;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .ba-box {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 20px 24px;
     }
+    .ba-label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--wood-light);
+      margin-bottom: 8px;
+    }
+    .ba-box.after { border-color: var(--terracotta); }
+    .ba-box.after .ba-label { color: var(--terracotta); }
+    .ba-text { font-size: 14px; line-height: 1.9; white-space: pre-wrap; }
+    .ba-arrow { font-size: 24px; color: var(--terracotta); text-align: center; }
 
-    .output-label::before {
-      content: '';
-      display: inline-block;
-      width: 3px;
-      height: 13px;
+    /* ── Pricing ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .price-card {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 32px 28px 28px;
+    }
+    .price-card.featured {
+      border-color: var(--terracotta);
+      position: relative;
+    }
+    .price-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
       background: var(--terracotta);
-      border-radius: 2px;
-    }
-
-    .char-count {
+      color: #fff;
       font-size: 11px;
-      color: var(--wood-light);
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      letter-spacing: 0.15em;
+      padding: 4px 16px;
+      border-radius: 20px;
+      white-space: nowrap;
     }
-
-    .output-text {
-      font-size: 15px;
-      line-height: 1.9;
-      color: var(--charcoal);
-      white-space: pre-wrap;
-      word-break: break-all;
-      min-height: 60px;
-      outline: none;
+    .price-plan { font-size: 12px; letter-spacing: 0.25em; color: var(--wood-light); margin-bottom: 10px; }
+    .price-main { font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif; font-size: 36px; font-weight: normal; color: var(--charcoal); }
+    .price-main span { font-size: 16px; }
+    .price-sub { font-size: 12px; color: var(--wood-light); margin-bottom: 20px; }
+    .price-features { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; }
+    .price-features li { font-size: 13px; display: flex; gap: 8px; align-items: flex-start; line-height: 1.6; }
+    .price-features li::before { content: '✓'; color: var(--terracotta); font-weight: bold; flex-shrink: 0; margin-top: 1px; }
+    .btn-stripe {
+      display: block;
+      text-align: center;
+      background: var(--charcoal);
+      color: #fff;
+      padding: 12px 20px;
       border-radius: 3px;
-      transition: background 0.2s, box-shadow 0.2s;
-      padding: 4px 6px;
-      margin: -4px -6px;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      transition: background 0.2s;
     }
-    .output-text[contenteditable="true"]:hover {
-      background: rgba(196,112,74,0.04);
-    }
-    .output-text[contenteditable="true"]:focus {
-      background: var(--white-warm);
-      box-shadow: 0 0 0 2px rgba(196,112,74,0.25);
-    }
-    .edit-hint {
-      font-size: 11px;
-      color: var(--wood-light);
-      margin-top: 6px;
-      font-family: 'Hiragino Sans','Yu Gothic',sans-serif;
-    }
+    .btn-stripe:hover { background: var(--wood); }
+    .price-card.featured .btn-stripe { background: var(--terracotta); }
+    .price-card.featured .btn-stripe:hover { background: var(--terracotta-dark); }
 
-    .hashtag-list {
+    .monitor-note {
+      background: rgba(196,112,74,0.08);
+      border: 1px solid rgba(196,112,74,0.3);
+      border-radius: 4px;
+      padding: 16px 20px;
       font-size: 13px;
-      line-height: 2;
       color: var(--terracotta-dark);
-      word-break: break-all;
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      margin-top: 20px;
+      text-align: center;
+      line-height: 1.7;
     }
 
-    .btn-copy {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 14px;
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      font-size: 12px;
-      letter-spacing: 0.12em;
-      color: var(--wood);
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    /* ── FAQ ── */
+    .faq-list { display: flex; flex-direction: column; gap: 0; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 20px 0; }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-q { font-size: 14px; font-weight: bold; letter-spacing: 0.05em; margin-bottom: 8px; display: flex; gap: 10px; }
+    .faq-q::before { content: 'Q.'; color: var(--terracotta); flex-shrink: 0; }
+    .faq-a { font-size: 13px; color: var(--wood); line-height: 1.8; display: flex; gap: 10px; }
+    .faq-a::before { content: 'A.'; color: var(--wood-light); flex-shrink: 0; }
 
-    .btn-copy:hover {
-      background: var(--cream-dark);
-      border-color: var(--wood-light);
+    /* ── CTA ── */
+    .cta {
+      background: var(--charcoal);
+      color: #fff;
+      text-align: center;
+      padding: 72px 24px;
     }
-
-    .btn-copy.copied {
-      border-color: var(--terracotta-light);
-      color: var(--terracotta);
-      background: rgba(196,112,74,0.05);
+    .cta-title {
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      font-size: clamp(18px, 4vw, 26px);
+      font-weight: normal;
+      letter-spacing: 0.15em;
+      margin-bottom: 12px;
     }
-
-    .btn-copy svg {
-      width: 13px;
-      height: 13px;
-    }
-
-    .btn-copy-all {
-      width: 100%;
-      padding: 11px;
-      background: var(--cream-dark);
-      border: 1px solid var(--border);
-      border-radius: 3px;
+    .cta-sub {
       font-size: 13px;
-      letter-spacing: 0.18em;
-      color: var(--charcoal-soft);
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-top: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      color: #b0a090;
+      margin-bottom: 32px;
+      line-height: 1.8;
     }
 
-    .btn-copy-all:hover {
-      background: var(--border);
-    }
-
-    .btn-copy-all.copied {
-      border-color: var(--terracotta-light);
-      color: var(--terracotta);
-      background: rgba(196,112,74,0.06);
-    }
-
-    /* Error */
-    .error-msg {
-      display: none;
-      padding: 12px 16px;
-      background: #fdf0ec;
-      border: 1px solid #e8b4a0;
-      border-radius: 3px;
-      color: #9b4a2a;
-      font-size: 13px;
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
-
-    .error-msg.visible { display: block; }
-
-    /* Footer */
+    /* ── Footer ── */
     .footer {
       text-align: center;
-      margin-top: 40px;
-      padding-top: 20px;
+      padding: 32px 20px;
+      font-size: 12px;
+      color: var(--wood-light);
+      letter-spacing: 0.1em;
       border-top: 1px solid var(--border);
     }
 
-    .footer-text {
-      font-size: 11px;
-      color: var(--wood-light);
-      letter-spacing: 0.15em;
-      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
-    }
-
-    .footer-deco {
-      margin-top: 8px;
-      font-size: 14px;
-      color: var(--terracotta-light);
-      letter-spacing: 0.3em;
-    }
-
-    /* Post Type Tabs */
-    .type-tabs {
-      display: flex; gap: 6px; overflow-x: auto; margin-bottom: 20px;
-      padding-bottom: 4px; scrollbar-width: none;
-    }
-    .type-tabs::-webkit-scrollbar { display: none; }
-    .type-tab {
-      flex-shrink: 0; padding: 7px 13px; border: 1px solid var(--border);
-      border-radius: 20px; background: var(--cream); color: var(--wood);
-      font-size: 12px; font-family: inherit; cursor: pointer;
-      transition: all 0.2s; white-space: nowrap; letter-spacing: 0.05em;
-    }
-    .type-tab:hover { border-color: var(--terracotta-light); color: var(--terracotta); }
-    .type-tab.active { background: var(--terracotta); color: #fff; border-color: var(--terracotta); }
-    .type-form { display: none; }
-    .type-form.active { display: block; }
-
-    /* Responsive */
-    @media (max-width: 500px) {
-      .form-row { grid-template-columns: 1fr; }
-      .card { padding: 20px 18px; }
-      .output-card { padding: 20px 18px; }
+    @media (max-width: 600px) {
+      .ba-grid { grid-template-columns: 1fr; }
+      .ba-arrow { transform: rotate(90deg); }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .step { flex-direction: column; gap: 10px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
 
-    <!-- Header -->
-    <header class="header">
-      <div class="header-deco">
-        <span>✦</span>
-      </div>
-      <h1 class="shop-name">上古屋</h1>
-      <p class="shop-subtitle">Instagram 投稿文ジェネレーター ─ 京都・西洞院蛸薬師</p>
-    </header>
+<!-- Monitor Banner -->
+<div class="monitor-banner">
+  <strong>無料モニター募集中</strong>｜残り5店舗・6月末締切
+</div>
 
-    <!-- Form -->
-    <div class="card">
-      <h2 class="card-title">投稿タイプを選ぶ</h2>
-
-      <!-- Type Tabs -->
-      <div class="type-tabs">
-        <button class="type-tab active" onclick="switchType('food',this)">🍽️ 今日のおすすめ</button>
-        <button class="type-tab" onclick="switchType('staff',this)">🧑‍🍳 スタッフ紹介</button>
-        <button class="type-tab" onclick="switchType('seats',this)">📅 空き状況</button>
-        <button class="type-tab" onclick="switchType('full',this)">🎉 満席御礼</button>
-        <button class="type-tab" onclick="switchType('ingredient',this)">🌿 食材紹介</button>
-        <button class="type-tab" onclick="switchType('newmenu',this)">🆕 新メニュー</button>
-        <button class="type-tab" onclick="switchType('notice',this)">📣 お知らせ</button>
-        <button class="type-tab" onclick="switchType('drink',this)">🍶 お酒・ドリンク</button>
-      </div>
-
-      <!-- Type 1: 今日のおすすめ -->
-      <div class="type-form active" id="form-food">
-        <div class="form-group">
-          <label>今日の料理・食材 <span style="font-size:11px;color:#999;font-weight:normal">─ 料理名だけでOK！</span></label>
-          <textarea id="foodInput" placeholder="例：本日の刺身盛り合わせ、鶏の唐揚げ、牛すじ煮込み…"></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>季節 <span style="font-size:11px;color:#999;font-weight:normal">（自動）</span></label>
-            <div class="select-wrapper">
-              <select id="season">
-                <option value="春" selected>春</option>
-                <option value="夏">夏</option>
-                <option value="秋">秋</option>
-                <option value="冬">冬</option>
-              </select>
-              <small id="seasonDebug" style="color:#999;font-size:10px"></small>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>投稿トーン <span style="font-size:11px;color:#999;font-weight:normal">（任意）</span></label>
-            <div class="select-wrapper">
-              <select id="tone">
-                <option value="しみじみ系">しみじみ系</option>
-                <option value="食欲そそる系">食欲そそる系</option>
-                <option value="お知らせ系">お知らせ系</option>
-                <option value="PR強め系">PR強め系🔥</option>
-                <option value="バズ狙い系">バズ狙い系⚡</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Type 2: スタッフ紹介 -->
-      <div class="type-form" id="form-staff">
-        <div class="form-row">
-          <div class="form-group">
-            <label>スタッフ名</label>
-            <input type="text" id="staffName" placeholder="例：田中さん">
-          </div>
-          <div class="form-group">
-            <label>役割・ポジション</label>
-            <input type="text" id="staffRole" placeholder="例：板前・ホール担当">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>人柄・エピソード</label>
-          <textarea id="staffEpisode" placeholder="例：笑顔が絶えない20代。地元出身で食への情熱が強い。お客様との会話を大切にしている。"></textarea>
-        </div>
-        <div class="form-group">
-          <label>得意料理・こだわり（任意）</label>
-          <input type="text" id="staffSpecialty" placeholder="例：だし巻き卵、鯖の棒寿司">
-        </div>
-      </div>
-
-      <!-- Type 3: 空き状況 -->
-      <div class="type-form" id="form-seats">
-        <div class="form-row">
-          <div class="form-group">
-            <label>本日の空き状況</label>
-            <div class="select-wrapper">
-              <select id="seatsStatus">
-                <option value="余裕あり">余裕あり 🟢</option>
-                <option value="残り少なめ">残り少なめ 🟡</option>
-                <option value="残りわずか">残りわずか 🔴</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>おすすめ時間帯（任意）</label>
-            <input type="text" id="seatsTime" placeholder="例：18時〜19時半">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>今夜のひと言（任意）</label>
-          <input type="text" id="seatsComment" placeholder="例：今夜は旬のおすすめ料理が揃ってます">
-        </div>
-        <div class="form-group">
-          <label>季節</label>
-          <div class="select-wrapper">
-            <select id="seatsSeason">
-              <option value="春">春</option><option value="夏">夏</option>
-              <option value="秋">秋</option><option value="冬">冬</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Type 4: 満席御礼 -->
-      <div class="type-form" id="form-full">
-        <div class="form-group">
-          <label>次の空き日時</label>
-          <input type="text" id="fullNextDate" placeholder="例：来週木曜・金曜 / 今週末のランチ">
-        </div>
-        <div class="form-group">
-          <label>感謝のひと言（任意）</label>
-          <input type="text" id="fullThanks" placeholder="例：おかげさまで連日満席が続いています">
-        </div>
-        <div class="form-group">
-          <label>予約先・連絡先（任意）</label>
-          <input type="text" id="fullContact" placeholder="例：DMまたはお電話にて / 食べログから">
-        </div>
-      </div>
-
-      <!-- Type 5: 食材紹介 -->
-      <div class="type-form" id="form-ingredient">
-        <div class="form-row">
-          <div class="form-group">
-            <label>食材名</label>
-            <input type="text" id="ingredientName" placeholder="例：黒毛和牛、鮮魚の盛り合わせ、旬の野菜">
-          </div>
-          <div class="form-group">
-            <label>産地・仕入れ先（任意）</label>
-            <input type="text" id="ingredientOrigin" placeholder="例：地元農家、朝採れ野菜、近海漁港">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>こだわり・エピソード</label>
-          <textarea id="ingredientEpisode" placeholder="例：今年初の間人ガニ。水揚げ直後に仕入れる活け蟹で、甘みと旨みが格段に違う。刺身・焼き・鍋で…"></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>季節</label>
-            <div class="select-wrapper">
-              <select id="ingredientSeason">
-                <option value="春">春</option><option value="夏">夏</option>
-                <option value="秋">秋</option><option value="冬">冬</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>投稿トーン</label>
-            <div class="select-wrapper">
-              <select id="ingredientTone">
-                <option value="しみじみ系">しみじみ系</option>
-                <option value="食欲そそる系">食欲そそる系</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Type 6: 新メニュー -->
-      <div class="type-form" id="form-newmenu">
-        <div class="form-group">
-          <label>メニュー名</label>
-          <input type="text" id="newmenuName" placeholder="例：季節野菜の炊き合わせ、黒毛和牛のたたき">
-        </div>
-        <div class="form-group">
-          <label>特徴・説明</label>
-          <textarea id="newmenuDesc" placeholder="例：春野菜を丁寧にだしで炊いた新作。タケノコ・菜の花・うすいえんどう…旬の恵みをそのままに。"></textarea>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>提供期間（任意）</label>
-            <input type="text" id="newmenuPeriod" placeholder="例：〜5月末 / 数量限定 / 通年">
-          </div>
-          <div class="form-group">
-            <label>季節</label>
-            <div class="select-wrapper">
-              <select id="newmenuSeason">
-                <option value="春">春</option><option value="夏">夏</option>
-                <option value="秋">秋</option><option value="冬">冬</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Type 7: お知らせ -->
-      <div class="type-form" id="form-notice">
-        <div class="form-group">
-          <label>お知らせの種類</label>
-          <div class="select-wrapper">
-            <select id="noticeType">
-              <option value="臨時休業・定休変更">臨時休業・定休変更</option>
-              <option value="イベント・特別企画">イベント・特別企画</option>
-              <option value="記念・感謝">記念・感謝</option>
-              <option value="営業時間変更">営業時間変更</option>
-              <option value="その他">その他</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>お知らせ内容</label>
-          <textarea id="noticeContent" placeholder="例：5月3〜5日はGW休業とさせていただきます。6日（月）より通常営業。ご迷惑をおかけします。"></textarea>
-        </div>
-      </div>
-
-      <!-- Type 8: お酒・ドリンク -->
-      <div class="type-form" id="form-drink">
-        <div class="form-group">
-          <label>お酒・ドリンク名</label>
-          <input type="text" id="drinkName" placeholder="例：〆張鶴 純、山崎ハイボール、自家製レモンサワー">
-        </div>
-        <div class="form-group">
-          <label>一言メモ <span style="font-size:12px;color:#999">（任意）</span></label>
-          <input type="text" id="drinkMemo" placeholder="例：今月入荷の限定品、辛口で食中酒向き、夏季限定">
-        </div>
-        <div class="form-group">
-          <label>投稿トーン</label>
-          <div class="select-wrapper">
-            <select id="drinkTone">
-              <option value="しみじみ系">しみじみ系</option>
-              <option value="食欲そそる系">食欲そそる系</option>
-              <option value="お知らせ系">お知らせ系</option>
-              <option value="PR強め系">PR強め系🔥</option>
-              <option value="バズ狙い系">バズ狙い系⚡</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <button class="btn-generate" id="generateBtn" onclick="generatePost()">
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-          <path d="M2 17l10 5 10-5"/>
-          <path d="M2 12l10 5 10-5"/>
-        </svg>
-        投稿文を生成する
-      </button>
-    </div>
-
-    <!-- Loading -->
-    <div class="loading" id="loading">
-      言葉を紡いでいます
-      <div class="loading-dots">
-        <span></span><span></span><span></span>
-      </div>
-    </div>
-
-    <!-- Error -->
-    <div class="error-msg" id="errorMsg"></div>
-
-    <!-- Output -->
-    <div class="output-section" id="outputSection">
-
-      <div class="output-card">
-        <div class="output-header">
-          <span class="output-label">Instagram 投稿文</span>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span class="char-count" id="charCount"></span>
-            <button class="btn-copy" id="copyPost" onclick="copyText('postText', 'copyPost')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-              コピー
-            </button>
-          </div>
-        </div>
-        <div class="output-text" id="postText" contenteditable="true" spellcheck="false"></div>
-        <p class="edit-hint">✏️ クリックして直接編集できます</p>
-        <p style="font-size:11px;color:#999;margin-top:8px;line-height:1.6">⚠️ AIの生成内容です。事実と異なる場合があります。投稿前に必ずご確認ください。</p>
-      </div>
-
-      <div class="output-card">
-        <div class="output-header">
-          <span class="output-label">ハッシュタグ</span>
-          <button class="btn-copy" id="copyTags" onclick="copyText('hashtagText', 'copyTags')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-            </svg>
-            コピー
-          </button>
-        </div>
-        <div class="hashtag-list" id="hashtagText"></div>
-      </div>
-
-      <button class="btn-copy-all" id="copyAll" onclick="copyAll()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-        </svg>
-        投稿文＋ハッシュタグをまとめてコピー
-      </button>
-
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-      <p class="footer-text">じんわり良い酒、良い食事。</p>
-      <p class="footer-deco">─ ✦ ─</p>
-    </footer>
-
+<!-- Hero -->
+<div class="hero">
+  <p class="hero-label">k-sta</p>
+  <h1>飲食店のInstagram投稿文を<br><em>30秒</em>で。</h1>
+  <p class="hero-sub">料理名を入れるだけで、投稿文とハッシュタグが完成します。<br>毎日の投稿に悩む時間を、調理に使ってください。</p>
+  <div class="hero-btns">
+    <a href="/demo.html" class="btn-primary">無料で試してみる</a>
+    <a href="#pricing" class="btn-ghost">料金を見る</a>
   </div>
+</div>
 
-  <script>
-    const SHOP = {
-      name: '上古屋',
-      location: '京都・西洞院蛸薬師',
-      genre: '和食居酒屋',
-      concept: 'じんわり良い酒、良い食事 / ほっこりまち酒場',
-      description: '京町家を改装した木のぬくもりあふれる小さな居酒屋（カウンター8席、テーブル14席）',
-      specialty: '店主の地元・京丹後の食材と地酒にこだわる',
-      target: '仕事帰りのゆったりしたい大人',
-      hashtags: '#上古屋'
-    };
+<!-- How it works -->
+<div class="section">
+  <div class="section-inner">
+    <p class="section-label">HOW IT WORKS</p>
+    <h2 class="section-title">3ステップで投稿完成</h2>
+    <p class="section-desc">難しい操作はありません。スマホでも使えます。</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>投稿タイプを選ぶ</h3>
+          <p>おすすめ料理・新メニュー・食材紹介・満席御礼など8種類から選択します。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>料理名を入力する</h3>
+          <p>「本日の松茸ご飯・丹波産」のように、いつも書いてるメモをそのまま入れるだけ。</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>生成してコピー</h3>
+          <p>30秒でお店の雰囲気に合った投稿文とハッシュタグが完成。そのままInstagramに貼り付けるだけです。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-    const SHOP_INTRO = `あなたは${SHOP.location}にある${SHOP.genre}「${SHOP.name}」のInstagram担当者です。
-【店舗情報】${SHOP.description}。${SHOP.specialty}。コンセプト：${SHOP.concept}。ターゲット：${SHOP.target}。`;
+<!-- Before / After -->
+<div class="section section-alt">
+  <div class="section-inner">
+    <p class="section-label">BEFORE / AFTER</p>
+    <h2 class="section-title">こんな投稿文が生成されます</h2>
+    <div class="ba-grid">
+      <div class="ba-box">
+        <p class="ba-label">BEFORE — 手書きメモ</p>
+        <p class="ba-text">本日のおすすめです。
+ぜひご来店ください。</p>
+      </div>
+      <div class="ba-arrow">→</div>
+      <div class="ba-box after">
+        <p class="ba-label">AFTER — AI生成（30秒）</p>
+        <p class="ba-text">秋の終わり、最後の松茸を仕入れました。
+土の香りをまとった、今年これが最後の出会い。
+焚き火のように静かに、
+だしとともに炊き上げた一品です。
+今夜だけの献立、ぜひ。</p>
+      </div>
+    </div>
+    <div style="text-align:center;">
+      <a href="/demo.html" class="btn-primary" style="display:inline-block;">実際に試してみる（無料）</a>
+    </div>
+  </div>
+</div>
 
-    const TONE_GUIDE = {
-      'しみじみ系': 'しみじみとした余韻を大切に、静かで詩的な文体。日常のちょっとした豊かさを感じさせる。',
-      '食欲そそる系': '料理の香りや食感が伝わるような、五感に訴える表現。読んで食べたくなる臨場感。',
-      'お知らせ系': '新鮮な食材や今夜のおすすめを自然体で伝える。押しつけがましくなく、さりげなく寄りたくなる。',
-      'PR強め系': '今すぐ行きたい・予約したいと思わせる背中を押す文体。限定感・希少性・緊張感を自然に盛り込む。数字や具体的な制限（残り◯席・今夜限り等）を使う。',
-      'バズ狙い系': '1行目で必ず足を止めさせる強いフック。意外性・共感・驚きのある書き出し。短文・改行多め・テンポよく読める構成。シェアしたくなる言葉選び。'
-    };
+<!-- Pricing -->
+<div class="section" id="pricing">
+  <div class="section-inner">
+    <p class="section-label">PRICING</p>
+    <h2 class="section-title">料金プラン</h2>
+    <p class="section-desc">月額のサブスクリプション。いつでも解約できます。</p>
 
-    const POST_RULES = `【投稿文のルール】
-- 200〜250字（スペース除く本文のみ）
-- 必ず1行目に強いフックを入れる（疑問・驚き・共感・数字のいずれか）
-- 押しつけがましくない、じんわり伝わる文体
-- 絵文字は1〜2個のみ、控えめに
-- 「来てください」より「寄りたくなる」表現
-- 改行を適度に入れて読みやすくする
-【ハッシュタグのルール】
-- 必ず5個以内（6個以上は無効になるため厳守）
-- 店・料理・季節に関連するものを厳選
-- ${SHOP.hashtags} を必ず含める`;
+    <div class="pricing-grid">
 
-    const SHORT_RULES = `【投稿文のルール】
-- 100〜150字（短くテンポよく）
-- 絵文字は1〜2個のみ
-- 自然体で、押しつけがましくない
-【ハッシュタグのルール】
-- 必ず5個以内（6個以上は無効になるため厳守）
-- 店・料理・季節に関連するものを厳選
-- ${SHOP.hashtags} を必ず含める`;
+      <!-- Light -->
+      <div class="price-card">
+        <p class="price-plan">LIGHT</p>
+        <p class="price-main">¥14,800<span>/月</span></p>
+        <p class="price-sub">（税込 ¥16,280）</p>
+        <ul class="price-features">
+          <li>専用ジェネレーター発行</li>
+          <li>投稿タイプ 8種類対応</li>
+          <li>月30回まで生成</li>
+          <li>ハッシュタグ自動付与</li>
+          <li>メールサポート</li>
+        </ul>
+        <a href="STRIPE_LIGHT_LINK" class="btn-stripe">このプランで申し込む</a>
+      </div>
 
-    let currentType = 'food';
+      <!-- Full -->
+      <div class="price-card featured">
+        <span class="price-badge">おすすめ</span>
+        <p class="price-plan">FULL</p>
+        <p class="price-main">¥29,800<span>/月</span></p>
+        <p class="price-sub">（税込 ¥32,780）</p>
+        <ul class="price-features">
+          <li>専用ジェネレーター発行</li>
+          <li>投稿タイプ 8種類対応</li>
+          <li>月無制限で生成</li>
+          <li>ハッシュタグ自動付与</li>
+          <li>月12本の投稿代行（週3回）</li>
+          <li>優先メールサポート</li>
+        </ul>
+        <a href="STRIPE_FULL_LINK" class="btn-stripe">このプランで申し込む</a>
+      </div>
 
-    function switchType(type, btn) {
-      currentType = type;
-      document.querySelectorAll('.type-tab').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.type-form').forEach(f => f.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('form-' + type).classList.add('active');
-      document.getElementById('outputSection').classList.remove('visible');
-      document.getElementById('errorMsg').classList.remove('visible');
-    }
+    </div>
 
-    function buildPrompt() {
-      const v = id => (document.getElementById(id) || {}).value || '';
+    <div class="monitor-note">
+      現在、<strong>無料モニター枠を5店舗限定</strong>で募集しています。<br>
+      6月末までのお申し込みで、初月完全無料でご利用いただけます。<br>
+      <a href="mailto:recorder.11c@gmail.com" style="color:var(--terracotta-dark);font-weight:bold;">モニター申し込みはこちら（メール）</a>
+    </div>
+  </div>
+</div>
 
-      switch(currentType) {
-        case 'food': {
-          const food = v('foodInput').trim();
-          if (!food) return { error: '今日の料理・食材を入力してください。' };
-          const season = v('season'), tone = v('tone');
-          return { prompt: `${SHOP_INTRO}
+<!-- FAQ -->
+<div class="section section-alt">
+  <div class="section-inner">
+    <p class="section-label">FAQ</p>
+    <h2 class="section-title">よくある質問</h2>
 
-【今日の投稿情報】
-- 料理・食材：${food}
-- 季節：${season}
-- 投稿トーン：${tone}（${TONE_GUIDE[tone]}）
-- 京丹後・地酒・季節感を自然に織り込む
+    <div class="faq-list">
+      <div class="faq-item">
+        <p class="faq-q">どんな飲食店でも使えますか？</p>
+        <p class="faq-a">和食・洋食・カフェ・居酒屋・ラーメン店など業態は問いません。お申し込み後にお店の情報を教えていただき、専用のジェネレーターを作成します。</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">スタッフでも使えますか？</p>
+        <p class="faq-a">はい。URLにアクセスするだけで使えるので、スマホ操作ができれば誰でも使えます。アカウント登録は不要です。</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">生成した投稿文は修正できますか？</p>
+        <p class="faq-a">生成後に自由に編集できます。AIが下書きを作り、仕上げはお店の方が行うイメージです。</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">解約はいつでもできますか？</p>
+        <p class="faq-a">はい。月単位の契約で、いつでもキャンセル可能です。違約金などはありません。</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">支払い方法は？</p>
+        <p class="faq-a">クレジットカード（Visa・Mastercard・JCB・Amex）に対応しています。Stripeによる安全な決済です。</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-${POST_RULES}
+<!-- CTA -->
+<div class="cta">
+  <h2 class="cta-title">まずは無料で試してみてください</h2>
+  <p class="cta-sub">デモ版でご自身のお店の雰囲気に合った投稿文が作れます。<br>登録不要・完全無料です。</p>
+  <div class="hero-btns">
+    <a href="/demo.html" class="btn-primary">デモを試す（無料）</a>
+    <a href="mailto:recorder.11c@gmail.com" class="btn-ghost">お問い合わせ</a>
+  </div>
+</div>
 
-以下のJSON形式のみで返答してください：
-{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
-        }
+<div class="footer">
+  © 2026 k-sta — Instagram投稿文ジェネレーター for 飲食店
+</div>
 
-        case 'staff': {
-          const name = v('staffName').trim();
-          if (!name) return { error: 'スタッフ名を入力してください。' };
-          const role = v('staffRole'), episode = v('staffEpisode'), specialty = v('staffSpecialty');
-          return { prompt: `${SHOP_INTRO}
-
-【スタッフ紹介投稿】
-- 名前：${name}
-- 役割・ポジション：${role || '未記入'}
-- 人柄・エピソード：${episode || '未記入'}
-- 得意料理・こだわり：${specialty || '未記入'}
-
-スタッフの人柄が伝わる、親しみやすく温かい紹介文を作成してください。
-${POST_RULES}
-
-{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
-        }
-
-        case 'seats': {
-          const status = v('seatsStatus'), time = v('seatsTime'), comment = v('seatsComment'), season = v('seatsSeason');
-          return { prompt: `${SHOP_INTRO}
-
-【本日の空き状況投稿】
-- 空き状況：${status}
-- おすすめ時間帯：${time || '特になし'}
-- 今夜のひと言：${comment || '特になし'}
-- 季節：${season}
-
-今夜の来店を自然に誘う、押しつけがましくない空き状況告知を作成してください。
-${SHORT_RULES}
-
-{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
-        }
-
-        case 'full': {
-          const next = v('fullNextDate').trim();
-          if (!next) return { error: '次の空き日時を入力してください。' };
-          const thanks = v('fullThanks'), contact = v('fullContact');
-          return { prompt: `${SHOP_INTRO}
-
-【満席御礼＋次回予約誘導投稿】
-- 次の空き日時：${next}
-- 感謝のひと言：${thanks || ''}
-- 予約先・連絡先：${contact || ''}
-
-満席のお礼と感謝を伝えながら、自然に次回予約につなげる文章を作成してください。
-${SHORT_RULES}
-
-{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
-        }
-
-        case 'ingredient': {
-          const name = v('ingredientName').trim();
-          if (!name) return { error: '食材名を入力してください。' };
-          const origin = v('ingredientOrigin'), episode = v('ingredientEpisode');
-          const season = v('ingredientSeason'), tone = v('ingredientTone');
-          return { prompt: `${SHOP_INTRO}
-
-【食材・こだわり紹介投稿】
-- 食材名：${name}
-- 産地・仕入れ先：${origin || ''}
-- こだわり・エピソード：${episode || ''}
-- 季節：${season}
-- トーン：${tone}（${TONE_GUIDE[tone]}）
-
-食材への愛情と職人のこだわりが伝わる紹介文を作成してください。
-${POST_RULES}
-
-{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
-        }
-
-        case 'newmenu': {
-          const name = v('newmenuName').trim();
-          if (!name) return { error: 'メニュー名を入力してください。' };
-          const desc = v('newmenuDesc'), period = v('newmenuPeriod'), season = v('newmenuSeason');
-          return { prompt: `${SHOP_INTRO}
-
-【新メニュー告知投稿】
-- メニュー名：${name}
-- 特徴・説明：${desc || ''}
-- 提供期間：${period || ''}
-- 季節：${season}
-
-期待感を高めながら自然体で伝える新メニュー告知を作成してください。
-${POST_RULES}
-
-{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
-        }
-
-        case 'notice': {
-          const type = v('noticeType'), content = v('noticeContent').trim();
-          if (!content) return { error: 'お知らせ内容を入力してください。' };
-          return { prompt: `${SHOP_INTRO}
-
-【お知らせ投稿】
-- 種類：${type}
-- 内容：${content}
-
-簡潔で丁寧、お客様への感謝と誠意が伝わるお知らせ文を作成してください。
-${SHORT_RULES}
-
-{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
-        }
-
-        case 'drink': {
-          const name = v('drinkName').trim();
-          if (!name) return { error: 'お酒・ドリンク名を入力してください。' };
-          const memo = v('drinkMemo'), tone = v('drinkTone');
-          return { prompt: `${SHOP_INTRO}
-
-【お酒・ドリンク紹介投稿】
-- お酒・ドリンク名：${name}
-- 特徴・メモ：${memo || '特になし'}
-- 投稿トーン：${tone}（${TONE_GUIDE[tone]}）
-
-お酒の魅力と飲んだときの情景が浮かぶ紹介文を作成してください。料理との相性や季節感も自然に織り込んでください。
-${POST_RULES}
-
-{"post":"投稿文","hashtags":"#タグ1 #タグ2 ..."}` };
-        }
-      }
-    }
-
-    async function generatePost() {
-      const errorMsg = document.getElementById('errorMsg');
-      const loading = document.getElementById('loading');
-      const outputSection = document.getElementById('outputSection');
-      const generateBtn = document.getElementById('generateBtn');
-
-      errorMsg.classList.remove('visible');
-
-      const result = buildPrompt();
-      if (result.error) { showError(result.error); return; }
-
-      generateBtn.disabled = true;
-      loading.classList.add('visible');
-      outputSection.classList.remove('visible');
-
-      try {
-        const res = await fetch('/api/proxy', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-5',
-            max_tokens: 1000,
-            messages: [{ role: 'user', content: result.prompt }]
-          })
-        });
-
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error?.message || `APIエラー (${res.status})`);
-        }
-
-        const data = await res.json();
-        const raw = data.content[0].text.trim();
-        const jsonMatch = raw.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) throw new Error('レスポンスの解析に失敗しました。もう一度お試しください。');
-
-        const parsed = JSON.parse(jsonMatch[0]);
-        const postText = parsed.post || '';
-        const hashtagText = (parsed.hashtags || '')
-          .replace(/#/g, ' ')
-          .split(/[\s,、]+/)
-          .filter(w => w.length > 0)
-          .slice(0, 5)
-          .map(w => '#' + w)
-          .join(' ');
-
-        document.getElementById('postText').textContent = postText;
-        document.getElementById('hashtagText').textContent = hashtagText;
-        const charCount = postText.replace(/\s/g, '').length;
-        document.getElementById('charCount').textContent = `${charCount}字`;
-
-        ['copyPost', 'copyTags', 'copyAll'].forEach(id => {
-          const btn = document.getElementById(id);
-          btn.classList.remove('copied');
-          btn.childNodes[btn.childNodes.length - 1].textContent =
-            id === 'copyAll' ? '投稿文＋ハッシュタグをまとめてコピー' : 'コピー';
-        });
-
-        outputSection.classList.add('visible');
-        outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-      } catch (e) {
-        showError(e.message);
-      } finally {
-        generateBtn.disabled = false;
-        loading.classList.remove('visible');
-      }
-    }
-
-    function showError(msg) {
-      const el = document.getElementById('errorMsg');
-      // エラーメッセージを日本語に変換
-      const msgMap = {
-        'overloaded': 'AIが混み合っています。少し待ってからもう一度お試しください。',
-        'rate_limit': 'リクエストが多すぎます。1〜2分後にもう一度お試しください。',
-        'timeout': '時間がかかりすぎています。もう一度お試しください。',
-        'network': 'ネットワークエラーが発生しました。接続を確認してお試しください。',
-        'api': 'APIエラーが発生しました。しばらく経ってからお試しください。',
-      };
-      const lower = (msg || '').toLowerCase();
-      let displayMsg = msg;
-      for (const [key, ja] of Object.entries(msgMap)) {
-        if (lower.includes(key)) { displayMsg = ja; break; }
-      }
-      el.textContent = displayMsg;
-      el.classList.add('visible');
-    }
-
-    async function copyText(textId, btnId) {
-      const text = document.getElementById(textId).innerText;
-      try {
-        await navigator.clipboard.writeText(text);
-        const btn = document.getElementById(btnId);
-        btn.classList.add('copied');
-        const textNode = btn.childNodes[btn.childNodes.length - 1];
-        textNode.textContent = 'コピー済';
-        setTimeout(() => { btn.classList.remove('copied'); textNode.textContent = 'コピー'; }, 2000);
-      } catch (e) { alert('コピーに失敗しました。手動でコピーしてください。'); }
-    }
-
-    async function copyAll() {
-      const post = document.getElementById('postText').innerText;
-      const tags = document.getElementById('hashtagText').textContent;
-      try {
-        await navigator.clipboard.writeText(post + '\n\n' + tags);
-        const btn = document.getElementById('copyAll');
-        btn.classList.add('copied');
-        btn.childNodes[btn.childNodes.length - 1].textContent = 'コピー済！';
-        setTimeout(() => {
-          btn.classList.remove('copied');
-          btn.childNodes[btn.childNodes.length - 1].textContent = '投稿文＋ハッシュタグをまとめてコピー';
-        }, 2000);
-      } catch (e) { alert('コピーに失敗しました。手動でコピーしてください。'); }
-    }
-
-    // 季節を現在の月から自動設定
-    (function() {
-      const m = new Date().getMonth() + 1;
-      const season = (m <= 2 || m === 12) ? '冬' : m <= 6 ? '春' : m <= 9 ? '夏' : '秋';
-      ['season','seatsSeason','ingredientSeason','newmenuSeason'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.value = season;
-      });
-      const dbg = document.getElementById('seasonDebug');
-      if (dbg) dbg.textContent = '（' + m + '月 → ' + season + ' を自動選択）';
-    })();
-
-    document.getElementById('postText').addEventListener('input', () => {
-      const text = document.getElementById('postText').innerText;
-      document.getElementById('charCount').textContent = text.replace(/\s/g, '').length + '字';
-    });
-
-    document.getElementById('foodInput').addEventListener('keydown', e => {
-      if (e.key === 'Enter' && e.metaKey) generatePost();
-    });
-  </script>
 </body>
 </html>

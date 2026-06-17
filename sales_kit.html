@@ -113,6 +113,7 @@
       <li><a href="#sec5"><span class="toc-num">5</span>フォローアップDM</a></li>
       <li><a href="#sec6"><span class="toc-num">6</span>スクショDM（パーソナライズ版）</a></li>
       <li><a href="#sec7"><span class="toc-num">7</span>送付タイミングガイド</a></li>
+      <li><a href="#sec8"><span class="toc-num">8</span>無料→有料転換メール</a></li>
     </ul>
   </div>
 
@@ -138,7 +139,7 @@ Instagramの投稿文を30秒で自動生成するツール作ってて、
 合わへんかったら全然大丈夫やから、
 気軽に触ってみてほしいだけ！
 
-https://kato-insta-support.vercel.app/gen.html</div>
+https://kato-insta-support.vercel.app/demo.html</div>
     </div>
 
     <div class="pattern">
@@ -568,6 +569,94 @@ https://kato-insta-support.vercel.app
       <strong>📅 1日の上限</strong>　20〜30件（超えるとInstagramアカウント制限の恐れあり）<br>
       <strong>⏱ 2通目のタイミング</strong>　1通目から2日後（1日は早すぎ・3日以上は忘れられる）<br>
       <strong>🔗 リンクの扱い</strong>　1通目には入れない。返信があってから2通目でURLを案内
+    </div>
+  </div>
+
+  <!-- Section 8: 有料転換メール -->
+  <div class="section" id="sec8">
+    <p class="section-label">SECTION 08</p>
+    <h2 class="section-title">無料モニター → 有料転換メール</h2>
+    <p class="section-desc">無料期間終了の1週間前に送るメールです。感謝を伝えつつ、自然に有料プランへ誘導します。</p>
+
+    <div class="dm-block">
+      <div class="dm-header">
+        <span class="dm-label">有料転換メール（1週間前）</span>
+        <button class="btn-copy" onclick="copyText(this, 'mail-paid-1w')">コピー</button>
+      </div>
+      <div class="text-box" id="mail-paid-1w">件名：【k-sta】無料モニター期間終了のご案内
+
+○○様
+
+いつもご利用いただきありがとうございます。
+k-sta担当の加藤です。
+
+無料モニター期間が、来週末（6月30日）に終了いたします。
+
+この1ヶ月間、ご利用いただきありがとうございました。
+もしよろしければ、ご感想を一言いただけると大変嬉しいです。
+
+─────────────────────
+継続してご利用いただける場合は、
+以下のプランからお選びください。
+
+■ ライトプラン　¥14,800/月（税込 ¥16,280）
+　・月30回まで生成
+　・専用ジェネレーター継続利用
+
+■ フルプラン　¥29,800/月（税込 ¥32,780）
+　・月無制限で生成
+　・月12本の投稿代行（週3回）付き
+
+お申し込みはこちら：
+https://kato-insta-support.vercel.app/#pricing
+
+─────────────────────
+7月1日以降もご利用を希望される方は、
+6月28日（日）までにご連絡をお願いします。
+
+どうぞよろしくお願いいたします。
+
+k-sta 加藤
+recorder.11c@gmail.com</div>
+    </div>
+
+    <div class="dm-block" style="margin-top:24px">
+      <div class="dm-header">
+        <span class="dm-label">フォローメール（前日・返信なし）</span>
+        <button class="btn-copy" onclick="copyText(this, 'mail-paid-day1')">コピー</button>
+      </div>
+      <div class="text-box" id="mail-paid-day1">件名：【k-sta】明日でモニター期間終了です
+
+○○様
+
+k-staの加藤です。
+先日ご案内した無料モニター期間が、明日（6月30日）で終了します。
+
+継続ご希望の方は本日中にご連絡いただけますと幸いです。
+
+もし「もう少し使ってから判断したい」という場合も、
+お気軽にご相談ください。
+
+https://kato-insta-support.vercel.app/#pricing
+
+k-sta 加藤
+recorder.11c@gmail.com</div>
+    </div>
+
+    <div class="dm-block" style="margin-top:24px">
+      <div class="dm-header">
+        <span class="dm-label">LINEでの転換メッセージ（知り合い向け）</span>
+        <button class="btn-copy" onclick="copyText(this, 'line-paid')">コピー</button>
+      </div>
+      <div class="text-box" id="line-paid">使ってみてどうやった？
+来週末でモニター期間終わりやねんけど、
+よかったら続けてほしくて！
+
+月14,800円のライトプランか、
+投稿代行もついてる29,800円のフルプランがあるんやけど、
+どっちか合いそうなやつある？
+
+もしくは感想だけでも聞かせてもらえたら嬉しい！</div>
     </div>
   </div>
 
