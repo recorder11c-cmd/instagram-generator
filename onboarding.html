@@ -868,7 +868,7 @@ module.exports = async (req, res) => {
     if (!generatedZipBlob) { alert('先にジェネレーターを生成してください。'); return; }
 
     const token = document.getElementById('vercelToken').value.trim();
-    const apiKey = document.getElementById('anthropicKey').value.trim();
+    const apiKey = document.getElementById('anthropicKeyStore').value.trim();
     if (!token) { alert('Vercelトークンを設定してください（上部の設定欄）。'); return; }
     if (!apiKey) { alert('Anthropic APIキーを設定してください（上部の設定欄）。'); return; }
 
