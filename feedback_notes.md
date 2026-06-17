@@ -40,6 +40,23 @@
 
 ---
 
+## 活動ログ（2026-06-17）
+
+- Dine Tokyo事例をもとにマネタイズ基盤を整備
+- gen.html作成（DM送信先の404エラー解消）
+- index.htmlをサービスLPに刷新（料金表・Stripeボタン・お問い合わせフォーム）
+- Stripe Payment Link作成：ライト¥4,980・フル¥9,800（テスト環境）
+- Stripeアカウント審査申請完了
+- sales_kit Section08（有料転換メール）・Section09（返信・納品メール）追加
+- 季節選択を春夏秋冬→1〜12月に変更（demo.html / gen.html）
+- gen.htmlのAPIエンドポイント修正（Netlify→Vercel）
+- お問い合わせフォーム実装（Formspree: xqeojrpr）
+- setup.html作成：クライアント向けお店情報入力フォーム（インスタ・サイトURL）
+- ksta_管理シート_20260617.xlsx作成（4シート構成）
+- CLAUDE.md・メモリ更新：セッション終了時にExcel更新を追加
+
+---
+
 ## 活動ログ（2026-06-15）
 
 - 前セッションのコンテキスト引き継ぎ確認
