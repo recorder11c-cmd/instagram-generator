@@ -1083,8 +1083,10 @@ module.exports = async (req, res) => {
           <label>季節 <span style="font-size:11px;color:#999;font-weight:normal">（自動）</span></label>
           <div class="select-wrapper">
             <select id="season">
-              <option value="春">春</option><option value="夏">夏</option>
-              <option value="秋">秋</option><option value="冬">冬</option>
+              <option value="1月">1月</option><option value="2月">2月</option><option value="3月">3月</option>
+              <option value="4月">4月</option><option value="5月">5月</option><option value="6月">6月</option>
+              <option value="7月">7月</option><option value="8月">8月</option><option value="9月">9月</option>
+              <option value="10月">10月</option><option value="11月">11月</option><option value="12月">12月</option>
             </select>
           </div>
         </div>
@@ -1149,8 +1151,10 @@ module.exports = async (req, res) => {
         <label>季節</label>
         <div class="select-wrapper">
           <select id="seatsSeason">
-            <option value="春">春</option><option value="夏">夏</option>
-            <option value="秋">秋</option><option value="冬">冬</option>
+            <option value="1月">1月</option><option value="2月">2月</option><option value="3月">3月</option>
+            <option value="4月">4月</option><option value="5月">5月</option><option value="6月">6月</option>
+            <option value="7月">7月</option><option value="8月">8月</option><option value="9月">9月</option>
+            <option value="10月">10月</option><option value="11月">11月</option><option value="12月">12月</option>
           </select>
         </div>
       </div>
@@ -1191,8 +1195,10 @@ module.exports = async (req, res) => {
           <label>季節</label>
           <div class="select-wrapper">
             <select id="ingredientSeason">
-              <option value="春">春</option><option value="夏">夏</option>
-              <option value="秋">秋</option><option value="冬">冬</option>
+              <option value="1月">1月</option><option value="2月">2月</option><option value="3月">3月</option>
+              <option value="4月">4月</option><option value="5月">5月</option><option value="6月">6月</option>
+              <option value="7月">7月</option><option value="8月">8月</option><option value="9月">9月</option>
+              <option value="10月">10月</option><option value="11月">11月</option><option value="12月">12月</option>
             </select>
           </div>
         </div>
@@ -1228,8 +1234,10 @@ module.exports = async (req, res) => {
           <label>季節</label>
           <div class="select-wrapper">
             <select id="newmenuSeason">
-              <option value="春">春</option><option value="夏">夏</option>
-              <option value="秋">秋</option><option value="冬">冬</option>
+              <option value="1月">1月</option><option value="2月">2月</option><option value="3月">3月</option>
+              <option value="4月">4月</option><option value="5月">5月</option><option value="6月">6月</option>
+              <option value="7月">7月</option><option value="8月">8月</option><option value="9月">9月</option>
+              <option value="10月">10月</option><option value="11月">11月</option><option value="12月">12月</option>
             </select>
           </div>
         </div>
@@ -1414,7 +1422,7 @@ module.exports = async (req, res) => {
 
   (function(){
     var m=new Date().getMonth()+1;
-    var s=(m<=2||m===12)?'冬':m<=6?'春':m<=9?'夏':'秋';
+    var s=m+'月';
     ['season','seatsSeason','ingredientSeason','newmenuSeason'].forEach(function(id){
       var el=document.getElementById(id);if(el)el.value=s;
     });
