@@ -513,12 +513,8 @@
             <label>季節</label>
             <div class="select-wrapper">
               <select id="season">
-                <option value="春" selected>春</option>
-                <option value="夏">夏</option>
-                <option value="秋">秋</option>
-                <option value="冬">冬</option>
+                <option value="1月">1月</option><option value="2月">2月</option><option value="3月">3月</option><option value="4月">4月</option><option value="5月">5月</option><option value="6月">6月</option><option value="7月">7月</option><option value="8月">8月</option><option value="9月">9月</option><option value="10月">10月</option><option value="11月">11月</option><option value="12月">12月</option>
               </select>
-              <small id="seasonDebug" style="color:#999;font-size:10px"></small>
             </div>
           </div>
           <div class="form-group">
@@ -584,8 +580,7 @@
           <label>季節</label>
           <div class="select-wrapper">
             <select id="seatsSeason">
-              <option value="春">春</option><option value="夏">夏</option>
-              <option value="秋">秋</option><option value="冬">冬</option>
+              <option value="1月">1月</option><option value="2月">2月</option><option value="3月">3月</option><option value="4月">4月</option><option value="5月">5月</option><option value="6月">6月</option><option value="7月">7月</option><option value="8月">8月</option><option value="9月">9月</option><option value="10月">10月</option><option value="11月">11月</option><option value="12月">12月</option>
             </select>
           </div>
         </div>
@@ -628,8 +623,7 @@
             <label>季節</label>
             <div class="select-wrapper">
               <select id="ingredientSeason">
-                <option value="春">春</option><option value="夏">夏</option>
-                <option value="秋">秋</option><option value="冬">冬</option>
+                <option value="1月">1月</option><option value="2月">2月</option><option value="3月">3月</option><option value="4月">4月</option><option value="5月">5月</option><option value="6月">6月</option><option value="7月">7月</option><option value="8月">8月</option><option value="9月">9月</option><option value="10月">10月</option><option value="11月">11月</option><option value="12月">12月</option>
               </select>
             </div>
           </div>
@@ -664,8 +658,7 @@
             <label>季節</label>
             <div class="select-wrapper">
               <select id="newmenuSeason">
-                <option value="春">春</option><option value="夏">夏</option>
-                <option value="秋">秋</option><option value="冬">冬</option>
+                <option value="1月">1月</option><option value="2月">2月</option><option value="3月">3月</option><option value="4月">4月</option><option value="5月">5月</option><option value="6月">6月</option><option value="7月">7月</option><option value="8月">8月</option><option value="9月">9月</option><option value="10月">10月</option><option value="11月">11月</option><option value="12月">12月</option>
               </select>
             </div>
           </div>
@@ -1106,16 +1099,13 @@ ${POST_RULES}
       } catch (e) { alert('コピーに失敗しました。手動でコピーしてください。'); }
     }
 
-    // 季節を現在の月から自動設定
+    // 現在の月を自動選択
     (function() {
       const m = new Date().getMonth() + 1;
-      const season = (m <= 2 || m === 12) ? '冬' : m <= 6 ? '春' : m <= 9 ? '夏' : '秋';
       ['season','seatsSeason','ingredientSeason','newmenuSeason'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.value = season;
+        if (el) el.value = m + '月';
       });
-      const dbg = document.getElementById('seasonDebug');
-      if (dbg) dbg.textContent = '（' + m + '月 → ' + season + ' を自動選択）';
     })();
 
     document.getElementById('postText').addEventListener('input', () => {
