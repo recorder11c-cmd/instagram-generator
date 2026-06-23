@@ -9,3 +9,4 @@
 クライアント管理,試用期間・契約管理,ローカルのみ（clients.html）,加藤さんのみ,残枠・MRR・期限アラート機能あり
 旅館ジェネレーター,投稿文自動生成（宿泊）,https://yamanone-ryokan-gen-8068.vercel.app,将来用,英語翻訳機能あり・現在は非公開
 GitHub,ソースコード管理,https://github.com/recorder11c-cmd/instagram-generator,加藤さんのみ,mainブランチで運用
+n-sta（ネイル版ジェネレーター）,ネイルサロン向けInstagram投稿文生成,https://kato-insta-support.vercel.app/n-sta.html,ネイルサロンオーナー,新規サービス・ローズピンクデザイン・4トーン対応（未デプロイ）

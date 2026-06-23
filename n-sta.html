@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>n-sta｜ネイルサロン Instagram投稿文ジェネレーター</title>
+  <style>
+    :root {
+      --blush: #f9f0f3;
+      --blush-dark: #f0e0e8;
+      --rose: #c4708a;
+      --rose-dark: #a85570;
+      --rose-light: #d98ba5;
+      --mauve: #8b6070;
+      --mauve-light: #b08090;
+      --charcoal: #3a2830;
+      --charcoal-soft: #5a3848;
+      --white-warm: #fdfafc;
+      --border: #e0c8d4;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      background-color: var(--blush);
+      color: var(--charcoal);
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .header-badge {
+      display: inline-block;
+      background: var(--rose);
+      color: var(--white-warm);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      padding: 4px 16px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      color: var(--charcoal);
+      margin-bottom: 6px;
+    }
+
+    .header h1 span {
+      color: var(--rose);
+      font-weight: 500;
+    }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--mauve-light);
+      letter-spacing: 0.15em;
+    }
+
+    .card {
+      background: var(--white-warm);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 16px rgba(196,112,138,0.06);
+    }
+
+    .card-title {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: var(--mauve);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--blush-dark);
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 13px;
+      background: var(--rose);
+      border-radius: 2px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--charcoal-soft);
+      letter-spacing: 0.1em;
+      margin-bottom: 7px;
+      font-weight: normal;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--blush);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      color: var(--charcoal);
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      appearance: none;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--rose-light);
+      background: var(--white-warm);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      line-height: 1.7;
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--mauve-light);
+      font-size: 12px;
+      pointer-events: none;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: var(--mauve-light);
+      margin-top: 5px;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-generate {
+      width: 100%;
+      padding: 14px;
+      background: var(--rose);
+      color: var(--white-warm);
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      letter-spacing: 0.25em;
+      font-family: 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-generate:hover:not(:disabled) { background: var(--rose-dark); }
+    .btn-generate:active:not(:disabled) { transform: scale(0.99); }
+    .btn-generate:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      color: var(--mauve-light);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+    }
+
+    .loading.visible { display: block; }
+
+    .loading-dots {
+      display: inline-flex;
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .loading-dots span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--rose-light);
+      animation: dot-pulse 1.2s ease-in-out infinite;
+    }
+
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot-pulse {
+      0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+      40% { opacity: 1; transform: scale(1); }
+    }
+
+    .output-section { display: none; }
+    .output-section.visible { display: block; }
+
+    .output-card {
+      background: var(--white-warm);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 16px rgba(196,112,138,0.06);
+    }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--blush-dark);
+    }
+
+    .output-label {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      color: var(--mauve);
+      font-weight: normal;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .output-label::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 13px;
+      background: var(--rose);
+      border-radius: 2px;
+    }
+
+    .char-count {
+      font-size: 11px;
+      color: var(--mauve-light);
+    }
+
+    .output-text {
+      font-size: 15px;
+      line-height: 1.9;
+      color: var(--charcoal);
+      white-space: pre-wrap;
+      word-break: break-all;
+      min-height: 60px;
+    }
+
+    .hashtag-list {
+      font-size: 13px;
+      line-height: 2;
+      color: var(--rose-dark);
+      word-break: break-all;
+    }
+
+    .btn-copy {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      color: var(--mauve);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover { background: var(--blush-dark); border-color: var(--mauve-light); }
+
+    .btn-copy.copied {
+      border-color: var(--rose-light);
+      color: var(--rose);
+      background: rgba(196,112,138,0.05);
+    }
+
+    .btn-copy svg { width: 13px; height: 13px; }
+
+    .btn-copy-all {
+      width: 100%;
+      padding: 11px;
+      background: var(--blush-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      color: var(--charcoal-soft);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-copy-all:hover { background: var(--border); }
+
+    .btn-copy-all.copied {
+      border-color: var(--rose-light);
+      color: var(--rose);
+      background: rgba(196,112,138,0.06);
+    }
+
+    .error-msg {
+      display: none;
+      padding: 12px 16px;
+      background: #fdf0f3;
+      border: 1px solid #e8a0b4;
+      border-radius: 8px;
+      color: #9b2a4a;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .error-msg.visible { display: block; }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-text {
+      font-size: 11px;
+      color: var(--mauve-light);
+      letter-spacing: 0.15em;
+    }
+
+    @media (max-width: 500px) {
+      .form-row { grid-template-columns: 1fr; }
+      .card { padding: 20px 18px; }
+      .output-card { padding: 20px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="header">
+      <div class="header-badge">NAIL SALON × Instagram</div>
+      <h1>n<span>-</span>sta</h1>
+      <p class="header-sub">ネイルサロン専用 Instagram 投稿文ジェネレーター</p>
+    </header>
+
+    <div class="card">
+      <h2 class="card-title">今日の投稿内容</h2>
+
+      <div class="form-group">
+        <label for="salonName">サロン名</label>
+        <input type="text" id="salonName" placeholder="例：Nail Salon Lily">
+        <p class="hint">初回だけ入力してください</p>
+      </div>
+
+      <div class="form-group">
+        <label for="designInput">今日のデザイン・施術内容</label>
+        <textarea id="designInput" placeholder="例：くすみピンクのフレンチ、夏らしいシェル・ホログラムのグラデーション、シンプルワンカラー（テラコッタ）…"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="price">料金（任意）</label>
+          <input type="text" id="price" placeholder="例：¥8,500">
+        </div>
+        <div class="form-group">
+          <label for="duration">施術時間（任意）</label>
+          <input type="text" id="duration" placeholder="例：約90分">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="target">ターゲット</label>
+          <div class="select-wrapper">
+            <select id="target">
+              <option value="20代女性">20代女性</option>
+              <option value="30代女性">30代女性</option>
+              <option value="学生">学生</option>
+              <option value="働く女性">働く女性</option>
+              <option value="ブライダル">ブライダル</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="tone">投稿トーン</label>
+          <div class="select-wrapper">
+            <select id="tone">
+              <option value="かわいい・トレンド系">かわいい・トレンド系</option>
+              <option value="上品・大人系">上品・大人系</option>
+              <option value="親しみやすい・日常系">親しみやすい・日常系</option>
+              <option value="お知らせ・キャンペーン系">お知らせ・キャンペーン系</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="memo">その他・補足（任意）</label>
+        <input type="text" id="memo" placeholder="例：予約残りわずか、梅雨前の特別デザイン、など">
+      </div>
+
+      <button class="btn-generate" id="generateBtn" onclick="generatePost()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        投稿文を生成する
+      </button>
+    </div>
+
+    <div class="loading" id="loading">
+      言葉を綴っています
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="output-section" id="outputSection">
+
+      <div class="output-card">
+        <div class="output-header">
+          <span class="output-label">Instagram 投稿文</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="char-count" id="charCount"></span>
+            <button class="btn-copy" id="copyPost" onclick="copyText('postText', 'copyPost')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+              コピー
+            </button>
+          </div>
+        </div>
+        <div class="output-text" id="postText"></div>
+      </div>
+
+      <div class="output-card">
+        <div class="output-header">
+          <span class="output-label">ハッシュタグ</span>
+          <button class="btn-copy" id="copyTags" onclick="copyText('hashtagText', 'copyTags')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            コピー
+          </button>
+        </div>
+        <div class="hashtag-list" id="hashtagText"></div>
+      </div>
+
+      <button class="btn-copy-all" id="copyAll" onclick="copyAll()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        投稿文＋ハッシュタグをまとめてコピー
+      </button>
+
+    </div>
+
+    <footer class="footer">
+      <p class="footer-text">n-sta ── ネイルサロンのInstagramをもっと楽に</p>
+    </footer>
+
+  </div>
+
+  <script>
+    async function generatePost() {
+      const salon = document.getElementById('salonName').value.trim();
+      const design = document.getElementById('designInput').value.trim();
+      const price = document.getElementById('price').value.trim();
+      const duration = document.getElementById('duration').value.trim();
+      const target = document.getElementById('target').value;
+      const tone = document.getElementById('tone').value;
+      const memo = document.getElementById('memo').value.trim();
+
+      const errorMsg = document.getElementById('errorMsg');
+      const loading = document.getElementById('loading');
+      const outputSection = document.getElementById('outputSection');
+      const generateBtn = document.getElementById('generateBtn');
+
+      errorMsg.classList.remove('visible');
+      if (!design) {
+        showError('デザイン・施術内容を入力してください。');
+        return;
+      }
+
+      generateBtn.disabled = true;
+      loading.classList.add('visible');
+      outputSection.classList.remove('visible');
+
+      const toneGuide = {
+        'かわいい・トレンド系': 'トレンド感・ときめき・かわいさを前面に。若い女性が「やりたい！」と思うような表現。絵文字多めOK。',
+        '上品・大人系': '洗練された言葉選び。シンプルで品があり、大人の女性が共感できる落ち着いたトーン。絵文字は控えめ。',
+        '親しみやすい・日常系': '話しかけるような自然な文体。日常のちょっとした嬉しさを共有するような温かみ。',
+        'お知らせ・キャンペーン系': 'キャンペーン・新メニュー・予約情報を分かりやすく。CTA（予約はプロフのリンクから）を含める。'
+      };
+
+      const salonInfo = salon ? `サロン名：${salon}` : 'サロン名：（未入力）';
+      const priceInfo = price ? `料金：${price}` : '';
+      const durationInfo = duration ? `施術時間：${duration}` : '';
+      const memoInfo = memo ? `補足：${memo}` : '';
+
+      const prompt = `あなたはネイルサロンのInstagram運用のプロです。
+
+【サロン情報】
+${salonInfo}
+
+【投稿情報】
+- デザイン・施術内容：${design}
+${priceInfo}
+${durationInfo}
+- ターゲット：${target}
+- 投稿トーン：${tone}（${toneGuide[tone]}）
+${memoInfo}
+
+【投稿文のルール】
+- 180〜250字（本文のみ）
+- ネイルの魅力・世界観が伝わる表現
+- 押しつけがましくなく、見て「やりたい」と思わせる
+- ターゲットに合わせた言葉選び
+- 改行を適度に入れて読みやすくする
+- 絵文字はトーンに合わせて調整（上品系は1〜2個、かわいい系は3〜5個まで）
+
+【ハッシュタグのルール】
+- 20〜25個
+- ネイルデザイン名・カラー・技法・ターゲット・季節・地域（省略可）に関するもの
+- #ネイル #nail #ネイルデザイン を必ず含める
+- 日本語タグと英語タグを混在させる
+
+以下のJSON形式のみで返答してください。説明文は不要です：
+{
+  "post": "投稿文（改行あり）",
+  "hashtags": "#タグ1 #タグ2 ..."
+}`;
+
+      try {
+        const res = await fetch('/api/proxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-5',
+            max_tokens: 1200,
+            messages: [{ role: 'user', content: prompt }]
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error?.message || `APIエラー (${res.status})`);
+        }
+
+        const data = await res.json();
+        const raw = data.content[0].text.trim();
+
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error('レスポンスの解析に失敗しました。もう一度お試しください。');
+
+        const parsed = JSON.parse(jsonMatch[0]);
+        const postText = parsed.post || '';
+        const hashtagText = (parsed.hashtags || '')
+          .replace(/#/g, ' ')
+          .split(/[\s,、]+/)
+          .filter(w => w.length > 0)
+          .map(w => '#' + w)
+          .join(' ');
+
+        document.getElementById('postText').textContent = postText;
+        document.getElementById('hashtagText').textContent = hashtagText;
+
+        const charCount = postText.replace(/\s/g, '').length;
+        document.getElementById('charCount').textContent = `${charCount}字`;
+
+        ['copyPost', 'copyTags', 'copyAll'].forEach(id => {
+          const btn = document.getElementById(id);
+          btn.classList.remove('copied');
+          btn.childNodes[btn.childNodes.length - 1].textContent = id === 'copyAll' ? '投稿文＋ハッシュタグをまとめてコピー' : 'コピー';
+        });
+
+        outputSection.classList.add('visible');
+        outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (e) {
+        showError(e.message);
+      } finally {
+        generateBtn.disabled = false;
+        loading.classList.remove('visible');
+      }
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+
+    async function copyText(textId, btnId) {
+      const text = document.getElementById(textId).textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        const btn = document.getElementById(btnId);
+        btn.classList.add('copied');
+        const textNode = btn.childNodes[btn.childNodes.length - 1];
+        textNode.textContent = 'コピー済';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          textNode.textContent = 'コピー';
+        }, 2000);
+      } catch (e) {
+        alert('コピーに失敗しました。手動でコピーしてください。');
+      }
+    }
+
+    async function copyAll() {
+      const post = document.getElementById('postText').textContent;
+      const tags = document.getElementById('hashtagText').textContent;
+      const combined = post + '\n\n' + tags;
+      try {
+        await navigator.clipboard.writeText(combined);
+        const btn = document.getElementById('copyAll');
+        btn.classList.add('copied');
+        btn.childNodes[btn.childNodes.length - 1].textContent = 'コピー済！';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.childNodes[btn.childNodes.length - 1].textContent = '投稿文＋ハッシュタグをまとめてコピー';
+        }, 2000);
+      } catch (e) {
+        alert('コピーに失敗しました。手動でコピーしてください。');
+      }
+    }
+
+    document.getElementById('designInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && e.metaKey) generatePost();
+    });
+  </script>
+</body>
+</html>
