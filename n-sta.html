@@ -390,7 +390,24 @@
       </div>
 
       <div class="form-group">
-        <label for="designInput">今日のデザイン・施術内容</label>
+        <label>ネイル写真（任意）</label>
+        <label for="imageInput" id="imageLabel" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;background:var(--blush);border:1.5px dashed var(--border);border-radius:8px;cursor:pointer;transition:border-color 0.2s;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--mauve-light)" stroke-width="1.5">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="M21 15l-5-5L5 21"/>
+          </svg>
+          <span id="imageLabelText" style="font-size:12px;color:var(--mauve-light);letter-spacing:0.1em;">写真をアップロード（AI が自動でデザインを読み取ります）</span>
+        </label>
+        <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="onImageSelect(this)">
+        <div id="imagePreview" style="display:none;margin-top:10px;position:relative;">
+          <img id="previewImg" style="width:100%;max-height:200px;object-fit:cover;border-radius:8px;border:1px solid var(--border);">
+          <button onclick="clearImage()" style="position:absolute;top:6px;right:6px;background:rgba(58,40,48,0.7);color:#fff;border:none;border-radius:50%;width:24px;height:24px;font-size:14px;cursor:pointer;line-height:1;">×</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="designInput">デザイン・施術内容（任意：写真がある場合は省略可）</label>
         <textarea id="designInput" placeholder="例：くすみピンクのフレンチ、夏らしいシェル・ホログラムのグラデーション、シンプルワンカラー（テラコッタ）…"></textarea>
       </div>
 
@@ -444,6 +461,32 @@
         </svg>
         投稿文を生成する
       </button>
+
+      <p id="usageCount" style="text-align:center;font-size:12px;color:var(--mauve-light);margin-top:12px;letter-spacing:0.1em;"></p>
+    </div>
+
+    <!-- アップグレードモーダル -->
+    <div id="upgradeModal" style="display:none;position:fixed;inset:0;background:rgba(58,40,48,0.5);z-index:100;align-items:center;justify-content:center;">
+      <div style="background:var(--white-warm);border-radius:16px;padding:32px 28px;max-width:360px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(58,40,48,0.2);">
+        <p style="font-size:28px;margin-bottom:12px;">💅</p>
+        <h2 style="font-size:17px;font-weight:500;color:var(--charcoal);margin-bottom:8px;">無料枠を使い切りました</h2>
+        <p style="font-size:13px;color:var(--mauve-light);line-height:1.7;margin-bottom:24px;">月3回の無料生成を使い切りました。<br>続けて使うにはプランをお選びください。</p>
+        <div style="display:grid;gap:10px;margin-bottom:20px;">
+          <div style="background:var(--blush);border:1px solid var(--border);border-radius:10px;padding:14px;">
+            <p style="font-size:13px;font-weight:500;color:var(--charcoal);margin-bottom:2px;">スモールパック</p>
+            <p style="font-size:20px;font-weight:500;color:var(--rose);margin-bottom:2px;">¥1,000</p>
+            <p style="font-size:12px;color:var(--mauve-light);">18投稿分（300クレジット）</p>
+          </div>
+          <div style="background:var(--blush);border:2px solid var(--rose-light);border-radius:10px;padding:14px;position:relative;">
+            <span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--rose);color:var(--white-warm);font-size:11px;padding:2px 12px;border-radius:999px;">おすすめ</span>
+            <p style="font-size:13px;font-weight:500;color:var(--charcoal);margin-bottom:2px;">スタンダードパック</p>
+            <p style="font-size:20px;font-weight:500;color:var(--rose);margin-bottom:2px;">¥5,000</p>
+            <p style="font-size:12px;color:var(--mauve-light);">120投稿分（2,000クレジット）</p>
+          </div>
+        </div>
+        <a href="mailto:recorder.11c@gmail.com?subject=n-sta%20プラン申し込み" style="display:block;background:var(--rose);color:var(--white-warm);text-decoration:none;padding:12px;border-radius:8px;font-size:14px;letter-spacing:0.15em;margin-bottom:10px;">申し込む</a>
+        <button onclick="document.getElementById('upgradeModal').style.display='none'" style="background:transparent;border:none;font-size:12px;color:var(--mauve-light);cursor:pointer;letter-spacing:0.1em;">閉じる</button>
+      </div>
     </div>
 
     <div class="loading" id="loading">
@@ -505,6 +548,32 @@
   </div>
 
   <script>
+    const FREE_LIMIT = 5;
+    const STORAGE_KEY = 'nsta_usage';
+
+    function getUsage() {
+      const d = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      const month = new Date().toISOString().slice(0, 7);
+      if (d.month !== month) return { month, count: 0 };
+      return d;
+    }
+
+    function saveUsage(u) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
+    }
+
+    function updateUsageDisplay() {
+      const u = getUsage();
+      const remaining = FREE_LIMIT - u.count;
+      const el = document.getElementById('usageCount');
+      if (remaining > 0) {
+        el.textContent = `無料残り ${remaining} 回 / 今月`;
+      } else {
+        el.textContent = '無料枠終了 — プランをお選びください';
+        el.style.color = 'var(--rose)';
+      }
+    }
+
     async function generatePost() {
       const salon = document.getElementById('salonName').value.trim();
       const design = document.getElementById('designInput').value.trim();
@@ -519,9 +588,18 @@
       const outputSection = document.getElementById('outputSection');
       const generateBtn = document.getElementById('generateBtn');
 
+      const imageBase64 = window._imageBase64 || null;
+      const imageType = window._imageType || 'image/jpeg';
+
       errorMsg.classList.remove('visible');
-      if (!design) {
-        showError('デザイン・施術内容を入力してください。');
+      if (!design && !imageBase64) {
+        showError('写真をアップロードするか、デザイン・施術内容を入力してください。');
+        return;
+      }
+
+      const usage = getUsage();
+      if (usage.count >= FREE_LIMIT) {
+        document.getElementById('upgradeModal').style.display = 'flex';
         return;
       }
 
@@ -541,13 +619,14 @@
       const durationInfo = duration ? `施術時間：${duration}` : '';
       const memoInfo = memo ? `補足：${memo}` : '';
 
-      const prompt = `あなたはネイルサロンのInstagram運用のプロです。
+      const promptText = `あなたはネイルサロンのInstagram運用のプロです。
+${imageBase64 ? '添付の写真を見てネイルのデザイン・カラー・雰囲気を分析し、投稿文を作成してください。' : ''}
 
 【サロン情報】
 ${salonInfo}
 
 【投稿情報】
-- デザイン・施術内容：${design}
+${design ? `- デザイン・施術内容：${design}` : '- デザイン・施術内容：写真から読み取ってください'}
 ${priceInfo}
 ${durationInfo}
 - ターゲット：${target}
@@ -563,16 +642,22 @@ ${memoInfo}
 - 絵文字はトーンに合わせて調整（上品系は1〜2個、かわいい系は3〜5個まで）
 
 【ハッシュタグのルール】
-- 20〜25個
-- ネイルデザイン名・カラー・技法・ターゲット・季節・地域（省略可）に関するもの
-- #ネイル #nail #ネイルデザイン を必ず含める
-- 日本語タグと英語タグを混在させる
+- 必ず4個だけ（多くても少なくてもNG）
+- ネイルデザイン名・カラー・技法・ターゲットに関する最も効果的なものを厳選
+- #ネイル を必ず含める
 
 以下のJSON形式のみで返答してください。説明文は不要です：
 {
   "post": "投稿文（改行あり）",
   "hashtags": "#タグ1 #タグ2 ..."
 }`;
+
+      const messageContent = imageBase64
+        ? [
+            { type: 'image', source: { type: 'base64', media_type: imageType, data: imageBase64 } },
+            { type: 'text', text: promptText }
+          ]
+        : promptText;
 
       try {
         const res = await fetch('/api/proxy', {
@@ -581,7 +666,7 @@ ${memoInfo}
           body: JSON.stringify({
             model: 'claude-sonnet-4-5',
             max_tokens: 1200,
-            messages: [{ role: 'user', content: prompt }]
+            messages: [{ role: 'user', content: messageContent }]
           })
         });
 
@@ -602,8 +687,13 @@ ${memoInfo}
           .replace(/#/g, ' ')
           .split(/[\s,、]+/)
           .filter(w => w.length > 0)
+          .slice(0, 4)
           .map(w => '#' + w)
           .join(' ');
+
+        usage.count += 1;
+        saveUsage(usage);
+        updateUsageDisplay();
 
         document.getElementById('postText').textContent = postText;
         document.getElementById('hashtagText').textContent = hashtagText;
@@ -669,9 +759,35 @@ ${memoInfo}
       }
     }
 
+    function onImageSelect(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const dataUrl = e.target.result;
+        const base64 = dataUrl.split(',')[1];
+        window._imageBase64 = base64;
+        window._imageType = file.type || 'image/jpeg';
+        document.getElementById('previewImg').src = dataUrl;
+        document.getElementById('imagePreview').style.display = 'block';
+        document.getElementById('imageLabelText').textContent = file.name;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearImage() {
+      window._imageBase64 = null;
+      window._imageType = null;
+      document.getElementById('imageInput').value = '';
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('imageLabelText').textContent = '写真をアップロード（AI が自動でデザインを読み取ります）';
+    }
+
     document.getElementById('designInput').addEventListener('keydown', e => {
       if (e.key === 'Enter' && e.metaKey) generatePost();
     });
+
+    updateUsageDisplay();
   </script>
 </body>
 </html>
