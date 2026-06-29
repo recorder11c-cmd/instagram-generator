@@ -10,10 +10,11 @@ async function rawBody(req) {
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method Not Allowed' });
   const raw = await rawBody(req);
-  const expected = crypto.createHmac('sha256', process.env.LINE_CHANNEL_SECRET || '').update(raw).digest('base64');
+  const channelSecret = String(process.env.LINE_CHANNEL_SECRET || '').replace(/[\r\n\u2028\u2029]/g, '').trim();
+  const expected = crypto.createHmac('sha256', channelSecret).update(raw).digest('base64');
   const received = req.headers['x-line-signature'] || '';
   const a = Buffer.from(expected); const b = Buffer.from(received);
-  if (!process.env.LINE_CHANNEL_SECRET || a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+  if (!channelSecret || a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
     return json(res, 401, { error: 'Invalid signature' });
   }
   const events = JSON.parse(raw).events || [];
