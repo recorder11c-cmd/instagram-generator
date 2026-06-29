@@ -1,0 +1,100 @@
+# レコルダ LINE自動化基盤 — 引き継ぎ
+
+最終更新: 2026-06-29
+
+## 再開方法
+
+新しいPCで以下を実行する。
+
+```bash
+git clone https://github.com/recorder11c-cmd/instagram-generator.git
+cd instagram-generator
+git checkout main
+git pull
+```
+
+最初にこのファイルと `recorda/README.md` を読む。
+
+## 現在の状態
+
+本番環境で以下の一連の動作を確認済み。
+
+1. LINE公式アカウントを友だち追加
+2. 署名付き登録URLを自動送信
+3. ブラウザで同意付き登録
+4. Supabaseへ連絡先・同意履歴・配信予約を保存
+5. LINEへ登録完了メッセージを送信
+6. 翌日・3日後のステップ配信を予約
+7. LINEブロックまたは「配信停止」で自動停止
+
+## サービス構成
+
+- LINE公式アカウント: `レコルダ`
+- LINE Developersプロバイダー: `レコルダ合同会社`
+- Webhook: `https://recorder-line-11c.vercel.app/api/line-webhook`
+- 登録フォーム: `https://recorder-line-11c.vercel.app/recorda/`
+- プライバシーポリシー: `https://recorder-line-11c.vercel.app/recorda/privacy.html`
+- Vercelプロジェクト: `recorder-line-11c`
+- Supabase Organization: `レコルダ合同会社`
+- Supabase Project: `recorda-production`（Tokyo）
+- GitHub: `recorder11c-cmd/instagram-generator`
+
+## Vercel環境変数
+
+値はGitHub・文書・チャットへ記録しない。VercelプロジェクトのSettingsで管理する。
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`（`sb_secret_`形式）
+- `LINE_CHANNEL_SECRET`
+- `LINE_CHANNEL_ACCESS_TOKEN`
+- `REGISTRATION_TOKEN_SECRET`
+- `PUBLIC_BASE_URL`
+- `CRON_SECRET`
+
+## データベース
+
+スキーマは `recorda/supabase.sql`。主なテーブル:
+
+- `recorda_contacts`
+- `recorda_consent_events`
+- `recorda_message_queue`
+
+RLS有効。ブラウザからSupabase Secret keyを使用しない。旧受託データは絶対に取り込まない。
+
+## 自動配信
+
+Vercel Hobby制限に合わせ、Cronは毎日 `00:15 UTC`（日本時間9時台）に実行。Hobbyでは実行時刻に最大約59分の幅がある。
+
+## 次に行うこと
+
+1. Vercel最新DeploymentがReadyであることを確認
+2. LINEプロフィール画像・説明文を設定
+3. リッチメニューを作成
+4. LINE DevelopersへプライバシーポリシーURLを登録
+5. テスト登録データを削除するか、テストとして明示
+6. 翌日ステップ配信が届くことを確認
+7. 削除請求の本人確認・管理手順を文書化
+8. 少人数（5〜10人）で限定運用後に一般募集
+
+## セキュリティ上の注意
+
+- 過去にGit remote URLへ埋め込まれていたGitHub PATは失効済み。再利用しない。
+- 初回のLINE Channel secretは画面共有後に再発行済み。古い値を再利用しない。
+- LINEアクセストークン、Supabase Secret key、ワンタイムコードをスクリーンショットやチャットへ載せない。
+- GitHub remoteは認証情報を含まないHTTPS URLへ修正済み。
+- 環境変数を変更したらVercelでRedeployする。
+
+## コード上の主要ファイル
+
+- `recorda/index.html`: 登録フォーム
+- `recorda/privacy.html`: プライバシーポリシー
+- `recorda/supabase.sql`: DBスキーマ・RPC
+- `api/line-webhook.js`: LINEイベント処理
+- `api/monitor-register.js`: 同意登録API
+- `api/step-dispatch.js`: ステップ配信
+- `api/_recorda.js`: 共通処理
+- `vercel.json`: Functions・Cron設定
+
+## ローカル作業ツリーについて
+
+元のPCにはInstagram支援など、レコルダとは無関係な未コミット変更が残っている。新しいPCのmainには、PR #1〜#3でマージしたレコルダ関連変更のみが安全に入っている。元PCの未コミット変更を新PCへ移す必要がある場合は、別途ファイル単位で確認すること。
