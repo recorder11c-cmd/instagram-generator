@@ -2,6 +2,10 @@ const crypto = require('crypto');
 
 const CONSENT_VERSION = 'monitor-privacy-ja-2026-06-29-v1';
 
+function cleanEnv(name) {
+  return String(process.env[name] || '').replace(/[\r\n\u2028\u2029]/g, '').trim();
+}
+
 function json(res, status, body) {
   res.status(status).setHeader('Content-Type', 'application/json; charset=utf-8').json(body);
 }
@@ -12,7 +16,7 @@ function readBody(req) {
 }
 
 function signRegistrationToken(userId) {
-  const secret = process.env.REGISTRATION_TOKEN_SECRET;
+  const secret = cleanEnv('REGISTRATION_TOKEN_SECRET');
   if (!secret) throw new Error('REGISTRATION_TOKEN_SECRET is not configured');
   const payload = Buffer.from(JSON.stringify({ userId, exp: Date.now() + 24 * 60 * 60 * 1000 })).toString('base64url');
   const signature = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
@@ -21,7 +25,7 @@ function signRegistrationToken(userId) {
 
 function verifyRegistrationToken(token) {
   if (!token) return null;
-  const secret = process.env.REGISTRATION_TOKEN_SECRET;
+  const secret = cleanEnv('REGISTRATION_TOKEN_SECRET');
   if (!secret) throw new Error('REGISTRATION_TOKEN_SECRET is not configured');
   const [payload, signature] = token.split('.');
   if (!payload || !signature) return null;
@@ -33,11 +37,12 @@ function verifyRegistrationToken(token) {
 }
 
 async function linePush(userId, messages) {
-  if (!userId || !process.env.LINE_CHANNEL_ACCESS_TOKEN) return;
+  const accessToken = cleanEnv('LINE_CHANNEL_ACCESS_TOKEN');
+  if (!userId || !accessToken) return;
   const response = await fetch('https://api.line.me/v2/bot/message/push', {
     method: 'POST',
     headers: {
-      authorization: `Bearer ${process.env.LINE_CHANNEL_ACCESS_TOKEN}`,
+      authorization: `Bearer ${accessToken}`,
       'content-type': 'application/json'
     },
     body: JSON.stringify({ to: userId, messages })
@@ -46,8 +51,8 @@ async function linePush(userId, messages) {
 }
 
 async function supabaseRpc(name, payload) {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = cleanEnv('SUPABASE_URL').replace(/\/+$/, '');
+  const key = cleanEnv('SUPABASE_SERVICE_ROLE_KEY');
   if (!url || !key) throw new Error('Supabase is not configured');
   const headers = { apikey: key, 'content-type': 'application/json' };
   // Legacy service_role keys are JWTs and require Authorization.
