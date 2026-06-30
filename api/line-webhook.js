@@ -7,6 +7,16 @@ async function rawBody(req) {
   return Buffer.concat(chunks).toString('utf8');
 }
 
+async function sendRegistrationLink(userId) {
+  const token = signRegistrationToken(userId);
+  const baseUrl = String(process.env.PUBLIC_BASE_URL || '').replace(/[\r\n\u2028\u2029]/g, '').trim().replace(/\/+$/, '');
+  if (!baseUrl) throw new Error('PUBLIC_BASE_URL is not configured');
+  await linePush(userId, [{
+    type: 'text',
+    text: `次のフォームで、ご希望の情報を選んでください。\n${baseUrl}/recorda/?token=${encodeURIComponent(token)}`
+  }]);
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method Not Allowed' });
   const raw = await rawBody(req);
@@ -22,13 +32,8 @@ module.exports = async (req, res) => {
     const userId = event.source?.userId;
     if (!userId) return;
     if (event.type === 'follow') {
-      const token = signRegistrationToken(userId);
-      const baseUrl = process.env.PUBLIC_BASE_URL;
-      if (!baseUrl) throw new Error('PUBLIC_BASE_URL is not configured');
-      await linePush(userId, [{
-        type: 'text',
-        text: `友だち追加ありがとうございます。\n次のフォームで、ご希望の情報を選んでください。\n${baseUrl}/recorda/?token=${encodeURIComponent(token)}`
-      }]);
+      await linePush(userId, [{ type: 'text', text: '友だち追加ありがとうございます。' }]);
+      await sendRegistrationLink(userId);
     }
     if (event.type === 'unfollow') {
       await supabaseRpc('unsubscribe_recorda_line_user', { p_line_user_id: userId });
@@ -37,6 +42,17 @@ module.exports = async (req, res) => {
         ['配信停止', '停止', 'unsubscribe'].includes(event.message.text.trim().toLowerCase())) {
       await linePush(userId, [{ type: 'text', text: '配信を停止しました。再開をご希望の場合は、登録フォームからもう一度同意してください。' }]);
       await supabaseRpc('unsubscribe_recorda_line_user', { p_line_user_id: userId });
+    }
+    if (event.type === 'message' && event.message?.type === 'text' &&
+        ['モニター登録', '登録フォーム'].includes(event.message.text.trim())) {
+      await sendRegistrationLink(userId);
+    }
+    if (event.type === 'message' && event.message?.type === 'text' &&
+        event.message.text.trim() === '業務改善・AI相談') {
+      await linePush(userId, [{
+        type: 'text',
+        text: 'ご相談ありがとうございます。現在のお困りごとや、減らしたい手作業をこのままメッセージでお送りください。内容を確認してご連絡します。'
+      }]);
     }
   }));
   return json(res, 200, { ok: true });

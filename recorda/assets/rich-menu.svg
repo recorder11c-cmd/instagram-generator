@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2500" height="843" viewBox="0 0 2500 843">
+  <rect width="2500" height="843" fill="#eef5f0"/>
+  <rect x="26" y="26" width="2448" height="791" rx="54" fill="#ffffff" stroke="#c9ddd3" stroke-width="8"/>
+  <path d="M833 70v703M1667 70v703" stroke="#c9ddd3" stroke-width="6"/>
+
+  <g transform="translate(416 276)" fill="none" stroke="#24705d" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="-104" y="-132" width="208" height="252" rx="26"/>
+    <path d="M-48-132v-25h96v25M-52-16l38 38 72-82"/>
+  </g>
+  <text x="416" y="542" text-anchor="middle" fill="#16332d" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="72" font-weight="700">モニター登録</text>
+  <text x="416" y="632" text-anchor="middle" fill="#527069" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="40">アンケートに参加する</text>
+
+  <g transform="translate(1250 276)" fill="none" stroke="#24705d" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M-130-112h260a38 38 0 0138 38V62a38 38 0 01-38 38H20l-84 65 18-65h-84a38 38 0 01-38-38V-74a38 38 0 0138-38z"/>
+    <path d="M-76-20h152M-76 34h96"/>
+  </g>
+  <text x="1250" y="542" text-anchor="middle" fill="#16332d" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="72" font-weight="700">業務改善・AI相談</text>
+  <text x="1250" y="632" text-anchor="middle" fill="#527069" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="40">LINEで相談する</text>
+
+  <g transform="translate(2084 276)" fill="none" stroke="#24705d" stroke-width="28" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0-155l145 56v104c0 102-57 169-145 207-88-38-145-105-145-207V-99z"/>
+    <path d="M-55 12l38 38 78-88"/>
+  </g>
+  <text x="2084" y="542" text-anchor="middle" fill="#16332d" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="72" font-weight="700">登録情報について</text>
+  <text x="2084" y="632" text-anchor="middle" fill="#527069" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="40">利用目的・配信停止</text>
+
+  <text x="1250" y="752" text-anchor="middle" fill="#79a999" font-family="'Hiragino Sans','Yu Gothic',sans-serif" font-size="30" letter-spacing="8">レコルダ</text>
+</svg>
