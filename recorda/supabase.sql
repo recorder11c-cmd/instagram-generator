@@ -61,12 +61,12 @@ begin
        case when p_segment='monitor'
          then 'レコルダモニターへようこそ。登録情報の扱いと、アンケート参加の流れをご案内します。回答はいつでも任意です。'
          else 'ご登録ありがとうございます。まずは、手作業を減らしながら顧客対応の質を保つ事例をご紹介します。' end,
-       now()+interval '1 day'),
+       (date_trunc('day',now() at time zone 'Asia/Tokyo')+interval '1 day 9 hours') at time zone 'Asia/Tokyo'),
       (v_id,p_line_user_id,
        case when p_segment='monitor'
          then 'アンケートのご案内時には、所要時間と謝礼を先にお伝えします。条件を確認してから参加できます。'
          else 'LINE・アンケート・AIをつなぐと、問い合わせ対応と顧客理解を一つの流れにできます。ご相談はこのLINEへどうぞ。' end,
-       now()+interval '3 days');
+       (date_trunc('day',now() at time zone 'Asia/Tokyo')+interval '3 days 9 hours') at time zone 'Asia/Tokyo');
   end if;
   return v_id;
 end $$;
