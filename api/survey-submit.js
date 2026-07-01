@@ -40,6 +40,12 @@ module.exports = async (req, res) => {
     return json(res, 201, { ok: true });
   } catch (error) {
     console.error(error);
+    if (error.message.includes('active monitor registration required')) {
+      return json(res, 403, { error: '先にLINEで「モニター登録」と送信し、登録フォームを完了してください。' });
+    }
+    if (error.message.includes('survey is not active')) {
+      return json(res, 410, { error: 'このアンケートは受付を終了しました。' });
+    }
     return json(res, 500, { error: '回答を保存できませんでした。時間をおいてお試しください。' });
   }
 };
