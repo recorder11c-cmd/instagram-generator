@@ -17,6 +17,16 @@ async function sendRegistrationLink(userId) {
   }]);
 }
 
+async function sendSurveyLink(userId) {
+  const token = signRegistrationToken(userId);
+  const baseUrl = String(process.env.PUBLIC_BASE_URL || '').replace(/[\r\n\u2028\u2029]/g, '').trim().replace(/\/+$/, '');
+  if (!baseUrl) throw new Error('PUBLIC_BASE_URL is not configured');
+  await linePush(userId, [{
+    type: 'text',
+    text: `テストアンケートはこちらです（約2分・謝礼なし）。\n${baseUrl}/recorda/survey.html?token=${encodeURIComponent(token)}`
+  }]);
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method Not Allowed' });
   const raw = await rawBody(req);
@@ -46,6 +56,10 @@ module.exports = async (req, res) => {
     if (event.type === 'message' && event.message?.type === 'text' &&
         ['モニター登録', '登録フォーム'].includes(event.message.text.trim())) {
       await sendRegistrationLink(userId);
+    }
+    if (event.type === 'message' && event.message?.type === 'text' &&
+        event.message.text.trim() === 'アンケートに参加') {
+      await sendSurveyLink(userId);
     }
     if (event.type === 'message' && event.message?.type === 'text' &&
         event.message.text.trim() === '業務改善・AI相談') {
