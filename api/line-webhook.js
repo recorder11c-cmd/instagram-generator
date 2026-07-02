@@ -27,6 +27,16 @@ async function sendSurveyLink(userId) {
   }]);
 }
 
+async function sendPaidSurveyLink(userId) {
+  const token = signRegistrationToken(userId);
+  const baseUrl = String(process.env.PUBLIC_BASE_URL || '').replace(/[\r\n\u2028\u2029]/g, '').trim().replace(/\/+$/, '');
+  if (!baseUrl) throw new Error('PUBLIC_BASE_URL is not configured');
+  await linePush(userId, [{
+    type: 'text',
+    text: `20名限定・300ポイントの謝礼付きアンケートです（約2分）。ポイント付与予定日は2026年7月10日です。\n${baseUrl}/recorda/survey.html?token=${encodeURIComponent(token)}&survey=line-paid-pilot-2026-07`
+  }]);
+}
+
 function isSurveyRequest(text) {
   const normalized = String(text || '')
     .normalize('NFKC')
@@ -73,6 +83,10 @@ module.exports = async (req, res) => {
     if (event.type === 'message' && event.message?.type === 'text' &&
         isSurveyRequest(event.message.text)) {
       await sendSurveyLink(userId);
+    }
+    if (event.type === 'message' && event.message?.type === 'text' &&
+        ['謝礼付きアンケート', '謝礼付きアンケートに参加'].includes(event.message.text.trim())) {
+      await sendPaidSurveyLink(userId);
     }
     if (event.type === 'message' && event.message?.type === 'text' &&
         event.message.text.trim() === '業務改善・AI相談') {
