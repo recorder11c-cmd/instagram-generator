@@ -33,7 +33,7 @@ async function sendPaidSurveyLink(userId) {
   if (!baseUrl) throw new Error('PUBLIC_BASE_URL is not configured');
   await linePush(userId, [{
     type: 'text',
-    text: `20名限定・300ポイントの謝礼付きアンケートです（約2分）。ポイント付与予定日は2026年7月10日です。\n${baseUrl}/recorda/survey.html?token=${encodeURIComponent(token)}&survey=line-paid-pilot-2026-07`
+    text: `20名限定・300ポイントの謝礼付きアンケートです（約3分）。参加条件をご確認ください。ポイント付与予定日は2026年7月10日です。\n${baseUrl}/recorda/paid-pilot.html?token=${encodeURIComponent(token)}`
   }]);
 }
 
