@@ -28,6 +28,38 @@ async function sendSurveyLink(userId) {
 }
 
 async function sendPaidSurveyLink(userId) {
+  const entry = await supabaseRpc('request_recorda_survey_entry', {
+    p_survey_id: 'line-paid-pilot-2026-07',
+    p_line_user_id: userId
+  });
+  if (entry?.status === 'registration_required') {
+    await linePush(userId, [{
+      type: 'text',
+      text: '先にモニター登録を完了してください。このトークで「モニター登録」と送信すると登録フォームが届きます。登録後、もう一度「謝礼付きアンケート」と送信してください。'
+    }]);
+    return;
+  }
+  if (entry?.status === 'not_open') {
+    await linePush(userId, [{
+      type: 'text',
+      text: '謝礼付きアンケートはまだ募集開始前です。募集開始までしばらくお待ちください。'
+    }]);
+    return;
+  }
+  if (entry?.status === 'full') {
+    await linePush(userId, [{
+      type: 'text',
+      text: 'ご応募ありがとうございます。今回は定員に達したため受付を終了しました。次回の募集をお待ちください。'
+    }]);
+    return;
+  }
+  if (entry?.status !== 'open') {
+    await linePush(userId, [{
+      type: 'text',
+      text: 'このアンケートは受付を終了しました。次回の募集をお待ちください。'
+    }]);
+    return;
+  }
   const token = signRegistrationToken(userId);
   const baseUrl = String(process.env.PUBLIC_BASE_URL || '').replace(/[\r\n\u2028\u2029]/g, '').trim().replace(/\/+$/, '');
   if (!baseUrl) throw new Error('PUBLIC_BASE_URL is not configured');
