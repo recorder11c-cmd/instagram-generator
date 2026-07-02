@@ -46,6 +46,9 @@ module.exports = async (req, res) => {
     if (error.message.includes('survey is not active')) {
       return json(res, 410, { error: 'このアンケートは受付を終了しました。' });
     }
+    if (error.message.includes('survey capacity reached')) {
+      return json(res, 409, { error: '定員に達したため、回答受付を終了しました。' });
+    }
     return json(res, 500, { error: '回答を保存できませんでした。時間をおいてお試しください。' });
   }
 };
