@@ -6,6 +6,12 @@ const ALLOWED = {
   preferred_length: ['3min', '5min', '10min'],
   topics: ['tourism', 'food', 'digital', 'lifestyle']
 };
+const PAID_ALLOWED = {
+  reward_method: ['paypay', 'digital_gift', 'either'],
+  survey_frequency: ['one_two', 'three_five', 'six_plus'],
+  preferred_length: ['3min', '5min', '10min'],
+  topics: ['shopping', 'food', 'travel', 'digital', 'lifestyle']
+};
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method Not Allowed' });
@@ -20,11 +26,17 @@ module.exports = async (req, res) => {
 
   const topics = Array.isArray(body.topics) ? body.topics : [];
   const comment = String(body.comment || '').trim();
-  if (!ALLOWED.kyoto_relation.includes(body.kyoto_relation) ||
-      !ALLOWED.line_frequency.includes(body.line_frequency) ||
-      !ALLOWED.preferred_length.includes(body.preferred_length) ||
-      topics.some(topic => !ALLOWED.topics.includes(topic)) ||
-      comment.length > 500) {
+  const paidInvalid = surveyId === 'line-paid-pilot-2026-07' &&
+    (!PAID_ALLOWED.reward_method.includes(body.reward_method) ||
+     !PAID_ALLOWED.survey_frequency.includes(body.survey_frequency) ||
+     !PAID_ALLOWED.preferred_length.includes(body.preferred_length) ||
+     topics.some(topic => !PAID_ALLOWED.topics.includes(topic)));
+  const freeInvalid = surveyId === 'line-pilot-2026-07' &&
+    (!ALLOWED.kyoto_relation.includes(body.kyoto_relation) ||
+     !ALLOWED.line_frequency.includes(body.line_frequency) ||
+     !ALLOWED.preferred_length.includes(body.preferred_length) ||
+     topics.some(topic => !ALLOWED.topics.includes(topic)));
+  if (paidInvalid || freeInvalid || comment.length > 500) {
     return json(res, 400, { error: '回答内容を確認してください。' });
   }
 
@@ -33,8 +45,9 @@ module.exports = async (req, res) => {
       p_survey_id: surveyId,
       p_line_user_id: lineUserId,
       p_answers: {
-        kyoto_relation: body.kyoto_relation,
-        line_frequency: body.line_frequency,
+        ...(surveyId === 'line-paid-pilot-2026-07'
+          ? { reward_method: body.reward_method, survey_frequency: body.survey_frequency }
+          : { kyoto_relation: body.kyoto_relation, line_frequency: body.line_frequency }),
         preferred_length: body.preferred_length,
         topics,
         comment
