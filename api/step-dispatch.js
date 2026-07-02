@@ -6,6 +6,7 @@ module.exports = async (req, res) => {
     return json(res, 401, { error: 'Unauthorized' });
   }
   try {
+    await supabaseRpc('prepare_recorda_paid_pilot_reminders', {});
     const jobs = await supabaseRpc('claim_recorda_messages', { p_limit: 50 });
     const results = [];
     for (const job of jobs || []) {
