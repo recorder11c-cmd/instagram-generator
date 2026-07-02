@@ -27,33 +27,33 @@
   <form id="survey">
     <input type="hidden" name="survey_token" id="surveyToken">
     <input type="hidden" name="survey_id" id="surveyId" value="line-pilot-2026-07">
-    <fieldset>
+    <fieldset id="question1">
       <legend>1. 京都との関わりを教えてください<span class="required">必須</span></legend>
       <label class="option"><input type="radio" name="kyoto_relation" value="resident" required>京都府在住</label>
       <label class="option"><input type="radio" name="kyoto_relation" value="commuter">通勤・通学している</label>
       <label class="option"><input type="radio" name="kyoto_relation" value="visitor">観光・買い物などで訪れる</label>
       <label class="option"><input type="radio" name="kyoto_relation" value="none">特に関わりはない</label>
     </fieldset>
-    <fieldset>
+    <fieldset id="question2">
       <legend>2. LINE公式アカウントを利用する頻度<span class="required">必須</span></legend>
       <label class="option"><input type="radio" name="line_frequency" value="weekly" required>週1回以上</label>
       <label class="option"><input type="radio" name="line_frequency" value="monthly">月1〜3回</label>
       <label class="option"><input type="radio" name="line_frequency" value="rarely">ほとんど使わない</label>
     </fieldset>
-    <fieldset>
+    <fieldset id="question3">
       <legend>3. 参加しやすいアンケートの長さ<span class="required">必須</span></legend>
       <label class="option"><input type="radio" name="preferred_length" value="3min" required>3分以内</label>
       <label class="option"><input type="radio" name="preferred_length" value="5min">5分以内</label>
       <label class="option"><input type="radio" name="preferred_length" value="10min">10分以内</label>
     </fieldset>
-    <fieldset>
+    <fieldset id="question4">
       <legend>4. 興味のあるテーマ（複数選択可）</legend>
       <label class="option"><input type="checkbox" name="topics" value="tourism">京都観光・地域</label>
       <label class="option"><input type="checkbox" name="topics" value="food">飲食店・買い物</label>
       <label class="option"><input type="checkbox" name="topics" value="digital">デジタルサービス・AI</label>
       <label class="option"><input type="checkbox" name="topics" value="lifestyle">暮らし・働き方</label>
     </fieldset>
-    <fieldset>
+    <fieldset id="question5">
       <legend>5. アンケートへの要望があれば教えてください</legend>
       <textarea name="comment" maxlength="500" placeholder="任意・500文字まで"></textarea>
     </fieldset>
@@ -75,6 +75,11 @@
     document.querySelector('#surveyTitle').innerHTML = '300ポイント謝礼付き<br>テスト調査';
     document.querySelector('#surveyIntro').textContent = '回答しやすさを確認するための、20名限定の短いアンケートです。';
     document.querySelector('#surveyMeta').innerHTML = '<span>所要時間 約2分</span><span>全5問</span><span>先着20名</span><span>完了で300ポイント</span>';
+    document.querySelector('#question1').innerHTML = '<legend>1. 希望するポイント交換方法<span class="required">必須</span></legend><label class="option"><input type="radio" name="reward_method" value="paypay" required>PayPay受け取りリンク</label><label class="option"><input type="radio" name="reward_method" value="digital_gift">選べるデジタルギフト</label><label class="option"><input type="radio" name="reward_method" value="either">どちらでもよい</label>';
+    document.querySelector('#question2').innerHTML = '<legend>2. 1か月に参加したいアンケート数<span class="required">必須</span></legend><label class="option"><input type="radio" name="survey_frequency" value="one_two" required>1〜2件</label><label class="option"><input type="radio" name="survey_frequency" value="three_five">3〜5件</label><label class="option"><input type="radio" name="survey_frequency" value="six_plus">6件以上</label>';
+    document.querySelector('#question3').innerHTML = '<legend>3. 300ポイントで回答できる長さ<span class="required">必須</span></legend><label class="option"><input type="radio" name="preferred_length" value="3min" required>3分以内</label><label class="option"><input type="radio" name="preferred_length" value="5min">5分以内</label><label class="option"><input type="radio" name="preferred_length" value="10min">10分以内</label>';
+    document.querySelector('#question4').innerHTML = '<legend>4. 回答したいテーマ（複数選択可）</legend><label class="option"><input type="checkbox" name="topics" value="shopping">商品・買い物</label><label class="option"><input type="checkbox" name="topics" value="food">飲食・グルメ</label><label class="option"><input type="checkbox" name="topics" value="travel">旅行・地域</label><label class="option"><input type="checkbox" name="topics" value="digital">アプリ・AI</label><label class="option"><input type="checkbox" name="topics" value="lifestyle">暮らし・働き方</label>';
+    document.querySelector('#question5').innerHTML = '<legend>5. 謝礼付きアンケートへの不安や要望</legend><textarea name="comment" maxlength="500" placeholder="任意・500文字まで"></textarea>';
     document.querySelector('#surveyNote').textContent = '回答完了後に300ポイントを付与します。300ポイントは300円相当のPayPay受け取りリンクまたは代替デジタルギフトへ交換できます。付与予定日は2026年7月10日です。回答は任意です。';
     document.querySelector('#resultMessage').textContent = '回答を記録しました。300ポイントは2026年7月10日に付与予定です。';
   }
@@ -88,6 +93,8 @@
     const body = {
       survey_token: data.get('survey_token'),
       survey_id: data.get('survey_id'),
+      reward_method: data.get('reward_method'),
+      survey_frequency: data.get('survey_frequency'),
       kyoto_relation: data.get('kyoto_relation'),
       line_frequency: data.get('line_frequency'),
       preferred_length: data.get('preferred_length'),
