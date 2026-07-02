@@ -10,6 +10,9 @@ const ALLOWED = {
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method Not Allowed' });
   const body = readBody(req);
+  const surveyId = body.survey_id === 'line-paid-pilot-2026-07'
+    ? 'line-paid-pilot-2026-07'
+    : 'line-pilot-2026-07';
   let lineUserId = null;
   try { lineUserId = verifyRegistrationToken(body.survey_token); }
   catch (error) { console.error(error); return json(res, 500, { error: '設定を確認してください。' }); }
@@ -27,7 +30,7 @@ module.exports = async (req, res) => {
 
   try {
     await supabaseRpc('submit_recorda_survey_response', {
-      p_survey_id: 'line-pilot-2026-07',
+      p_survey_id: surveyId,
       p_line_user_id: lineUserId,
       p_answers: {
         kyoto_relation: body.kyoto_relation,
