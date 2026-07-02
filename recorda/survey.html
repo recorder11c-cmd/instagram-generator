@@ -21,11 +21,12 @@
 <body>
 <main>
   <div class="brand">レコルダ</div>
-  <h1>LINEとアンケートに関する<br>テスト調査</h1>
-  <p class="intro">今後のアンケートを、答えやすく安心できるものにするための短いテストです。</p>
-  <div class="meta"><span>所要時間 約2分</span><span>全5問</span><span>テストのため謝礼なし</span></div>
+  <h1 id="surveyTitle">LINEとアンケートに関する<br>テスト調査</h1>
+  <p class="intro" id="surveyIntro">今後のアンケートを、答えやすく安心できるものにするための短いテストです。</p>
+  <div class="meta" id="surveyMeta"><span>所要時間 約2分</span><span>全5問</span><span>テストのため謝礼なし</span></div>
   <form id="survey">
     <input type="hidden" name="survey_token" id="surveyToken">
+    <input type="hidden" name="survey_id" id="surveyId" value="line-pilot-2026-07">
     <fieldset>
       <legend>1. 京都との関わりを教えてください<span class="required">必須</span></legend>
       <label class="option"><input type="radio" name="kyoto_relation" value="resident" required>京都府在住</label>
@@ -56,15 +57,27 @@
       <legend>5. アンケートへの要望があれば教えてください</legend>
       <textarea name="comment" maxlength="500" placeholder="任意・500文字まで"></textarea>
     </fieldset>
-    <p class="note">回答はテスト運用とサービス改善に使用します。個人を特定する形で公表しません。</p>
+    <p class="note" id="surveyNote">回答はテスト運用とサービス改善に使用します。個人を特定する形で公表しません。</p>
     <p id="error" class="error" role="alert"></p>
     <button id="submit" type="submit">回答を送信する</button>
   </form>
-  <section id="result"><h2>回答を受け付けました</h2><p>テストへのご協力、ありがとうございました。</p></section>
+  <section id="result"><h2>回答を受け付けました</h2><p id="resultMessage">テストへのご協力、ありがとうございました。</p></section>
 </main>
 <script>
-  const token = new URLSearchParams(location.search).get('token') || '';
+  const params = new URLSearchParams(location.search);
+  const token = params.get('token') || '';
+  const paidSurveyId = 'line-paid-pilot-2026-07';
+  const isPaidPilot = params.get('survey') === paidSurveyId;
   document.querySelector('#surveyToken').value = token;
+  if (isPaidPilot) {
+    document.title = '300ポイント謝礼付きアンケート｜レコルダ';
+    document.querySelector('#surveyId').value = paidSurveyId;
+    document.querySelector('#surveyTitle').innerHTML = '300ポイント謝礼付き<br>テスト調査';
+    document.querySelector('#surveyIntro').textContent = '回答しやすさを確認するための、20名限定の短いアンケートです。';
+    document.querySelector('#surveyMeta').innerHTML = '<span>所要時間 約2分</span><span>全5問</span><span>先着20名</span><span>完了で300ポイント</span>';
+    document.querySelector('#surveyNote').textContent = '回答完了後に300ポイントを付与します。300ポイントは300円相当のPayPay受け取りリンクまたは代替デジタルギフトへ交換できます。回答は任意です。';
+    document.querySelector('#resultMessage').textContent = '300ポイントを付与しました。デジタルギフトのご案内をお待ちください。';
+  }
   const form = document.querySelector('#survey');
   form.addEventListener('submit', async event => {
     event.preventDefault();
@@ -74,6 +87,7 @@
     const data = new FormData(form);
     const body = {
       survey_token: data.get('survey_token'),
+      survey_id: data.get('survey_id'),
       kyoto_relation: data.get('kyoto_relation'),
       line_frequency: data.get('line_frequency'),
       preferred_length: data.get('preferred_length'),
