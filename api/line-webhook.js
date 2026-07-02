@@ -27,6 +27,19 @@ async function sendSurveyLink(userId) {
   }]);
 }
 
+function isSurveyRequest(text) {
+  const normalized = String(text || '')
+    .normalize('NFKC')
+    .replace(/[\s　]+/g, '')
+    .replace(/[!！?？。、．.]+$/g, '');
+  return [
+    'アンケート',
+    'アンケート参加',
+    'アンケートに参加',
+    'アンケートに参加する'
+  ].includes(normalized);
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method Not Allowed' });
   const raw = await rawBody(req);
@@ -58,7 +71,7 @@ module.exports = async (req, res) => {
       await sendRegistrationLink(userId);
     }
     if (event.type === 'message' && event.message?.type === 'text' &&
-        event.message.text.trim() === 'アンケートに参加') {
+        isSurveyRequest(event.message.text)) {
       await sendSurveyLink(userId);
     }
     if (event.type === 'message' && event.message?.type === 'text' &&
@@ -73,3 +86,4 @@ module.exports = async (req, res) => {
 };
 
 module.exports.config = { api: { bodyParser: false } };
+module.exports.isSurveyRequest = isSurveyRequest;
