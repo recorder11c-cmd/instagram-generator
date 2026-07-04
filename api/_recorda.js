@@ -15,15 +15,17 @@ function readBody(req) {
   try { return JSON.parse(req.body || '{}'); } catch { return {}; }
 }
 
-function signRegistrationToken(userId) {
+function signRegistrationToken(userId, intent = '') {
   const secret = cleanEnv('REGISTRATION_TOKEN_SECRET');
   if (!secret) throw new Error('REGISTRATION_TOKEN_SECRET is not configured');
-  const payload = Buffer.from(JSON.stringify({ userId, exp: Date.now() + 24 * 60 * 60 * 1000 })).toString('base64url');
+  const claims = { userId, exp: Date.now() + 24 * 60 * 60 * 1000 };
+  if (intent === 'paid') claims.intent = 'paid';
+  const payload = Buffer.from(JSON.stringify(claims)).toString('base64url');
   const signature = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
   return `${payload}.${signature}`;
 }
 
-function verifyRegistrationToken(token) {
+function verifyRegistrationClaims(token) {
   if (!token) return null;
   const secret = cleanEnv('REGISTRATION_TOKEN_SECRET');
   if (!secret) throw new Error('REGISTRATION_TOKEN_SECRET is not configured');
@@ -33,7 +35,11 @@ function verifyRegistrationToken(token) {
   const actual = Buffer.from(signature, 'base64url');
   if (actual.length !== expected.length || !crypto.timingSafeEqual(actual, expected)) return null;
   const decoded = JSON.parse(Buffer.from(payload, 'base64url').toString());
-  return decoded.exp > Date.now() ? decoded.userId : null;
+  return decoded.exp > Date.now() && decoded.userId ? decoded : null;
+}
+
+function verifyRegistrationToken(token) {
+  return verifyRegistrationClaims(token)?.userId || null;
 }
 
 async function linePush(userId, messages) {
@@ -69,5 +75,6 @@ async function supabaseRpc(name, payload) {
 }
 
 module.exports = {
-  CONSENT_VERSION, json, linePush, readBody, signRegistrationToken, supabaseRpc, verifyRegistrationToken
+  CONSENT_VERSION, json, linePush, readBody, signRegistrationToken, supabaseRpc,
+  verifyRegistrationClaims, verifyRegistrationToken
 };
