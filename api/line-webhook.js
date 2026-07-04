@@ -7,13 +7,16 @@ async function rawBody(req) {
   return Buffer.concat(chunks).toString('utf8');
 }
 
-async function sendRegistrationLink(userId) {
-  const token = signRegistrationToken(userId);
+async function sendRegistrationLink(userId, intent = '') {
+  const token = signRegistrationToken(userId, intent);
   const baseUrl = String(process.env.PUBLIC_BASE_URL || '').replace(/[\r\n\u2028\u2029]/g, '').trim().replace(/\/+$/, '');
   if (!baseUrl) throw new Error('PUBLIC_BASE_URL is not configured');
+  const intro = intent === 'paid'
+    ? '先にモニター登録を完了してください。登録後、今回の謝礼付きアンケートをご案内します。'
+    : '次のフォームで、ご希望の情報を選んでください。';
   await linePush(userId, [{
     type: 'text',
-    text: `次のフォームで、ご希望の情報を選んでください。\n${baseUrl}/recorda/?token=${encodeURIComponent(token)}`
+    text: `${intro}\n${baseUrl}/recorda/?token=${encodeURIComponent(token)}`
   }]);
 }
 
@@ -33,10 +36,7 @@ async function sendPaidSurveyLink(userId) {
     p_line_user_id: userId
   });
   if (entry?.status === 'registration_required') {
-    await linePush(userId, [{
-      type: 'text',
-      text: '先にモニター登録を完了してください。このトークで「モニター登録」と送信すると登録フォームが届きます。登録後、もう一度「謝礼付きアンケート」と送信してください。'
-    }]);
+    await sendRegistrationLink(userId, 'paid');
     return;
   }
   if (entry?.status === 'not_open') {

@@ -1,6 +1,6 @@
 const {
   CONSENT_VERSION, json, linePush, readBody, signRegistrationToken, supabaseRpc,
-  verifyRegistrationToken
+  verifyRegistrationClaims
 } = require('./_recorda');
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -17,9 +17,11 @@ module.exports = async (req, res) => {
       !area || !['monitor', 'business'].includes(segment)) {
     return json(res, 400, { error: '入力内容と同意欄を確認してください。' });
   }
-  let lineUserId = null;
-  try { lineUserId = verifyRegistrationToken(body.registration_token); }
+  let registrationClaims = null;
+  try { registrationClaims = verifyRegistrationClaims(body.registration_token); }
   catch (error) { console.error(error); return json(res, 500, { error: '設定を確認してください。' }); }
+  const lineUserId = registrationClaims?.userId || null;
+  const registrationIntent = registrationClaims?.intent === 'paid' ? 'paid' : '';
 
   try {
     await supabaseRpc('register_recorda_contact', {
@@ -35,7 +37,7 @@ module.exports = async (req, res) => {
       let next = segment === 'monitor'
         ? '今後、参加可能なアンケートをご案内します。回答は任意で、いつでも配信停止できます。'
         : '業務改善やAI活用の事例を、必要な範囲でお届けします。';
-      if (segment === 'monitor') {
+      if (segment === 'monitor' && registrationIntent === 'paid') {
         const entry = await supabaseRpc('request_recorda_survey_entry', {
           p_survey_id: 'line-paid-pilot-2026-07',
           p_line_user_id: lineUserId
