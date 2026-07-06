@@ -18,10 +18,12 @@ DEPLOY_FILES = {
     'onboarding.html':  'onboarding.html',
     'sales_kit.html':   'sales_kit.html',
     'feedback.html':    'feedback.html',
-    'api/proxy.js':     'api/proxy.js',
-    'vercel.json':      'vercel.json',
+    'api/proxy.js':          'api/proxy.js',
+    'api/step-dispatch.js':  'api/step-dispatch.js',
+    'vercel.json':           'vercel.json',
     'demo.html':        'demo.html',
     'setup.html':       'setup.html',
+    'n-sta.html':       'n-sta.html',
 }
 
 def vapi(path, data=None, method=None):
