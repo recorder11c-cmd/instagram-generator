@@ -4,12 +4,14 @@
 
 ## 300ポイント謝礼テストの現在地
 
-2026年7月11日時点:
+2026年7月14日時点:
 
 - 対象10名
 - 9名受取済み
-- 1名未受取
+- 1名はPayPay受け取り期限切れ
 - 未受取1名へリマインド済み
+- 未受取1名の300ポイントは残す
+- PayPay受取済み9名分はポイント消化済み
 - PayPayリンクやパスコードはDBに保存しない
 
 ## 状態確認
@@ -27,9 +29,35 @@ where survey_id = 'line-paid-pilot-2026-07';
 期待値:
 
 - `reward_rows`: 10
-- `claimed_rewards`: 9 または 10
-- `link_sent_rewards`: 1 または 0
-- `expired_rewards`: 0
+- `claimed_rewards`: 9
+- `link_sent_rewards`: 0
+- `expired_rewards`: 1
+
+## ポイント台帳の最終確認
+
+2026年7月14日に、PayPay受取済み9名分をポイント消化済みにした。
+途中で10名分を追加消化したため、削除ではなく `adjustment` で戻した。
+
+```sql
+select
+  entry_type,
+  note,
+  count(*) as rows,
+  sum(points) as total_points
+from recorda_point_ledger
+where survey_id = 'line-paid-pilot-2026-07'
+group by entry_type, note
+order by entry_type, note;
+```
+
+期待値:
+
+- `earned` / `アンケート回答完了`: 10件 / +3,000
+- `redeemed` / `2026-07-14 PayPay受取済み確認のためポイント消化`: 9件 / -2,700
+- `redeemed` / `2026-07-14 PayPay送付済みのためポイント消化`: 10件 / -3,000
+- `adjustment` / `2026-07-14 二重消化の戻し`: 10件 / +3,000
+
+合計残高は300ポイント。未受取1名分として残す。
 
 ## 未受取1名が受け取った場合
 
