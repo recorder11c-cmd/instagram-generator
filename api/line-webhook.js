@@ -125,6 +125,7 @@ async function sendNormal50SurveyLink(userId, replyToken = '') {
 function normalizeLineText(text) {
   return String(text || '')
     .normalize('NFKC')
+    .replace(/[「」『』【】［］\[\]（）()<>＜＞"“”'‘’]/g, '')
     .replace(/[\s　]+/g, '')
     .replace(/[!！?？。、．.]+$/g, '');
 }
