@@ -82,6 +82,14 @@
 - `api/line-webhook.js`: `50ポイントアンケート` / `50ポイント調査` / `通常アンケート` / `短いアンケート` のキーワード対応
 - `recorda/migrations/2026-07-14-normal-50-point-survey.sql`: 調査IDを `draft` で作成するSQL
 
+## 2026年7月14日 テスト確認
+
+- Supabaseへ `line-50pt-2026-07` を作成済み
+- `draft` 状態ではLINEから「現在準備中」と返ることを確認済み
+- `active` へ変更後、個人LINEから `50ポイントアンケート` を送信し、本人専用URLが返ることを確認済み
+- 回答保存と50ポイント付与を確認済み
+- 第三者へのLINE配信はまだ行っていない
+
 ## 開始手順
 
 1. Supabase SQL Editorで `recorda/migrations/2026-07-14-normal-50-point-survey.sql` を実行
