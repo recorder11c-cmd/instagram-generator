@@ -82,6 +82,61 @@ function isSurveyRequest(text) {
   ].includes(normalized);
 }
 
+function isPointRedemptionRequest(text) {
+  const normalized = String(text || '')
+    .normalize('NFKC')
+    .replace(/[\s　]+/g, '')
+    .replace(/[!！?？。、．.]+$/g, '');
+  return [
+    'ポイント交換',
+    'ポイントを交換',
+    'ポイント交換申請',
+    'ギフト交換',
+    'デジタルギフト交換'
+  ].includes(normalized);
+}
+
+async function sendPointRedemptionReply(userId) {
+  const result = await supabaseRpc('request_recorda_point_redemption', {
+    p_line_user_id: userId
+  });
+  if (result?.status === 'registration_required') {
+    await linePush(userId, [{
+      type: 'text',
+      text: 'ポイント交換には、先にモニター登録が必要です。登録フォームをご案内します。'
+    }]);
+    await sendRegistrationLink(userId);
+    return;
+  }
+  if (result?.status === 'insufficient') {
+    const balance = Number(result.balance || 0);
+    const remaining = Number(result.remaining_points || 0);
+    await linePush(userId, [{
+      type: 'text',
+      text: `現在のポイントは${balance}ポイントです。\nデジタルギフトへの交換は500ポイントから受け付けています。あと${remaining}ポイントで交換できます。`
+    }]);
+    return;
+  }
+  if (result?.status === 'already_requested') {
+    await linePush(userId, [{
+      type: 'text',
+      text: 'ポイント交換申請はすでに受け付けています。確認後、デジタルギフトの受け取りリンクをこのトークでお送りします。'
+    }]);
+    return;
+  }
+  if (result?.status === 'accepted') {
+    await linePush(userId, [{
+      type: 'text',
+      text: '500ポイントの交換申請を受け付けました。確認後、デジタルギフトの受け取りリンクをこのトークでお送りします。'
+    }]);
+    return;
+  }
+  await linePush(userId, [{
+    type: 'text',
+    text: 'ポイント交換の受付状況を確認できませんでした。時間をおいてもう一度お試しください。'
+  }]);
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method Not Allowed' });
   const raw = await rawBody(req);
@@ -121,6 +176,10 @@ module.exports = async (req, res) => {
       await sendPaidSurveyLink(userId);
     }
     if (event.type === 'message' && event.message?.type === 'text' &&
+        isPointRedemptionRequest(event.message.text)) {
+      await sendPointRedemptionReply(userId);
+    }
+    if (event.type === 'message' && event.message?.type === 'text' &&
         event.message.text.trim() === '業務改善・AI相談') {
       await linePush(userId, [{
         type: 'text',
@@ -133,3 +192,4 @@ module.exports = async (req, res) => {
 
 module.exports.config = { api: { bodyParser: false } };
 module.exports.isSurveyRequest = isSurveyRequest;
+module.exports.isPointRedemptionRequest = isPointRedemptionRequest;
