@@ -69,11 +69,15 @@ async function sendPaidSurveyLink(userId) {
   }]);
 }
 
-function isSurveyRequest(text) {
-  const normalized = String(text || '')
+function normalizeLineText(text) {
+  return String(text || '')
     .normalize('NFKC')
     .replace(/[\s　]+/g, '')
     .replace(/[!！?？。、．.]+$/g, '');
+}
+
+function isSurveyRequest(text) {
+  const normalized = normalizeLineText(text);
   return [
     'アンケート',
     'アンケート参加',
@@ -83,16 +87,37 @@ function isSurveyRequest(text) {
 }
 
 function isPointRedemptionRequest(text) {
-  const normalized = String(text || '')
-    .normalize('NFKC')
-    .replace(/[\s　]+/g, '')
-    .replace(/[!！?？。、．.]+$/g, '');
+  const normalized = normalizeLineText(text);
   return [
     'ポイント交換',
     'ポイントを交換',
     'ポイント交換申請',
     'ギフト交換',
     'デジタルギフト交換'
+  ].includes(normalized);
+}
+
+function isRegistrationRequest(text) {
+  const normalized = normalizeLineText(text);
+  return [
+    'モニター登録',
+    '登録フォーム',
+    '登録',
+    '参加',
+    'モニター',
+    'モニター参加',
+    '参加したい',
+    '登録したい'
+  ].includes(normalized);
+}
+
+function isBusinessConsultationRequest(text) {
+  const normalized = normalizeLineText(text);
+  return [
+    '業務改善AI相談',
+    '業務改善・AI相談',
+    'AI相談',
+    '相談'
   ].includes(normalized);
 }
 
@@ -137,6 +162,13 @@ async function sendPointRedemptionReply(userId) {
   }]);
 }
 
+async function sendGeneralMessageReply(userId) {
+  await linePush(userId, [{
+    type: 'text',
+    text: 'メッセージありがとうございます。内容を確認しました。\nモニター登録をご希望の場合は「モニター登録」、ポイント交換をご希望の場合は「ポイント交換」と送信してください。'
+  }]);
+}
+
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method Not Allowed' });
   const raw = await rawBody(req);
@@ -157,35 +189,47 @@ module.exports = async (req, res) => {
     }
     if (event.type === 'unfollow') {
       await supabaseRpc('unsubscribe_recorda_line_user', { p_line_user_id: userId });
+      return;
     }
-    if (event.type === 'message' && event.message?.type === 'text' &&
-        ['配信停止', '停止', 'unsubscribe'].includes(event.message.text.trim().toLowerCase())) {
+    if (event.type !== 'message' || event.message?.type !== 'text') return;
+
+    const messageText = event.message.text;
+
+    if (['配信停止', '停止', 'unsubscribe'].includes(messageText.trim().toLowerCase())) {
       await linePush(userId, [{ type: 'text', text: '配信を停止しました。再開をご希望の場合は、登録フォームからもう一度同意してください。' }]);
       await supabaseRpc('unsubscribe_recorda_line_user', { p_line_user_id: userId });
+      return;
     }
-    if (event.type === 'message' && event.message?.type === 'text' &&
-        ['モニター登録', '登録フォーム'].includes(event.message.text.trim())) {
+
+    if (isRegistrationRequest(messageText)) {
       await sendRegistrationLink(userId);
+      return;
     }
-    if (event.type === 'message' && event.message?.type === 'text' &&
-        isSurveyRequest(event.message.text)) {
+
+    if (isSurveyRequest(messageText)) {
       await sendSurveyLink(userId);
+      return;
     }
-    if (event.type === 'message' && event.message?.type === 'text' &&
-        ['謝礼付きアンケート', '謝礼付きアンケートに参加'].includes(event.message.text.trim())) {
+
+    if (['謝礼付きアンケート', '謝礼付きアンケートに参加'].includes(messageText.trim())) {
       await sendPaidSurveyLink(userId);
+      return;
     }
-    if (event.type === 'message' && event.message?.type === 'text' &&
-        isPointRedemptionRequest(event.message.text)) {
+
+    if (isPointRedemptionRequest(messageText)) {
       await sendPointRedemptionReply(userId);
+      return;
     }
-    if (event.type === 'message' && event.message?.type === 'text' &&
-        event.message.text.trim() === '業務改善・AI相談') {
+
+    if (isBusinessConsultationRequest(messageText)) {
       await linePush(userId, [{
         type: 'text',
         text: 'ご相談ありがとうございます。現在のお困りごとや、減らしたい手作業をこのままメッセージでお送りください。内容を確認してご連絡します。'
       }]);
+      return;
     }
+
+    await sendGeneralMessageReply(userId);
   }));
   return json(res, 200, { ok: true });
 };
@@ -193,3 +237,5 @@ module.exports = async (req, res) => {
 module.exports.config = { api: { bodyParser: false } };
 module.exports.isSurveyRequest = isSurveyRequest;
 module.exports.isPointRedemptionRequest = isPointRedemptionRequest;
+module.exports.isRegistrationRequest = isRegistrationRequest;
+module.exports.isBusinessConsultationRequest = isBusinessConsultationRequest;
