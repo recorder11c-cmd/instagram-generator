@@ -12,13 +12,21 @@ const PAID_ALLOWED = {
   preferred_length: ['3min', '5min', '10min'],
   topics: ['shopping', 'food', 'travel', 'digital', 'lifestyle']
 };
+const NORMAL_50_SURVEY_ID = 'line-50pt-2026-07';
+const NORMAL_50_ALLOWED = {
+  explanation_clarity: ['clear', 'mostly_clear', 'slightly_unclear', 'unclear'],
+  answer_intent: ['yes', 'depends', 'unlikely'],
+  redemption_feeling: ['good', 'needs_more_explanation', 'too_far', 'not_interested'],
+  preferred_length: ['1min', '3min', '5min', 'depends']
+};
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method Not Allowed' });
   const body = readBody(req);
-  const surveyId = body.survey_id === 'line-paid-pilot-2026-07'
-    ? 'line-paid-pilot-2026-07'
-    : 'line-pilot-2026-07';
+  const surveyId = [
+    'line-paid-pilot-2026-07',
+    NORMAL_50_SURVEY_ID
+  ].includes(body.survey_id) ? body.survey_id : 'line-pilot-2026-07';
   let lineUserId = null;
   try { lineUserId = verifyRegistrationToken(body.survey_token); }
   catch (error) { console.error(error); return json(res, 500, { error: '設定を確認してください。' }); }
@@ -36,7 +44,12 @@ module.exports = async (req, res) => {
      !ALLOWED.line_frequency.includes(body.line_frequency) ||
      !ALLOWED.preferred_length.includes(body.preferred_length) ||
      topics.some(topic => !ALLOWED.topics.includes(topic)));
-  if (paidInvalid || freeInvalid || comment.length > 500) {
+  const normal50Invalid = surveyId === NORMAL_50_SURVEY_ID &&
+    (!NORMAL_50_ALLOWED.explanation_clarity.includes(body.explanation_clarity) ||
+     !NORMAL_50_ALLOWED.answer_intent.includes(body.answer_intent) ||
+     !NORMAL_50_ALLOWED.redemption_feeling.includes(body.redemption_feeling) ||
+     !NORMAL_50_ALLOWED.preferred_length.includes(body.preferred_length));
+  if (paidInvalid || freeInvalid || normal50Invalid || comment.length > 500) {
     return json(res, 400, { error: '回答内容を確認してください。' });
   }
 
@@ -47,9 +60,15 @@ module.exports = async (req, res) => {
       p_answers: {
         ...(surveyId === 'line-paid-pilot-2026-07'
           ? { reward_method: body.reward_method, survey_frequency: body.survey_frequency }
-          : { kyoto_relation: body.kyoto_relation, line_frequency: body.line_frequency }),
+          : surveyId === NORMAL_50_SURVEY_ID
+            ? {
+                explanation_clarity: body.explanation_clarity,
+                answer_intent: body.answer_intent,
+                redemption_feeling: body.redemption_feeling
+              }
+            : { kyoto_relation: body.kyoto_relation, line_frequency: body.line_frequency }),
         preferred_length: body.preferred_length,
-        topics,
+        ...(surveyId === NORMAL_50_SURVEY_ID ? {} : { topics }),
         comment
       }
     });

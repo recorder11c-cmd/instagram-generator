@@ -67,7 +67,9 @@
   const params = new URLSearchParams(location.search);
   const token = params.get('token') || '';
   const paidSurveyId = 'line-paid-pilot-2026-07';
+  const normal50SurveyId = 'line-50pt-2026-07';
   const isPaidPilot = params.get('survey') === paidSurveyId;
+  const isNormal50Survey = params.get('survey') === normal50SurveyId;
   document.querySelector('#surveyToken').value = token;
   if (isPaidPilot) {
     document.title = '300ポイント謝礼付きアンケート｜レコルダ';
@@ -82,6 +84,19 @@
     document.querySelector('#question5').innerHTML = '<legend>5. 謝礼付きアンケートへの不安や要望</legend><textarea name="comment" maxlength="500" placeholder="任意・500文字まで"></textarea>';
     document.querySelector('#surveyNote').textContent = '回答完了後に300ポイントを付与します。300ポイントは300円相当のPayPay受け取りリンクまたは代替デジタルギフトへ交換できます。付与予定日は2026年7月10日です。回答は任意です。';
     document.querySelector('#resultMessage').textContent = '回答を記録しました。300ポイントは2026年7月10日に付与予定です。';
+  } else if (isNormal50Survey) {
+    document.title = '50ポイントアンケート｜レコルダ';
+    document.querySelector('#surveyId').value = normal50SurveyId;
+    document.querySelector('#surveyTitle').innerHTML = '50ポイント対象<br>短いアンケート';
+    document.querySelector('#surveyIntro').textContent = 'レコルダのモニター制度をより使いやすくするための短い確認です。';
+    document.querySelector('#surveyMeta').innerHTML = '<span>所要時間 約1〜2分</span><span>全5問</span><span>完了で50ポイント</span><span>回答は任意</span>';
+    document.querySelector('#question1').innerHTML = '<legend>1. レコルダのモニター制度について、説明は分かりやすいですか？<span class="required">必須</span></legend><label class="option"><input type="radio" name="explanation_clarity" value="clear" required>分かりやすい</label><label class="option"><input type="radio" name="explanation_clarity" value="mostly_clear">だいたい分かる</label><label class="option"><input type="radio" name="explanation_clarity" value="slightly_unclear">少し分かりにくい</label><label class="option"><input type="radio" name="explanation_clarity" value="unclear">分かりにくい</label>';
+    document.querySelector('#question2').innerHTML = '<legend>2. 50ポイントのアンケート案内が届いた場合、回答したいと思いますか？<span class="required">必須</span></legend><label class="option"><input type="radio" name="answer_intent" value="yes" required>回答したい</label><label class="option"><input type="radio" name="answer_intent" value="depends">内容による</label><label class="option"><input type="radio" name="answer_intent" value="unlikely">あまり回答しないと思う</label>';
+    document.querySelector('#question3').innerHTML = '<legend>3. 500ポイントからデジタルギフトへ交換する仕組みについて、どう感じますか？<span class="required">必須</span></legend><label class="option"><input type="radio" name="redemption_feeling" value="good" required>良いと思う</label><label class="option"><input type="radio" name="redemption_feeling" value="needs_more_explanation">もう少し説明がほしい</label><label class="option"><input type="radio" name="redemption_feeling" value="too_far">交換まで遠いと感じる</label><label class="option"><input type="radio" name="redemption_feeling" value="not_interested">興味がない</label>';
+    document.querySelector('#question4').innerHTML = '<legend>4. アンケートの所要時間として参加しやすい長さはどれですか？<span class="required">必須</span></legend><label class="option"><input type="radio" name="preferred_length" value="1min" required>1分以内</label><label class="option"><input type="radio" name="preferred_length" value="3min">3分以内</label><label class="option"><input type="radio" name="preferred_length" value="5min">5分以内</label><label class="option"><input type="radio" name="preferred_length" value="depends">内容による</label>';
+    document.querySelector('#question5').innerHTML = '<legend>5. 不安な点・改善してほしい点があれば教えてください</legend><textarea name="comment" maxlength="500" placeholder="任意・500文字まで"></textarea>';
+    document.querySelector('#surveyNote').textContent = '回答完了後に50ポイントを付与します。ポイントは500ポイントからデジタルギフトへ交換申請できます。現金出金はありません。回答は任意です。';
+    document.querySelector('#resultMessage').textContent = '回答を記録しました。50ポイントを付与します。ご協力ありがとうございました。';
   }
   const form = document.querySelector('#survey');
   form.addEventListener('submit', async event => {
@@ -95,6 +110,9 @@
       survey_id: data.get('survey_id'),
       reward_method: data.get('reward_method'),
       survey_frequency: data.get('survey_frequency'),
+      explanation_clarity: data.get('explanation_clarity'),
+      answer_intent: data.get('answer_intent'),
+      redemption_feeling: data.get('redemption_feeling'),
       kyoto_relation: data.get('kyoto_relation'),
       line_frequency: data.get('line_frequency'),
       preferred_length: data.get('preferred_length'),

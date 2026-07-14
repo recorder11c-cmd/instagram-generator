@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>50ポイントアンケート｜レコルダ</title>
+  <style>
+    :root{--ink:#16332d;--green:#24705d;--pale:#eef5f0;--line:#c9ddd3}
+    *{box-sizing:border-box}body{margin:0;background:var(--pale);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;line-height:1.75}
+    main{max-width:760px;margin:auto;padding:44px 18px 80px}.brand{color:var(--green);font-weight:700;letter-spacing:.18em}
+    .card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:clamp(24px,5vw,42px);margin-top:22px}
+    h1{font-size:clamp(28px,6vw,42px);line-height:1.35;margin:.35em 0}.lead{color:#4d6a63;font-size:18px}
+    ul{padding-left:1.4em}.note{background:var(--pale);border-radius:10px;padding:14px;color:#526d66}
+    a.button{display:block;text-align:center;text-decoration:none;background:var(--green);color:#fff;border-radius:10px;padding:15px 18px;font-weight:700;margin-top:22px}
+    #error{color:#a33b32}
+  </style>
+</head>
+<body>
+<main>
+  <div class="brand">レコルダ</div>
+  <section class="card">
+    <h1>50ポイント対象<br>短いアンケート</h1>
+    <p class="lead">レコルダのモニター制度をより使いやすくするため、1〜2分のアンケートを実施します。</p>
+    <ul>
+      <li>回答完了で50ポイントを付与します。</li>
+      <li>ポイントは500ポイントからデジタルギフトへ交換申請できます。</li>
+      <li>現金出金はありません。</li>
+      <li>回答は任意です。途中でやめても不利益はありません。</li>
+      <li>回答はサービス改善に利用し、個人を特定する形で公表しません。</li>
+    </ul>
+    <p class="note">このページは、LINEで届いた本人専用URLから開いた方のみ回答できます。</p>
+    <p id="error"></p>
+    <a class="button" id="start" href="#">内容を確認して回答へ進む</a>
+  </section>
+</main>
+<script>
+  const params = new URLSearchParams(location.search);
+  const token = params.get('token') || '';
+  const start = document.querySelector('#start');
+  if (token) {
+    start.href = `/recorda/survey.html?token=${encodeURIComponent(token)}&survey=line-50pt-2026-07`;
+  } else {
+    start.style.display = 'none';
+    document.querySelector('#error').textContent = 'LINEで「50ポイントアンケート」と送信し、届いた本人専用URLから開いてください。';
+  }
+</script>
+</body>
+</html>
