@@ -56,6 +56,20 @@ async function linePush(userId, messages) {
   if (!response.ok) throw new Error(`LINE push failed: ${response.status}`);
 }
 
+async function lineReply(replyToken, messages) {
+  const accessToken = cleanEnv('LINE_CHANNEL_ACCESS_TOKEN');
+  if (!replyToken || !accessToken) return;
+  const response = await fetch('https://api.line.me/v2/bot/message/reply', {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({ replyToken, messages })
+  });
+  if (!response.ok) throw new Error(`LINE reply failed: ${response.status}`);
+}
+
 async function supabaseRpc(name, payload) {
   const url = cleanEnv('SUPABASE_URL').replace(/\/+$/, '');
   const key = cleanEnv('SUPABASE_SERVICE_ROLE_KEY');
@@ -75,6 +89,6 @@ async function supabaseRpc(name, payload) {
 }
 
 module.exports = {
-  CONSENT_VERSION, json, linePush, readBody, signRegistrationToken, supabaseRpc,
+  CONSENT_VERSION, json, linePush, lineReply, readBody, signRegistrationToken, supabaseRpc,
   verifyRegistrationClaims, verifyRegistrationToken
 };
