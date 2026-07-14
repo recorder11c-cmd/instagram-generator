@@ -1,6 +1,8 @@
 const crypto = require('crypto');
 const { json, linePush, lineReply, signRegistrationToken, supabaseRpc } = require('./_recorda');
 
+const NORMAL_50_SURVEY_ID = 'line-50pt-2026-07';
+
 async function rawBody(req) {
   const chunks = [];
   for await (const chunk of req) chunks.push(chunk);
@@ -81,6 +83,45 @@ async function sendPaidSurveyLink(userId, replyToken = '') {
   }]);
 }
 
+async function sendNormal50SurveyLink(userId, replyToken = '') {
+  const entry = await supabaseRpc('request_recorda_survey_entry', {
+    p_survey_id: NORMAL_50_SURVEY_ID,
+    p_line_user_id: userId
+  });
+  if (entry?.status === 'registration_required') {
+    await sendRegistrationLink(userId, '', replyToken);
+    return;
+  }
+  if (entry?.status === 'not_open') {
+    await sendLineMessage(userId, replyToken, [{
+      type: 'text',
+      text: '50ポイントアンケートは現在準備中です。開始までしばらくお待ちください。'
+    }]);
+    return;
+  }
+  if (entry?.status === 'full') {
+    await sendLineMessage(userId, replyToken, [{
+      type: 'text',
+      text: 'ご応募ありがとうございます。今回の50ポイントアンケートは受付を終了しました。次回の募集をお待ちください。'
+    }]);
+    return;
+  }
+  if (entry?.status !== 'open') {
+    await sendLineMessage(userId, replyToken, [{
+      type: 'text',
+      text: 'このアンケートは受付を終了しました。次回の募集をお待ちください。'
+    }]);
+    return;
+  }
+  const token = signRegistrationToken(userId);
+  const baseUrl = String(process.env.PUBLIC_BASE_URL || '').replace(/[\r\n\u2028\u2029]/g, '').trim().replace(/\/+$/, '');
+  if (!baseUrl) throw new Error('PUBLIC_BASE_URL is not configured');
+  await sendLineMessage(userId, replyToken, [{
+    type: 'text',
+    text: `50ポイント対象の短いアンケートです（約1〜2分）。回答は任意です。ポイントは500ポイントからデジタルギフトへ交換申請できます。\n${baseUrl}/recorda/normal-survey.html?token=${encodeURIComponent(token)}`
+  }]);
+}
+
 function normalizeLineText(text) {
   return String(text || '')
     .normalize('NFKC')
@@ -106,6 +147,17 @@ function isPointRedemptionRequest(text) {
     'ポイント交換申請',
     'ギフト交換',
     'デジタルギフト交換'
+  ].includes(normalized);
+}
+
+function isNormal50SurveyRequest(text) {
+  const normalized = normalizeLineText(text);
+  return [
+    '50ポイントアンケート',
+    '50ポイント調査',
+    '通常アンケート',
+    '通常調査',
+    '短いアンケート'
   ].includes(normalized);
 }
 
@@ -232,6 +284,11 @@ module.exports = async (req, res) => {
         return;
       }
 
+      if (isNormal50SurveyRequest(messageText)) {
+        await sendNormal50SurveyLink(userId, replyToken);
+        return;
+      }
+
       if (isPointRedemptionRequest(messageText)) {
         await sendPointRedemptionReply(userId, replyToken);
         return;
@@ -256,5 +313,6 @@ module.exports = async (req, res) => {
 module.exports.config = { api: { bodyParser: false } };
 module.exports.isSurveyRequest = isSurveyRequest;
 module.exports.isPointRedemptionRequest = isPointRedemptionRequest;
+module.exports.isNormal50SurveyRequest = isNormal50SurveyRequest;
 module.exports.isRegistrationRequest = isRegistrationRequest;
 module.exports.isBusinessConsultationRequest = isBusinessConsultationRequest;

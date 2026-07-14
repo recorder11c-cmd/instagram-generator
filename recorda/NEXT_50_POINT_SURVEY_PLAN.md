@@ -16,6 +16,8 @@
 
 - 対象：アクティブモニター登録者
 - 謝礼：回答完了で50ポイント
+- 調査ID：`line-50pt-2026-07`
+- 初期状態：`draft`。管理者確認後に `active` へ変更
 - 交換：500ポイント到達後にデジタルギフト交換申請を受け付ける
 - 現金出金：なし
 - 所要時間：1〜2分
@@ -71,6 +73,31 @@
 - 回答完了時のポイント台帳登録が50ポイントであること
 - 公式LINEの送信文に「回答任意」「50ポイント」「500ポイントから交換」「現金出金なし」を明記すること
 - 個人情報画面を撮影・共有しないこと
+
+## 実装済み
+
+- `recorda/normal-survey.html`: 50ポイント調査の条件確認ページ
+- `recorda/survey.html?survey=line-50pt-2026-07`: 50ポイント用の5問フォーム
+- `api/survey-submit.js`: 50ポイント調査の回答値検証
+- `api/line-webhook.js`: `50ポイントアンケート` / `50ポイント調査` / `通常アンケート` / `短いアンケート` のキーワード対応
+- `recorda/migrations/2026-07-14-normal-50-point-survey.sql`: 調査IDを `draft` で作成するSQL
+
+## 開始手順
+
+1. Supabase SQL Editorで `recorda/migrations/2026-07-14-normal-50-point-survey.sql` を実行
+2. 画面とLINE返信テストを行う
+3. 管理者が配信文を最終確認する
+4. 以下SQLで調査を開始する
+
+```sql
+update recorda_surveys
+set status = 'active'
+where id = 'line-50pt-2026-07';
+```
+
+5. LINE公式アカウントから対象者へ案内を送信する
+
+第三者へのLINE送信は、管理者本人の最終承認・本人操作で行う。
 
 ## 確認SQL案
 
