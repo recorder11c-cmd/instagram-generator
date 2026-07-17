@@ -90,6 +90,20 @@
 - 回答保存と50ポイント付与を確認済み
 - 第三者へのLINE配信はまだ行っていない
 
+## 2026年7月17日 集計確認
+
+- 回答・ポイント付与: 9件 / 450ポイント
+- 説明理解: クリア7件、ほぼクリア2件
+- 回答意向: はい7件、場合による1件、ありそうもない1件
+- 交換条件: 良い5件、さらなる説明が必要2件、遠すぎる2件
+- 所要時間: 3分4件、1分3件、5分2件
+
+関連資料:
+
+- `recorda/LINE_50PT_SURVEY_SAMPLE_REPORT_2026-07-17.md`
+- `recorda/POINT_EXCHANGE_FAQ.md`
+- `recorda/LINE_50PT_SURVEY_OPERATION_COPY.md`
+
 ## 開始手順
 
 1. Supabase SQL Editorで `recorda/migrations/2026-07-14-normal-50-point-survey.sql` を実行
