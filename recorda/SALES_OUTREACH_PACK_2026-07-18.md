@@ -150,6 +150,7 @@ LPでは「9件」を大きく見せず、以下の言い方にする。
 - X投稿1本目を投稿、または下書き保存
 - 個別提案できる候補を3名書き出す
 - 1名だけに個別提案文を送る
+- SNS半自動化とBrain等での販売計画は `recorda/SNS_AUTOMATION_AND_CONTENT_SALES_PLAN.md` を参照
 
 ## 注意
 
