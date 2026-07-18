@@ -4,9 +4,13 @@
 
 公開申請日: 2026-07-18
 
-ステータス: Brain承認済み・公開URL確認待ち
+ステータス: Brain承認済み・公開URL確認済み
 
 承認日: 2026-07-18
+
+公開URL: https://brain-market.com/u/recorda/a/b3YjM3UjMgoTZsNWa0JXY
+
+無料閲覧リンク: 発行済み（リンク本体は公開・資料保存しない）
 
 ## 結論
 
@@ -319,7 +323,7 @@ X投稿
 
 審査通過後に以下を実施する。
 
-1. Brain公開URLを記録する（URL確認待ち）
+1. Brain公開URLを記録する（完了）
 2. Xで告知する
 3. note記事末尾または次回noteで紹介する
 4. LPからの導線追加を検討する
@@ -338,7 +342,7 @@ Brainでテンプレートを公開しました。
 公式LINE、Instagram、店頭QRで使える配信文や、回答の読み取り方もまとめました。
 
 初回980円です。
-【Brain URL】
+https://brain-market.com/u/recorda/a/b3YjM3UjMgoTZsNWa0JXY
 ```
 
 ### リンクなし
