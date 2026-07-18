@@ -4,6 +4,25 @@ const {
 } = require('./_recorda');
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const AGE_GROUPS = ['', '10代', '20代', '30代', '40代', '50代', '60代以上', '回答しない'];
+const GENDERS = ['', '女性', '男性', 'その他', '回答しない'];
+const OCCUPATIONS = [
+  '',
+  '会社員',
+  '自営業・フリーランス',
+  '会社役員・経営者',
+  'パート・アルバイト',
+  '学生',
+  '主婦・主夫',
+  '無職・休職中',
+  'その他',
+  '回答しない'
+];
+
+function optionalChoice(value, allowed) {
+  const normalized = String(value || '').trim();
+  return allowed.includes(normalized) ? normalized || null : undefined;
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return json(res, 405, { error: 'Method Not Allowed' });
@@ -13,8 +32,12 @@ module.exports = async (req, res) => {
   const email = String(body.email || '').trim().toLowerCase();
   const area = String(body.area || '').trim();
   const segment = body.segment;
+  const ageGroup = optionalChoice(body.age_group, AGE_GROUPS);
+  const gender = optionalChoice(body.gender, GENDERS);
+  const occupation = optionalChoice(body.occupation, OCCUPATIONS);
   if (!body.consent || !name || name.length > 80 || !EMAIL.test(email) || email.length > 200 ||
-      !area || !['monitor', 'business'].includes(segment)) {
+      !area || !['monitor', 'business'].includes(segment) ||
+      ageGroup === undefined || gender === undefined || occupation === undefined) {
     return json(res, 400, { error: '入力内容と同意欄を確認してください。' });
   }
   let registrationClaims = null;
@@ -31,7 +54,10 @@ module.exports = async (req, res) => {
       p_segment: segment,
       p_line_user_id: lineUserId,
       p_consent_version: CONSENT_VERSION,
-      p_source: lineUserId ? 'line' : 'web'
+      p_source: lineUserId ? 'line' : 'web',
+      p_age_group: ageGroup,
+      p_gender: gender,
+      p_occupation: occupation
     });
     if (lineUserId) {
       let next = segment === 'monitor'
