@@ -6,6 +6,19 @@ create table if not exists recorda_contacts (
   email text not null unique,
   area text not null,
   segment text not null check (segment in ('monitor','business')),
+  age_group text check (age_group is null or age_group in ('10代','20代','30代','40代','50代','60代以上','回答しない')),
+  gender text check (gender is null or gender in ('女性','男性','その他','回答しない')),
+  occupation text check (occupation is null or occupation in (
+    '会社員',
+    '自営業・フリーランス',
+    '会社役員・経営者',
+    'パート・アルバイト',
+    '学生',
+    '主婦・主夫',
+    '無職・休職中',
+    'その他',
+    '回答しない'
+  )),
   line_user_id text unique,
   source text not null,
   status text not null default 'active' check (status in ('active','unsubscribed','deleted')),
@@ -39,14 +52,16 @@ alter table recorda_message_queue enable row level security;
 
 create or replace function register_recorda_contact(
   p_name text, p_email text, p_area text, p_segment text, p_line_user_id text,
-  p_consent_version text, p_source text
+  p_consent_version text, p_source text,
+  p_age_group text default null, p_gender text default null, p_occupation text default null
 ) returns uuid language plpgsql security definer set search_path = public as $$
 declare v_id uuid;
 begin
-  insert into recorda_contacts(name,email,area,segment,line_user_id,source)
-  values(p_name,p_email,p_area,p_segment,p_line_user_id,p_source)
+  insert into recorda_contacts(name,email,area,segment,age_group,gender,occupation,line_user_id,source)
+  values(p_name,p_email,p_area,p_segment,p_age_group,p_gender,p_occupation,p_line_user_id,p_source)
   on conflict(email) do update set
     name=excluded.name, area=excluded.area, segment=excluded.segment,
+    age_group=excluded.age_group, gender=excluded.gender, occupation=excluded.occupation,
     line_user_id=coalesce(excluded.line_user_id,recorda_contacts.line_user_id),
     status='active', updated_at=now()
   returning id into v_id;
@@ -107,11 +122,11 @@ begin
   end if;
 end $$;
 
-revoke all on function register_recorda_contact(text,text,text,text,text,text,text) from public;
+revoke all on function register_recorda_contact(text,text,text,text,text,text,text,text,text,text) from public;
 revoke all on function claim_recorda_messages(integer) from public;
 revoke all on function finish_recorda_message(uuid,boolean,text) from public;
 revoke all on function unsubscribe_recorda_line_user(text) from public;
-grant execute on function register_recorda_contact(text,text,text,text,text,text,text) to service_role;
+grant execute on function register_recorda_contact(text,text,text,text,text,text,text,text,text,text) to service_role;
 grant execute on function claim_recorda_messages(integer) to service_role;
 grant execute on function finish_recorda_message(uuid,boolean,text) to service_role;
 grant execute on function unsubscribe_recorda_line_user(text) to service_role;

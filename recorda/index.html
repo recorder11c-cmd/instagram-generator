@@ -32,6 +32,28 @@
     <div class="field"><label for="name">お名前</label><input id="name" name="name" maxlength="80" autocomplete="name" required></div>
     <div class="field"><label for="email">メールアドレス</label><input id="email" name="email" type="email" maxlength="200" autocomplete="email" required></div>
     <div class="field"><label for="area">お住まいの地域</label><select id="area" name="area" required><option value="">選択してください</option><option>京都府</option><option>大阪府</option><option>滋賀県</option><option>その他の近畿</option><option>近畿以外</option></select></div>
+    <div class="field">
+      <label for="age_group">年代（任意）</label>
+      <select id="age_group" name="age_group">
+        <option value="">選択しない</option>
+        <option>10代</option><option>20代</option><option>30代</option><option>40代</option><option>50代</option><option>60代以上</option><option>回答しない</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="gender">性別（任意）</label>
+      <select id="gender" name="gender">
+        <option value="">選択しない</option>
+        <option>女性</option><option>男性</option><option>その他</option><option>回答しない</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="occupation">職業（任意）</label>
+      <select id="occupation" name="occupation">
+        <option value="">選択しない</option>
+        <option>会社員</option><option>自営業・フリーランス</option><option>会社役員・経営者</option><option>パート・アルバイト</option><option>学生</option><option>主婦・主夫</option><option>無職・休職中</option><option>その他</option><option>回答しない</option>
+      </select>
+    </div>
+    <p class="note">年代・性別・職業は任意です。回答結果を匿名で集計し、より良いレポート作成の参考にします。個人が特定される形では利用しません。</p>
     <fieldset><legend>ご関心のある内容</legend><div class="choice">
       <label><input type="radio" name="segment" value="monitor" required>アンケートモニター</label>
       <label><input type="radio" name="segment" value="business" required>業務改善・AI導入</label>
